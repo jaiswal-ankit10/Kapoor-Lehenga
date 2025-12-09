@@ -17,10 +17,13 @@ import userIcon from "../assets/icons/user.png";
 import returnIcon from "../assets/icons/return.png";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/userSlice";
+import CartSidebar from "./CartSidebar";
 
 const Header = () => {
   const [openMenu, setOpenMenu] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
+  const [openCart, setOpenCart] = useState(false);
+
   const { user } = useSelector((store) => store.user);
   const { cartItems } = useSelector((store) => store.cart);
 
@@ -206,7 +209,10 @@ const Header = () => {
             <h2 className="hidden md:block">Wishlist</h2>
           </div>
 
-          <div className="flex items-center gap-3 cursor-pointer ">
+          <div
+            className="flex items-center gap-3 cursor-pointer "
+            onClick={() => setOpenCart(true)}
+          >
             <div className="relative">
               <img src={cartIcon} className="w-5 md:w-6 " />
               <p className="absolute bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs left-3 bottom-0">
@@ -215,6 +221,7 @@ const Header = () => {
             </div>
             <h2 className="hidden md:block">Cart</h2>
           </div>
+          <CartSidebar openCart={openCart} setOpenCart={setOpenCart} />
         </div>
       </div>
 

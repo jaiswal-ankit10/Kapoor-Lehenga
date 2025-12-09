@@ -21,7 +21,7 @@ const ProductCard = ({ product }) => {
       dispatch(addToWishlist(product));
     }
   };
-  const toggleCart = (e) => {
+  const addItemToCart = (e) => {
     e.stopPropagation();
     dispatch(addToCart(product));
   };
@@ -65,7 +65,7 @@ const ProductCard = ({ product }) => {
 
         {/* ADD TO CART */}
         <button
-          onClick={toggleCart}
+          onClick={addItemToCart}
           className="absolute bottom-4 left-7 w-[200px] bg-white py-2 font-semibold text-sm opacity-0 group-hover:opacity-100 duration-300 pointer-events-auto z-20"
         >
           {isWishlisted ? "Move to Bag" : "Add to Cart"}

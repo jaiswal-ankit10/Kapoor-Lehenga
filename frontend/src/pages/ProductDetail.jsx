@@ -13,9 +13,12 @@ import ProductCard from "../components/ProductCard";
 import SimilarProductsSlider from "../components/SimilarProductsSlider";
 import MoreProducts from "../components/MoreProducts";
 import ReviewSection from "../components/ReviewSection";
+import { addToCart } from "../redux/cartSlice";
+import { useDispatch } from "react-redux";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
   const product = productList.find((p) => p.id === parseInt(id));
   const [selectedThumb, setSelectedThumb] = useState(product.thumbnails[0]);
   const [qty, setQty] = useState(1);
@@ -26,6 +29,11 @@ const ProductDetail = () => {
     breadcrumbRoutes.productPage,
     breadcrumbRoutes.productDetails(id),
   ];
+  const addItemToCart = (e) => {
+    e.stopPropagation();
+    dispatch(addToCart(product));
+  };
+
   if (!product) return <div>Loading...</div>;
   return (
     <>
@@ -165,8 +173,8 @@ const ProductDetail = () => {
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-4 mt-6">
-            <button className="bg-[#EDEDED] px-4 py-3 rounded-lg">
+          <div className="flex gap-4 mt-6 ">
+            <button className="bg-[#EDEDED] px-4 py-3 rounded-lg cursor-pointer">
               <div className="relative inline-block ">
                 <FiHeart size={28} />
                 <GoPlus
@@ -175,11 +183,14 @@ const ProductDetail = () => {
                 />
               </div>
             </button>
-            <button className="bg-[#E9B159] w-full py-4 text-xl text-white flex items-center justify-center gap-4">
+            <button
+              onClick={addItemToCart}
+              className="bg-[#E9B159] w-full py-4 text-xl text-white flex items-center justify-center gap-4 cursor-pointer"
+            >
               <img src={cart} alt="add to bag" className="w-10" />
               <h2>Add to Bag</h2>
             </button>
-            <button className="bg-[#03A685] w-full py-4 text-xl text-white">
+            <button className="bg-[#03A685] w-full py-4 text-xl text-white cursor-pointer">
               Buy Now
             </button>
           </div>

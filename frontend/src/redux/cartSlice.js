@@ -1,36 +1,77 @@
 import { createSlice } from "@reduxjs/toolkit";
+
+const savedCart = JSON.parse(localStorage.getItem("cartItems")) || [];
+const savedTotal = JSON.parse(localStorage.getItem("cartTotal")) || 0;
+
 const initialState = {
-  cartItems: JSON.parse(localStorage.getItem("cart")) || [],
+  cartItems: savedCart,
+  totalAmount: savedTotal,
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    addToCart: (state, action) => {
-      const product = action.payload;
-
-      const exists = state.cartItems.find((item) => item.id === product.id);
-
-      if (!exists) {
-        state.cartItems.push(product);
-        localStorage.setItem("cart", JSON.stringify(state.cartItems));
+    addToCart(state, action) {
+      const price = Number(action.payload.price.toString().replace(/,/g, ""));
+      const existing = state.cartItems.find((i) => i.id === action.payload.id);
+      if (existing) {
+        existing.qty++;
+      } else {
+        state.cartItems.push({ ...action.payload, qty: 1, price: price });
       }
-    },
-    removeFromCart: (state, action) => {
-      state.cartItems = state.cartItems.filter(
-        (item) => item.id !== action.payload
+      state.totalAmount = state.cartItems.reduce(
+        (sum, item) => sum + item.price * item.qty,
+        0
       );
-
-      localStorage.setItem("cart", JSON.stringify(state.cartItems));
+      updateLocalStorage(state);
     },
 
-    clearCart: (state) => {
+    removeFromCart(state, action) {
+      state.cartItems = state.cartItems.filter((i) => i.id !== action.payload);
+      state.totalAmount = state.cartItems.reduce(
+        (sum, item) => sum + item.price * item.qty,
+        0
+      );
+      updateLocalStorage(state);
+    },
+
+    increaseQty(state, action) {
+      const item = state.cartItems.find((i) => i.id === action.payload);
+      item.qty++;
+      state.totalAmount += item.price;
+      updateLocalStorage(state);
+    },
+
+    decreaseQty(state, action) {
+      const item = state.cartItems.find((i) => i.id === action.payload);
+      if (item.qty > 1) item.qty--;
+      state.totalAmount = state.cartItems.reduce(
+        (sum, item) => sum + item.price * item.qty,
+        0
+      );
+      updateLocalStorage(state);
+    },
+
+    clearCart(state) {
       state.cartItems = [];
-      localStorage.removeItem("cart");
+      state.totalAmount = 0;
+      updateLocalStorage(state);
     },
   },
 });
 
-export const { addToCart, removeFromCart, clearCart } = cartSlice.actions;
+const updateLocalStorage = (state) => {
+  localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
+  localStorage.setItem("cartTotal", JSON.stringify(state.totalAmount));
+};
+
+export const {
+  addToCart,
+  removeFromCart,
+  increaseQty,
+  decreaseQty,
+  clearCart,
+} = cartSlice.actions;
+
 export default cartSlice.reducer;
