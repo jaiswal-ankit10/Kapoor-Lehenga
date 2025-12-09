@@ -1,0 +1,45 @@
+export const reviewsData = {
+  average: 4.5,
+  totalReviews: 267,
+  distribution: {
+    5: 55,
+    4: 15,
+    3: 15,
+    2: 10,
+    1: 5,
+  },
+  topReviews: [
+    {
+      user: "Anglo Saxon",
+      avatar: "/user1.jpg",
+      rating: 4,
+      date: "25 Sep, 2023",
+      text: "Pink and white teardrop cut zirconia gemstones adorn this opulent jewellery set...",
+      images: [],
+    },
+    {
+      user: "Daanish Sodhi",
+      avatar: "/user2.jpg",
+      rating: 4,
+      date: "25 Sep, 2023",
+      text: "Pink and white teardrop cut zirconia gemstones adorn this opulent jewellery set...",
+      images: ["/rev1.jpg", "/rev2.jpg", "/rev3.jpg"],
+    },
+    {
+      user: "Kim Sabharwal",
+      avatar: "/user3.jpg",
+      rating: 3,
+      date: "25 Sep, 2023",
+      text: "Pink and white teardrop cut zirconia gemstones adorn this opulent jewellery set...",
+      images: [],
+    },
+    {
+      user: "Lalit Mane",
+      avatar: "/user4.jpg",
+      rating: 3,
+      date: "25 Sep, 2023",
+      text: "Pink and white teardrop cut zirconia gemstones adorn this opulent jewellery set...",
+      images: [],
+    },
+  ],
+};

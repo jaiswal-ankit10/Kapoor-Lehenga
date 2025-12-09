@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@import "@fontsource/jost/400.css"; /* Regular */
+@import "@fontsource/jost/500.css"; /* Medium */
+@import "@fontsource/jost/600.css"; /* Semi-bold */
+@import "@fontsource/jost/700.css"; /* Bold */
+
+* {
+  font-family: "Jost", sans-serif !important;
+}
+:root {
+  --swiper-navigation-color: black !important;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: black !important;
+  width: 25px !important;
+  height: 25px !important;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 12px !important;
+}
