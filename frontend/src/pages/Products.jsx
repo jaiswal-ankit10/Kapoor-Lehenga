@@ -3,12 +3,15 @@ import RoutesSection from "../components/RoutesSection";
 import { breadcrumbRoutes } from "../utils/breadcrumbRoutes";
 import FilterSidebar from "../components/FilterSideBar";
 import ProductCard from "../components/ProductCard";
-import { productList } from "../utils/productList";
 import Pagination from "../components/pagination";
 import FAQs from "../components/Faqs";
+import { fetchAllProducts } from "../services/productService";
+
+import { useDispatch, useSelector } from "react-redux";
 
 const Products = () => {
-  const [products, setProducts] = useState([]);
+  const dispatch = useDispatch();
+  const { products, loading, error } = useSelector((store) => store.products);
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 25;
 
@@ -21,8 +24,15 @@ const Products = () => {
     return b.id - a.id; // latest
   });
   useEffect(() => {
-    setProducts(productList);
-  }, [products, sortedProducts]);
+    try {
+      dispatch(fetchAllProducts());
+    } catch (error) {
+      console.log("Error fetching Product");
+    }
+  }, [dispatch]);
+  if (loading) return <p className="text-center py-10">Loading products...</p>;
+  if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
+
   return (
     <>
       {/* routes section */}
@@ -61,7 +71,7 @@ const Products = () => {
 
           {/* PRODUCTS GRID */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-            {sortedProducts.map((product) => (
+            {sortedProducts?.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

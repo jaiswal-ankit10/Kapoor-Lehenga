@@ -8,6 +8,7 @@ import saree2 from "../assets/images/sarees/saree2.png";
 import saree3 from "../assets/images/sarees/saree3.png";
 import saree4 from "../assets/images/sarees/saree4.png";
 import saree5 from "../assets/images/sarees/saree5.png";
+import { useNavigate } from "react-router-dom";
 
 const categories = [
   { title: "Crush(Pleated) Work", img: saree1 },
@@ -22,6 +23,7 @@ const categories = [
 ];
 
 const CategorySlider = () => {
+  const navigate = useNavigate();
   return (
     <div className="px-10 py-6">
       <Swiper
@@ -51,7 +53,10 @@ const CategorySlider = () => {
                 "Browse, explore, and indulge in endless possibilities by
                 category."
               </p>
-              <button className="mt-5 bg-black text-white px-5 py-2 w-full text-sm font-medium">
+              <button
+                className="mt-5 bg-black text-white px-5 py-2 w-full text-sm font-medium cursor-pointer"
+                onClick={() => navigate("/products")}
+              >
                 SHOP HERE →
               </button>
             </div>

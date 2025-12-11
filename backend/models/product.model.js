@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema(
   {
-    name: {
+    title: {
       type: String,
       required: true,
       trim: true,
@@ -20,6 +20,15 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0,
+    },
+    discountedPrice: {
+      type: Number,
+    },
+    discount: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: 0,
     },
     stock: {
       type: Number,
@@ -77,3 +86,9 @@ const productSchema = new mongoose.Schema(
 );
 
 export const Product = mongoose.model("Product", productSchema);
+productSchema.pre("save", function (next) {
+  if (this.discount) {
+    this.discountedPrice = this.price - (this.price * this.discount) / 100;
+  }
+  next();
+});

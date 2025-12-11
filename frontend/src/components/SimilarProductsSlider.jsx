@@ -26,8 +26,11 @@ const SimilarProductsSlider = ({ products }) => {
       </button>
 
       {/* Slider */}
-      <div ref={sliderRef} className="flex gap-6 overflow-x-hidden">
-        {products.map((product) => (
+      <div
+        ref={sliderRef}
+        className="flex gap-6 overflow-x-hidden scroll-smooth"
+      >
+        {products?.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>

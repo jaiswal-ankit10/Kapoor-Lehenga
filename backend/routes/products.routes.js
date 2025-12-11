@@ -1,14 +1,18 @@
-import { Router } from "express";
+import express from "express";
+import {
+  createProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+} from "../controllers/products.controller.js";
 
-import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { createProduct } from "../controllers/products.controller.js";
+const router = express.Router();
 
-const router = Router();
-
-router.route("/create").post(verifyJWT, createProduct);
-// router.route("/update").put(verifyJWT, updateCartItem);
-// router.route("/remove").delete(verifyJWT, removeCartItem);
-// router.route("/").get(verifyJWT, getCart);
-// router.route("/clear").delete(verifyJWT, clearCart);
+router.post("/create", createProduct);
+router.get("/", getAllProducts);
+router.get("/:id", getProductById);
+router.put("/:id", updateProduct);
+router.delete("/:id", deleteProduct);
 
 export default router;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowUp,
@@ -18,6 +18,8 @@ import returnIcon from "../assets/icons/return.png";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/userSlice";
 import CartSidebar from "./CartSidebar";
+import { loadCartFromBackend } from "../services/cartService";
+import { loadWishlistFromBackend } from "../services/wishlistService";
 
 const Header = () => {
   const [openMenu, setOpenMenu] = useState(false);
@@ -44,6 +46,10 @@ const Header = () => {
     "RECEPTION",
     "OTHERS",
   ];
+  useEffect(() => {
+    dispatch(loadCartFromBackend());
+    dispatch(loadWishlistFromBackend());
+  }, []);
 
   return (
     <div className="bg-[#E9B159] w-full px-6 md:px-10 py-3">
@@ -182,7 +188,7 @@ const Header = () => {
                       // }}
                     >
                       <img src={returnIcon} alt="" className="w-5 -ml-1.5" />
-                      <p>Retrun Product</p>
+                      <p>Return Product</p>
                     </div>
                     <div
                       className="flex items-center gap-2 cursor-pointer hover:text-red-600 p-2"

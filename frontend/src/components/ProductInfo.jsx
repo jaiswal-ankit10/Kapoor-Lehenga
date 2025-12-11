@@ -3,7 +3,7 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { PiPackageDuotone } from "react-icons/pi";
 import { TbInfoSquareRounded } from "react-icons/tb";
 import { LuPackageOpen } from "react-icons/lu";
-import { productList } from "../utils/productList";
+import { productList } from "../../../backend/dummyData/productList";
 
 const ProductInfo = ({ product }) => {
   const [openDetails, setOpenDetails] = useState(true);
