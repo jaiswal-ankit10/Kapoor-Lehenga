@@ -36,6 +36,9 @@ import authRegister from "./routes/auth.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
 import productRoutes from "./routes/products.routes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+
+app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/auth", authRegister);
 app.use("/api/v1/cart", cartRoutes);
 app.use("/api/v1/products", productRoutes);
