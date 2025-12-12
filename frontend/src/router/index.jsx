@@ -12,6 +12,12 @@ import Address from "../pages/Address";
 import MyOrder from "../pages/MyOrder";
 import OrderDetail from "../pages/OrderDetail";
 import ReturnProduct from "../pages/ReturnProduct";
+import AdminPanel from "../pages/AdminPanel";
+import AdminRoute from "../components/ProtectedRoute/AdminRoute";
+import UserRoute from "../components/ProtectedRoute/UserRoute";
+import AdminDashboard from "../components/AdminComponents/AdminDashboard";
+import Users from "../components/AdminComponents/Users";
+import AdminProducts from "../components/AdminComponents/AdminProducts";
 
 export const router = createBrowserRouter([
   {
@@ -23,10 +29,38 @@ export const router = createBrowserRouter([
       { path: "signup", element: <Signup /> },
       { path: "products", element: <Products /> },
       { path: "products/:id", element: <ProductDetail /> },
-      { path: "wishlist", element: <Wishlist /> },
-      { path: "my-order", element: <MyOrder /> },
-      { path: "order-detail", element: <OrderDetail /> },
-      { path: "return-product", element: <ReturnProduct /> },
+      {
+        path: "wishlist",
+        element: (
+          <UserRoute>
+            <Wishlist />
+          </UserRoute>
+        ),
+      },
+      {
+        path: "my-order",
+        element: (
+          <UserRoute>
+            <MyOrder />
+          </UserRoute>
+        ),
+      },
+      {
+        path: "order-detail",
+        element: (
+          <UserRoute>
+            <OrderDetail />
+          </UserRoute>
+        ),
+      },
+      {
+        path: "return-product",
+        element: (
+          <UserRoute>
+            <ReturnProduct />
+          </UserRoute>
+        ),
+      },
 
       {
         path: "*",
@@ -34,6 +68,33 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  { path: "/address", element: <Address /> },
-  { path: "/payment", element: <PaymentPage /> },
+  {
+    path: "/address",
+    element: (
+      <UserRoute>
+        <Address />
+      </UserRoute>
+    ),
+  },
+  {
+    path: "/payment",
+    element: (
+      <UserRoute>
+        <Address />
+      </UserRoute>
+    ),
+  },
+  {
+    path: "/admin/",
+    element: (
+      <AdminRoute>
+        <AdminPanel />
+      </AdminRoute>
+    ),
+    children: [
+      { path: "dashboard", element: <AdminDashboard /> },
+      { path: "users", element: <Users /> },
+      { path: "products", element: <AdminProducts /> },
+    ],
+  },
 ]);

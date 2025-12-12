@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const registerUser = asyncHandler(async (req, res) => {
-  const { fullName, email, mobile, password, role } = req.body;
+  const { fullName, email, mobile, password, adminSecret } = req.body;
   if (!fullName || !mobile || !email || !password) {
     throw new ApiError(400, "All the fields are required");
   }
@@ -22,20 +22,21 @@ export const registerUser = asyncHandler(async (req, res) => {
       []
     );
   }
+  const role = adminSecret === process.env.ADMIN_SECRET ? "admin" : "customer";
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Assign role — only allow admin creation via backend logic
-  let finalRole = "customer";
-  if (role && role.toLowerCase() === "admin") {
-    throw new ApiError(400, "Admin creation not allowed through public API");
-  }
+  // let finalRole = "customer";
+  // if (role && role.toLowerCase() === "admin") {
+  //   throw new ApiError(400, "Admin creation not allowed through public API");
+  // }
 
   const user = await User.create({
     fullName,
     email,
     mobile,
     password: hashedPassword,
-    role: finalRole,
+    role: role,
   });
 
   return res.status(200).json(
@@ -51,7 +52,7 @@ export const registerUser = asyncHandler(async (req, res) => {
           role: user.role,
         },
       },
-      "User registered successfully and verification email has been sent on your email"
+      "User registered successfully "
     )
   );
 });
@@ -89,7 +90,8 @@ export const login = asyncHandler(async (req, res) => {
     .status(200)
     .cookie("token", token, {
       httpOnly: true,
-      sameSite: "Strict",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
     .json({

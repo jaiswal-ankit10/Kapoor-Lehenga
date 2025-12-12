@@ -29,8 +29,13 @@ const Login = () => {
       });
 
       if (res.data.success) {
+        const role = res.data.user.role;
         dispatch(setUser({ user: res.data.user }));
-        navigate("/");
+        if (role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       }
     } catch (error) {
       console.log(error);
