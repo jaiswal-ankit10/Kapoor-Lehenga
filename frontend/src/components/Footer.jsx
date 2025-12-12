@@ -32,7 +32,7 @@ const Footer = () => {
       </div>
 
       {/* Middle Content Section */}
-      <div className="px-30 py-14 grid grid-cols-2 md:grid-cols-5 gap-8">
+      <div className="px-4 md:px-30 py-14 grid grid-cols-2 md:grid-cols-5 gap-8">
         {/* Company */}
         <div>
           <h3 className="uppercase font-medium mb-3">Company</h3>

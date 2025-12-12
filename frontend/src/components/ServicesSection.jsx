@@ -29,7 +29,7 @@ const services = [
 const ServicesSection = () => {
   return (
     <section className="py-12">
-      <div className="max-w-[1100px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+      <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
         {services.map((item, index) => (
           <div key={index} className="flex flex-col items-center gap-2">
             <img src={item.icon} alt={item.title} className="w-12 h-12" />

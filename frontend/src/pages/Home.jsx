@@ -1,19 +1,12 @@
 import React from "react";
 import bannerImage from "../assets/images/banner.png";
+import mobileImage from "../assets/images/mobile-banner.png";
 import CategorySlider from "../components/CategorySlider";
-import luxe1 from "../assets/images/luxe/img1.png";
-import luxe2 from "../assets/images/luxe/img2.png";
-import luxe3 from "../assets/images/luxe/img3.png";
-import luxe4 from "../assets/images/luxe/img4.png";
-import cardImage1 from "../assets/images/brown-card/img1.png";
-import cardImage2 from "../assets/images/brown-card/img2.png";
-import cardImage3 from "../assets/images/brown-card/img3.png";
-import cardImage4 from "../assets/images/brown-card/img4.png";
+import luxeImg from "../assets/images/luxe.png";
 import newlyLaunchedBanner from "../assets/images/newly-launched.png";
 import sareeBanner from "../assets/images/saree-banner.png";
 import NewArrival from "../components/NewArrival";
-import bannerImg from "../assets/images/banner2.jpg";
-import brandLogo from "../assets/images/brandLogo.jpg";
+import Subscribe from "../assets/images/subscribe.png";
 import leftBanner from "../assets/images/festival-special/img1.png";
 import rightTop from "../assets/images/festival-special/img2.png";
 import bottomBanner1 from "../assets/images/festival-special/img3.png";
@@ -34,85 +27,27 @@ const Home = () => {
   return (
     <div>
       {/* Banner section */}
-      <section>
-        <img src={bannerImage} alt="" />
+      <section className="">
+        <img src={bannerImage} alt="" className="hidden md:block" />
+        <img src={mobileImage} alt="" className="block md:hidden w-full" />
       </section>
       <CategorySlider />
       {/* Luxe Section */}
-      <section className="bg-[#310914] w-full h-[90vh] flex justify-around ">
-        {/* explore */}
-        <div className="grid grid-cols-2 h-full gap-0">
-          <img src={luxe1} alt="luxe1" className="w-full h-full object-cover" />
-          <img src={luxe2} alt="luxe2" className="w-full h-full object-cover" />
-          <img src={luxe3} alt="luxe3" className="w-full h-full object-cover" />
-          <img src={luxe4} alt="luxe4" className="w-full h-full object-cover" />
-        </div>
-
-        {/* cards */}
-        <div className="grid grid-cols-2 gap-8 py-20">
-          <div className="w-[230px] text-white">
-            <div className="relative w-full">
-              <img
-                src={cardImage1}
-                alt="cardImage1"
-                className="w-full h-full object-cover"
-              />
-
-              {/* Bottom blur gradient */}
-              <div className="absolute bottom-0 left-0 w-full h-30 bg-linear-to-t from-[#2b0112] to-transparent pointer-events-none"></div>
-            </div>
-
-            <h2>Line Lehenga</h2>
-          </div>
-          <div className="w-[230px] text-white">
-            <div className="relative w-full">
-              <img
-                src={cardImage2}
-                alt="cardImage2"
-                className="w-full h-full object-cover"
-              />
-
-              {/* Bottom blur gradient */}
-              <div className="absolute bottom-0 left-0 w-full h-30 bg-linear-to-t from-[#2b0112] to-transparent pointer-events-none"></div>
-            </div>
-            <h2>Embroidered N </h2>
-          </div>
-          <div className="w-[230px] text-white">
-            <div className="relative w-full">
-              <img
-                src={cardImage3}
-                alt="cardImage3"
-                className="w-full h-full object-cover"
-              />
-
-              {/* Bottom blur gradient */}
-              <div className="absolute bottom-0 left-0 w-full h-30 bg-linear-to-t from-[#2b0112] to-transparent pointer-events-none"></div>
-            </div>
-            <h2>Maroon Net</h2>
-          </div>
-          <div className="w-[230px] text-white">
-            <div className="relative w-full">
-              <img
-                src={cardImage4}
-                alt="cardImage4"
-                className="w-full h-full object-cover"
-              />
-
-              {/* Bottom blur gradient */}
-              <div className="absolute bottom-0 left-0 w-full h-30 bg-linear-to-t from-[#2b0112] to-transparent pointer-events-none"></div>
-            </div>
-            <h2>Maroon Art Silk</h2>
-          </div>
-        </div>
+      <section className="bg-[#310914] w-full min-h-[40%] md:min-h-screen flex  md:flex-row md:justify-between px-4 md:px-8 lg:px-16 ">
+        <img src={luxeImg} alt="luxe img" className="w-full" />
       </section>
 
       {/* newly launched banner */}
       <section className="max-w-[85vw] mx-auto my-10">
-        <img src={newlyLaunchedBanner} alt="newlyLaunchedBanner" />
+        <img
+          src={newlyLaunchedBanner}
+          alt="newlyLaunchedBanner"
+          className="w-full object-cover"
+        />
       </section>
 
       {/* newly arrival section */}
-      <section className="text-center mb-10">
+      <section className="container mx-auto text-center mb-10">
         <div className="text-2xl">New Arrival</div>
         <p className="mb-5">
           "Embrace the festival magic, let joy fill every moment."
@@ -121,28 +56,12 @@ const Home = () => {
       </section>
 
       {/* Subscription */}
-      <section
-        className="h-[60vh] w-full bg-cover bg-center bg-no-repeat flex items-center justify-center"
-        style={{ backgroundImage: `url(${bannerImg})` }}
-      >
-        {/* Blur Card */}
-        <div className="bg-white/60 backdrop-blur-sm   px-10 py-8 rounded-xl border border-white shadow-lg max-w-2xl text-center relative">
-          {/* Border Outline (double border effect) */}
-          <div className="absolute inset-0 rounded-xl border border-white/60 pointer-events-none"></div>
-
-          {/* Logo */}
-          <img src={brandLogo} alt="logo" className="w-40 mx-auto mb-4" />
-
-          {/* Title */}
-          <h2 className="text-xl md:text-2xl font-semibold italic text-gray-800">
-            “Subscribe to our newsletter and get <br />
-            <span className="font-bold">10% off your first purchase</span>”
-          </h2>
-        </div>
+      <section className="h-auto w-full ">
+        <img src={Subscribe} alt="subscription" className="w-full" />
       </section>
 
       {/* Festival Special Section */}
-      <section className="max-w-[85vw] mx-auto px-4 py-12 flex flex-col gap-10 items-center">
+      <section className="container mx-auto px-4 py-12 flex flex-col gap-10 items-center">
         {/* Heading */}
         <div className="text-center">
           <h1 className="text-3xl font-semibold">Festival Special</h1>
@@ -153,7 +72,7 @@ const Home = () => {
 
         <div className="flex flex-col md:flex-row gap-6">
           {/* LEFT BIG IMAGE */}
-          <div className="col-span-1 h-[800px]">
+          <div className="flex-1 md:col-span-1 h-auto md:h-[800px]">
             <img
               src={leftBanner}
               alt="Luxury Fabrics"
@@ -162,9 +81,9 @@ const Home = () => {
           </div>
 
           {/* RIGHT SIDE */}
-          <div className="col-span-1 md:col-span-2 grid grid-rows-2 gap-4">
+          <div className="flex-1 col-span-1 md:col-span-2 grid grid-rows-2 gap-4">
             {/* TOP FULL WIDTH */}
-            <div className="row-span-1 h-[385px]">
+            <div className="row-span-1 h-auto">
               <img
                 src={rightTop}
                 alt="Top Stylist Guide"
@@ -174,7 +93,7 @@ const Home = () => {
 
             {/* BOTTOM TWO IMAGES */}
             <div className="row-span-1 grid grid-cols-2 gap-4">
-              <div className="h-[385px]">
+              <div className="h-auto">
                 <img
                   src={bottomBanner1}
                   alt="Stunning Look"
@@ -182,7 +101,7 @@ const Home = () => {
                 />
               </div>
 
-              <div className="h-[385px]">
+              <div className="h-auto">
                 <img
                   src={bottomBanner2}
                   alt="Spring Collection"
@@ -199,7 +118,7 @@ const Home = () => {
         <img
           src={sareeBanner}
           alt="sareeBanner"
-          className="h-[200px] w-full object-cover"
+          className="h-[200px]  w-full object-cover"
         />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
@@ -215,7 +134,7 @@ const Home = () => {
       <ServicesSection />
 
       {/* map section */}
-      <section className="w-full bg-[#E3FCFF] flex items-center justify-center">
+      <section className="w-full h-[50vh] md:h-full bg-[#E3FCFF] flex items-center justify-center">
         <img src={mapImage} alt="map" className="bg-[#E3FCFF]" />
       </section>
       {isLogin && (

@@ -42,7 +42,7 @@ const ProductCard = ({ product }) => {
   return (
     <div
       onClick={() => navigate(`/products/${productId}`)}
-      className="group w-[260px] shrink-0 overflow-hidden hover:shadow-xl duration-300 cursor-pointer relative bg-white"
+      className="group w-[220px] lg:w-[260px] shrink-0 overflow-hidden hover:shadow-xl duration-300 cursor-pointer relative bg-white"
     >
       {/* Wishlist Icon */}
       <button

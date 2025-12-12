@@ -20,28 +20,31 @@ const categories = [
   { title: "Floral Saree", img: saree5 },
   { title: "Floral Saree", img: saree5 },
   { title: "Floral Saree", img: saree5 },
+  { title: "Floral Saree", img: saree5 },
+  { title: "Floral Saree", img: saree5 },
 ];
 
 const CategorySlider = () => {
   const navigate = useNavigate();
   return (
-    <div className="px-10 py-6">
+    <div className=" my-6">
       <Swiper
         modules={[Navigation]}
         navigation
-        slidesPerView={1.5}
-        spaceBetween={0}
+        slidesPerView={5}
+        spaceBetween={5}
         breakpoints={{
-          640: { slidesPerView: 2.5 },
+          640: { slidesPerView: 2 },
           768: { slidesPerView: 3.5 },
           1024: { slidesPerView: 4.5 },
-          1280: { slidesPerView: 5.2 },
+          1280: { slidesPerView: 5 },
+          1536: { slidesPerView: 8 },
         }}
         className="mySwiper"
       >
-        {/* LEFT STATIC SHOP CARD */}
+        {/* LEFT STATIC SHOP CARD
         <SwiperSlide>
-          <div className="w-60 h-[300px] bg-linear-to-br from-[#fbc67a] via-[#f57bd1] to-[#9253e8] text-white p-3">
+          <div className="w-60 hidden md:flex h-[300px] bg-linear-to-br from-[#fbc67a] via-[#f57bd1] to-[#9253e8] text-white p-3">
             <div className="h-full bg-linear-to-br from-[#fbc67a] via-[#f57bd1] to-[#9253e8] p-5 border border-white flex flex-col items-center justify-between">
               <img src={logo} alt="logo" className="w-[87px] h-[86px] mb-3" />
 
@@ -61,11 +64,10 @@ const CategorySlider = () => {
               </button>
             </div>
           </div>
-        </SwiperSlide>
-
+        </SwiperSlide> */}
         {/* SLIDER IMAGES */}
         {categories.map((item, index) => (
-          <SwiperSlide key={index}>
+          <SwiperSlide key={index} className="shrink-0">
             <div className="flex flex-col items-center relative">
               <img
                 src={item.img}

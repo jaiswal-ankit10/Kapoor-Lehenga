@@ -75,7 +75,7 @@ const ProductDetail = () => {
               key={i}
               src={`${imageBaseUrl}${thumb}`}
               onClick={() => setSelectedThumb(thumb)}
-              className={`w-[100px] h-[140px] object-cover rounded cursor-pointer border ${
+              className={`w-[70px] h-[100px] md:w-[100px] md:h-[140px] object-cover rounded cursor-pointer border ${
                 selectedThumb === thumb ? "border-black" : "border-gray-300"
               }`}
             />
@@ -86,7 +86,7 @@ const ProductDetail = () => {
         {selectedThumb && (
           <img
             src={`${imageBaseUrl}${selectedThumb}`}
-            className="w-[450px] h-[550px] object-fill rounded"
+            className="w-[320px] h-[420px] md:w-[450px] md:h-[550px] object-fill rounded"
           />
         )}
 
@@ -216,7 +216,7 @@ const ProductDetail = () => {
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-4 mt-6 ">
+          <div className="flex flex-col md:flex-row gap-4 mt-6 ">
             <button
               onClick={toggleWishlist}
               className="bg-[#EDEDED] px-4 py-3 rounded-lg cursor-pointer"

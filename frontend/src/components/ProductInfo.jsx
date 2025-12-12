@@ -33,7 +33,7 @@ const ProductInfo = ({ product }) => {
         </div>
 
         {openDetails && (
-          <div className="grid grid-cols-2 gap-y-2 mt-3 pl-10 text-md">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 mt-3 pl-10 text-md">
             <p>
               <span className="font-semibold">Material:</span> Crepe
             </p>

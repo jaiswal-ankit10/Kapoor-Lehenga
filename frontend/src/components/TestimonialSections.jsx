@@ -25,31 +25,40 @@ const testimonials = [
 
 const TestimonialsSection = () => {
   return (
-    <section className="bg-[#fcefd9] h-[728px] ">
+    <section className="bg-[#fcefd9] h-[70%] ">
       <h2 className="text-center text-2xl font-semibold mb-8 w-full bg-[#FFD37F]">
         Customer Stories
       </h2>
 
-      <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-4 pb-10 pt-20">
+      <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-4 pb-10  md:pt-20">
         {testimonials.map((item, index) => (
           <div
             key={index}
-            className=" px-6 pb-6 pt-20 relative bg-white shadow-md w-full max-w-[370px] mx-auto"
+            className=" px-6 pb-6 md:pt-20 flex flex-col  relative bg-white shadow-md w-full  mx-auto"
           >
             {/* IMAGE */}
-            <img
-              src={item.img}
-              alt={item.name}
-              className="w-40 h-52 object-cover absolute -top-12 left-1/2 transform -translate-x-1/2 shadow-md"
-            />
+            <div className="">
+              <img
+                src={item.img}
+                alt={item.name}
+                className="hidden md:block w-40 h-52 object-cover absolute md:-top-12 md:left-1/2 transform md:-translate-x-1/2 shadow-md"
+              />
+              <img
+                src={item.img}
+                alt={item.name}
+                className="w-24 h-24 rounded-full object-cover mx-auto md:hidden mt-2"
+              />
+            </div>
 
             {/* NAME */}
-            <h3 className="text-red-600 text-center mt-25">{item.name}</h3>
+            <div>
+              <h3 className="text-red-600 text-center md:mt-25">{item.name}</h3>
 
-            {/* CONTENT */}
-            <p className="text-gray-700 text-sm leading-relaxed mt-2 text-center">
-              {item.content}
-            </p>
+              {/* CONTENT */}
+              <p className="text-gray-700 text-sm leading-relaxed mt-2 text-center">
+                {item.content}
+              </p>
+            </div>
           </div>
         ))}
       </div>

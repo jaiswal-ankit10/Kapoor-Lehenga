@@ -6,4 +6,7 @@ export const breadcrumbRoutes = {
     route: `/products/${id}`,
   }),
   wishlist: { name: "WishList", route: "/wishlist" },
+  myOrder: { name: "My Order", route: "/my-order" },
+  orderDetail: { name: "Order Details", route: "/order-detal" },
+  returnProduct: { name: "Return Product", route: "/return-product" },
 };
