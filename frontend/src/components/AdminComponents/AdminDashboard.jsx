@@ -8,7 +8,7 @@ export default function AdminDashboard() {
     (async () => {
       try {
         const res = await axiosInstance.get("/admin/dashboard");
-        console.log("DASHBOARD RESPONSE:", res.data);
+        // console.log("DASHBOARD RESPONSE:", res.data);
         if (res.data.success) setStats(res.data.stats);
       } catch (err) {
         console.error(err);

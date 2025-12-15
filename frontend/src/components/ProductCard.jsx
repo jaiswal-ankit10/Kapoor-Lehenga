@@ -20,6 +20,8 @@ const ProductCard = ({ product }) => {
 
   const productId = actualProduct._id || actualProduct.id;
   const imageBaseUrl = import.meta.env.VITE_BACKEND_URL;
+  const resolveImage = (url) =>
+    url?.startsWith("http") ? url : `${imageBaseUrl}${url}`;
 
   const isWishlisted = wishlistItems.some(
     (item) => item?.product?._id === productId || item?._id === productId
@@ -59,15 +61,17 @@ const ProductCard = ({ product }) => {
       {/* Slider */}
       <div className="relative h-[330px]" onClick={(e) => e.stopPropagation()}>
         <Swiper navigation={true} modules={[Navigation]} className="h-full">
-          {actualProduct?.images?.map((img, index) => (
-            <SwiperSlide key={index}>
-              <img
-                src={img.startsWith("http") ? img : `${imageBaseUrl}${img}`}
-                alt={actualProduct.title}
-                className="w-full h-full object-cover"
-              />
-            </SwiperSlide>
-          ))}
+          {(actualProduct?.images || [actualProduct?.thumbnail])
+            ?.filter(Boolean)
+            .map((img, index) => (
+              <SwiperSlide key={index}>
+                <img
+                  src={resolveImage(img)}
+                  alt={actualProduct.title}
+                  className="w-full h-full object-cover"
+                />
+              </SwiperSlide>
+            ))}
         </Swiper>
 
         {/* Add to Cart button */}

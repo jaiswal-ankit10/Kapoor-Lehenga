@@ -7,6 +7,18 @@ import path from "path";
 import { asyncHandler } from "./utils/async-handler.js";
 import { fileURLToPath } from "url";
 
+import dns from "dns";
+
+dns.setDefaultResultOrder("ipv4first");
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("❌ Unhandled Rejection:", reason);
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("❌ Uncaught Exception:", error);
+});
+
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);

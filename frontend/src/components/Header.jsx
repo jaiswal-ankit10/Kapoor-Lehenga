@@ -21,6 +21,7 @@ import { logout } from "../redux/userSlice";
 import CartSidebar from "./CartSidebar";
 import { loadCartFromBackend } from "../services/cartService";
 import { loadWishlistFromBackend } from "../services/wishlistService";
+import { setCategory, setSearch } from "../redux/filterSlice";
 
 const Header = () => {
   const [openMenu, setOpenMenu] = useState(false);
@@ -51,6 +52,16 @@ const Header = () => {
     dispatch(loadCartFromBackend());
     dispatch(loadWishlistFromBackend());
   }, []);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    dispatch(setSearch(value));
+    navigate(`/products?search=${encodeURIComponent(value)}`);
+  };
+  const handleCategory = (category) => {
+    dispatch(setCategory(category));
+    navigate(`/products?category=${encodeURIComponent(category)}`);
+  };
 
   return (
     <div className="bg-[#E9B159] w-full  px-6 md:px-10 py-3">
@@ -107,6 +118,7 @@ const Header = () => {
               type="text"
               placeholder="Search for products..."
               className="bg-transparent outline-none text-white w-full"
+              onChange={handleSearchChange}
             />
           </div>
         </div>
@@ -269,6 +281,7 @@ const Header = () => {
             type="text"
             placeholder="Search for products..."
             className="bg-transparent outline-none text-white w-full"
+            onChange={handleSearchChange}
           />
         </div>
       </div>
@@ -277,7 +290,11 @@ const Header = () => {
       <div className="mt-3 w-full">
         <ul className="hidden lg:flex text-white  lg:justify-around  w-full  mx-auto text-base md:text-sm  lg:text-lg xl:text-xl  ">
           {menuItems.map((item, index) => (
-            <li key={index} className="cursor-pointer hover:text-gray-200">
+            <li
+              onClick={() => handleCategory(item)}
+              key={index}
+              className="cursor-pointer hover:text-gray-200"
+            >
               {item}
             </li>
           ))}

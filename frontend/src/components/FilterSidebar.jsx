@@ -1,7 +1,16 @@
 import React, { useState } from "react";
 import { FiChevronDown } from "react-icons/fi";
 
-const FilterSidebar = () => {
+const categories = [
+  "LEHENGA",
+  "SAREE",
+  "KURTI",
+  "GOWN",
+  "SUIT",
+  "DRESS",
+];
+
+const FilterSidebar = ({ onCategorySelect, selected }) => {
   const [open, setOpen] = useState({
     category: true,
     fabric: false,
@@ -12,6 +21,11 @@ const FilterSidebar = () => {
   });
 
   const toggle = (key) => setOpen({ ...open, [key]: !open[key] });
+
+  const handleCategory = (cat) => {
+    if (!onCategorySelect) return;
+    onCategorySelect(selected === cat ? "" : cat);
+  };
 
   return (
     <div className="w-[250px]">
@@ -28,16 +42,24 @@ const FilterSidebar = () => {
         </button>
 
         {open.category && (
-          <div className="pl-2 mt-2 flex flex-col gap-1 ">
-            <label>
-              <input type="checkbox" /> Umbrella Lehenga
-            </label>
-            <label>
-              <input type="checkbox" /> Silk Lehenga
-            </label>
-            <label>
-              <input type="checkbox" /> Bridal Lehenga
-            </label>
+          <div className="pl-2 mt-2 flex flex-col gap-2 ">
+            {categories.map((cat) => (
+              <label key={cat} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={selected === cat}
+                  onChange={() => handleCategory(cat)}
+                />
+                <span>{cat}</span>
+              </label>
+            ))}
+            <button
+              type="button"
+              onClick={() => handleCategory("")}
+              className="text-xs text-gray-600 underline mt-1 text-left"
+            >
+              Clear
+            </button>
           </div>
         )}
       </div>

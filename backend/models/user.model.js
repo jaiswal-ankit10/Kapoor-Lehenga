@@ -4,7 +4,9 @@ const userSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
-      required: true,
+      required: function () {
+        return this.authProvider === "local"; // Required only for normal signup
+      },
       trim: true,
     },
 
@@ -19,19 +21,27 @@ const userSchema = new mongoose.Schema(
 
     mobile: {
       type: String,
-      required: true,
-      unique: true,
+      required: function () {
+        return this.authProvider === "local";
+      },
+      unique: function () {
+        return this.authProvider === "local";
+      },
       match: [/^[6-9]\d{9}$/, "Please enter a valid phone number"],
     },
 
     password: {
       type: String,
       minlength: 6,
-      select: false, // Prevents password return in API response
+      select: false,
+      required: function () {
+        return this.authProvider === "local";
+      },
     },
 
+    // 🔹 OTP fields (same as before)
     otp: {
-      type: String, // Save OTP temporarily
+      type: String,
     },
 
     otpExpireTime: {
@@ -46,6 +56,18 @@ const userSchema = new mongoose.Schema(
 
     profileImage: {
       type: String,
+    },
+
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
+
+    googleId: {
+      type: String,
+      unique: false,
+      sparse: true,
     },
   },
   { timestamps: true }

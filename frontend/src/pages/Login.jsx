@@ -7,10 +7,12 @@ import axios from "axios";
 import { USER_API_END_POINT } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/userSlice";
+import GoogleLogin from "../components/GoogleAuth/GoogleLogin";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const [input, setInput] = useState({
     email: "",
     mobile: "",
@@ -20,6 +22,7 @@ const Login = () => {
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
+
   const submitHandler = async (e) => {
     e.preventDefault();
 
@@ -29,13 +32,14 @@ const Login = () => {
       });
 
       if (res.data.success) {
-        const role = res.data.user.role;
-        dispatch(setUser({ user: res.data.user }));
-        if (role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
+        dispatch(
+          setUser({
+            user: res.data.user,
+            token: res.data.token,
+          })
+        );
+
+        navigate(res.data.user.role === "admin" ? "/admin" : "/");
       }
     } catch (error) {
       console.log(error);
@@ -103,9 +107,8 @@ const Login = () => {
         <button className="text-sm">Login With B2B →</button>
 
         <div className="flex gap-4 mt-2">
-          <button className="bg-gray-200 px-4 py-2 rounded">
-            <img src={googleLogo} className="w-10" />
-          </button>
+          <GoogleLogin />
+
           <button className="bg-gray-200 px-4 py-2 rounded">
             <img src={facebookLogo} className="w-10" />
           </button>

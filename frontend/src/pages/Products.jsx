@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import RoutesSection from "../components/RoutesSection";
 import { breadcrumbRoutes } from "../utils/breadcrumbRoutes";
 import FilterSidebar from "../components/FilterSideBar";
@@ -8,28 +8,47 @@ import FAQs from "../components/Faqs";
 import { fetchAllProducts } from "../services/productService";
 
 import { useDispatch, useSelector } from "react-redux";
+import { setCategory, setSort, setPage, setSearch } from "../redux/filterSlice";
+import { useSearchParams } from "react-router-dom";
 
 const Products = () => {
   const dispatch = useDispatch();
-  const { products, loading, error } = useSelector((store) => store.products);
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 25;
+  const [searchParams] = useSearchParams();
+  const { products, loading, error, total, pages, page } = useSelector(
+    (store) => store.products
+  );
+  const filters = useSelector((store) => store.filters);
 
   const breadcrumb = [breadcrumbRoutes.home, breadcrumbRoutes.productPage];
-  const [sort, setSort] = useState("latest");
 
-  const sortedProducts = [...products].sort((a, b) => {
-    if (sort === "low-to-high") return a.price - b.price;
-    if (sort === "high-to-low") return b.price - a.price;
-    return b.id - a.id; // latest
-  });
   useEffect(() => {
-    try {
-      dispatch(fetchAllProducts());
-    } catch (error) {
-      console.log("Error fetching Product");
+    dispatch(fetchAllProducts(filters));
+  }, [dispatch, filters]);
+
+  useEffect(() => {
+    const search = searchParams.get("search") || "";
+    const category = searchParams.get("category") || "";
+
+    if (search !== filters.search) {
+      dispatch(setSearch(search));
     }
-  }, [dispatch]);
+
+    if (category !== filters.category) {
+      dispatch(setCategory(category));
+    }
+  }, [searchParams, dispatch]);
+
+  const handleCategory = (value) => {
+    dispatch(setCategory(value));
+  };
+  const handleSort = (value) => {
+    dispatch(setSort(value));
+  };
+
+  const handlePageChange = (p) => {
+    dispatch(setPage(p));
+  };
+
   if (loading) return <p className="text-center py-10">Loading products...</p>;
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
 
@@ -41,7 +60,10 @@ const Products = () => {
       {/* main section */}
       <div className="flex gap-6 px-10 py-6">
         {/* LEFT FILTERS */}
-        <FilterSidebar />
+        <FilterSidebar
+          onCategorySelect={handleCategory}
+          selected={filters.category}
+        />
 
         <div className="flex-1">
           {/* TOP HEADER */}
@@ -51,7 +73,7 @@ const Products = () => {
                 Lehenga Wedding Dresses Collection
               </h2>
               <p className="text-sm text-gray-500 mt-1">
-                Showing {sortedProducts.length} results
+                Showing {products.length} of {total || products.length} results
               </p>
             </div>
 
@@ -60,19 +82,20 @@ const Products = () => {
               <h1>Sort By:</h1>
               <select
                 className="bg-[#F5F4F4] px-3 py-2 rounded outline-0"
-                onChange={(e) => setSort(e.target.value)}
+                value={filters.sort}
+                onChange={(e) => handleSort(e.target.value)}
               >
-                <option value="latest">Sort By Latest</option>
-                <option value="low-to-high">Sort By Low to High Price</option>
-                <option value="high-to-low">Sort By High to Low Price</option>
+                <option value="newest">Sort By Latest</option>
+                <option value="price_asc">Sort By Low to High Price</option>
+                <option value="price_desc">Sort By High to Low Price</option>
               </select>
             </div>
           </div>
 
           {/* PRODUCTS GRID */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-            {sortedProducts?.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {products?.map((product) => (
+              <ProductCard key={product._id || product.id} product={product} />
             ))}
           </div>
         </div>
@@ -80,9 +103,9 @@ const Products = () => {
       {/* Pagination section */}
       <div className="flex items-center justify-center mb-20">
         <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          currentPage={page}
+          totalPages={pages || 1}
+          onPageChange={handlePageChange}
         />
       </div>
       {/* FAQS */}

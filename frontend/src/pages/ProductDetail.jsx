@@ -32,6 +32,10 @@ const ProductDetail = () => {
 
   const isWishlisted = wishlistItems.some((item) => item.product?._id === id);
   const imageBaseUrl = import.meta.env.VITE_BACKEND_URL;
+  const resolveImage = (url) => {
+    if (!url) return "";
+    return url.startsWith("http") ? url : `${imageBaseUrl}${url}`;
+  };
 
   useEffect(() => {
     dispatch(fetchProductById(id));
@@ -40,6 +44,8 @@ const ProductDetail = () => {
   useEffect(() => {
     if (product?.images?.length > 0) {
       setSelectedThumb(product.images[0]);
+    } else if (product?.thumbnail) {
+      setSelectedThumb(product.thumbnail);
     }
   }, [product]);
 
@@ -70,22 +76,24 @@ const ProductDetail = () => {
       <div className="max-w-[85vw] mx-auto px-12 py-10 flex gap-10 flex-col md:flex-row">
         {/* Thumbnails */}
         <div className="flex flex-row md:flex-col gap-3">
-          {product?.images?.map((thumb, i) => (
-            <img
-              key={i}
-              src={`${imageBaseUrl}${thumb}`}
-              onClick={() => setSelectedThumb(thumb)}
-              className={`w-[70px] h-[100px] md:w-[100px] md:h-[140px] object-cover rounded cursor-pointer border ${
-                selectedThumb === thumb ? "border-black" : "border-gray-300"
-              }`}
-            />
-          ))}
+          {(product?.images || [product?.thumbnail])
+            .filter(Boolean)
+            .map((thumb, i) => (
+              <img
+                key={i}
+                src={resolveImage(thumb)}
+                onClick={() => setSelectedThumb(thumb)}
+                className={`w-[70px] h-[100px] md:w-[100px] md:h-[140px] object-cover rounded cursor-pointer border ${
+                  selectedThumb === thumb ? "border-black" : "border-gray-300"
+                }`}
+              />
+            ))}
         </div>
 
         {/* Main Image */}
         {selectedThumb && (
           <img
-            src={`${imageBaseUrl}${selectedThumb}`}
+            src={resolveImage(selectedThumb)}
             className="w-[320px] h-[420px] md:w-[450px] md:h-[550px] object-fill rounded"
           />
         )}
@@ -123,22 +131,26 @@ const ProductDetail = () => {
           </p>
 
           <div className="flex gap-2 mt-2">
-            {product?.images?.map((color, index) => (
-              <div key={index} className="relative">
-                <img
-                  src={`${imageBaseUrl}${color}`}
-                  onClick={() => setSelectedThumb(color)}
-                  className={`w-[60px] h-20 object-cover rounded cursor-pointer border ${
-                    selectedThumb === color ? "border-black" : "border-gray-300"
-                  }`}
-                />
+            {(product?.images || [product?.thumbnail])
+              .filter(Boolean)
+              .map((color, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={resolveImage(color)}
+                    onClick={() => setSelectedThumb(color)}
+                    className={`w-[60px] h-20 object-cover rounded cursor-pointer border ${
+                      selectedThumb === color
+                        ? "border-black"
+                        : "border-gray-300"
+                    }`}
+                  />
 
-                {/* Circle Selection Indicator */}
-                {selectedThumb === color && (
-                  <div className="absolute top-1 right-1 bg-white rounded-full p-0.5 border border-black" />
-                )}
-              </div>
-            ))}
+                  {/* Circle Selection Indicator */}
+                  {selectedThumb === color && (
+                    <div className="absolute top-1 right-1 bg-white rounded-full p-0.5 border border-black" />
+                  )}
+                </div>
+              ))}
           </div>
 
           {/* Available Offers */}

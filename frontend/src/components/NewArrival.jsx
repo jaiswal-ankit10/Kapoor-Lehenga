@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "./ProductCard";
 import { useEffect } from "react";
-import { fetchAllProducts } from "../services/productService";
+import { fetchNewProducts } from "../services/productService";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 const NewArrival = () => {
@@ -9,7 +9,7 @@ const NewArrival = () => {
   const { products, loading, error } = useSelector((store) => store.products);
 
   useEffect(() => {
-    dispatch(fetchAllProducts());
+    dispatch(fetchNewProducts());
   }, [dispatch]);
 
   if (loading) return <p>Loading products...</p>;

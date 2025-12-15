@@ -1,10 +1,56 @@
 import User from "../models/user.model.js";
+import bcrypt from "bcryptjs";
+import { ApiError } from "../utils/api-error.js";
+import { asyncHandler } from "../utils/async-handler.js";
 
 //user management
 export const getAllUsers = async (req, res) => {
   const users = await User.find().select("-password");
   res.json({ success: true, users });
 };
+
+export const createUser = asyncHandler(async (req, res) => {
+  const { fullName, email, mobile, password, role = "customer" } = req.body;
+
+  if (!fullName || !mobile || !email || !password) {
+    throw new ApiError(400, "All the fields are required");
+  }
+
+  const existingUser = await User.findOne({
+    $or: [{ email }, { mobile }],
+  });
+
+  if (existingUser) {
+    throw new ApiError(409, "User with email or phoneNumber already exists");
+  }
+
+  if (role && !["customer", "admin"].includes(role)) {
+    throw new ApiError(400, "Invalid role. Must be 'customer' or 'admin'");
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = await User.create({
+    fullName,
+    email,
+    mobile,
+    password: hashedPassword,
+    role: role,
+    authProvider: "local",
+  });
+
+  return res.status(201).json({
+    success: true,
+    message: "User created successfully",
+    user: {
+      id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      mobile: user.mobile,
+      role: user.role,
+    },
+  });
+});
 export const getUserById = async (req, res) => {
   const { id } = req.params;
   const user = await User.findById(id).select("-password");

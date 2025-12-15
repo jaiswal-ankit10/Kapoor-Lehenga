@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import axios from "axios";
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { fullName, email, mobile, password, adminSecret } = req.body;
@@ -197,3 +198,92 @@ export const verfiyOtp = asyncHandler(async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 });
+
+export const googleAuthController = async (req, res) => {
+  try {
+    const { code } = req.body;
+
+    if (!code) {
+      return res.status(400).json({
+        success: false,
+        message: "Authorization code is required",
+      });
+    }
+
+    // 🔹 1. Exchange Google Auth Code → Access Token + ID Token
+    const tokenResponse = await axios.post(
+      "https://oauth2.googleapis.com/token",
+      {
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: "postmessage",
+        grant_type: "authorization_code",
+      }
+    );
+
+    const { access_token, id_token } = tokenResponse.data;
+
+    // 🔹 2. Get Google user info
+    const googleUser = await axios.get(
+      `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`
+    );
+
+    const { id, name, email, picture } = googleUser.data;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Google account does not have an email",
+      });
+    }
+
+    // 🔹 3. Find existing user (match by email)
+    let user = await User.findOne({ email });
+
+    // 🔹 4. Create new user if not found
+    if (!user) {
+      user = await User.create({
+        fullName: name,
+        email,
+        profileImage: picture,
+        googleId: id,
+        authProvider: "google",
+        mobile: null, // Google does NOT provide mobile
+        password: null,
+      });
+    }
+
+    // 🔹 5. If user exists but provider is different
+    if (user.authProvider === "local" && !user.googleId) {
+      // Allow linking the Google account
+      user.googleId = id;
+      user.authProvider = "google";
+      await user.save();
+    }
+
+    // 🔹 6. Generate JWT token
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return res.json({
+      success: true,
+      message: "Google login successful",
+      data: {
+        user,
+        token,
+      },
+    });
+  } catch (err) {
+    console.error("Google OAuth Error:", err.response?.data || err.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Google authentication failed",
+      error: err.message,
+    });
+  }
+};

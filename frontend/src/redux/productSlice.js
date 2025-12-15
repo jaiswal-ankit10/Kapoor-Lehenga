@@ -5,14 +5,21 @@ const initialState = {
   product: null,
   loading: false,
   error: null,
+  total: 0,
+  page: 1,
+  pages: 1,
 };
 
 const productSlice = createSlice({
   name: "products",
   initialState,
   reducers: {
-    setProducts(state, action) {
-      state.products = action.payload;
+    setProductsData(state, action) {
+      const { products, total = 0, page = 1, pages = 1 } = action.payload;
+      state.products = products || [];
+      state.total = total;
+      state.page = page;
+      state.pages = pages;
       state.loading = false;
       state.error = null;
     },
@@ -20,6 +27,19 @@ const productSlice = createSlice({
       state.product = action.payload;
       state.loading = false;
       state.error = null;
+    },
+    setNewProducts(state, action) {
+      state.products = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    updateProduct(state, action) {
+      state.products = state.products.map((product) =>
+        product._id === action.payload._id ? action.payload : product
+      );
+    },
+    removeProduct(state, action) {
+      state.products = state.products.filter((p) => p._id !== action.payload);
     },
     setLoading(state) {
       state.loading = true;
@@ -31,7 +51,14 @@ const productSlice = createSlice({
   },
 });
 
-export const { setProducts, setSingleProduct, setLoading, setError } =
-  productSlice.actions;
+export const {
+  setProductsData,
+  setSingleProduct,
+  setNewProducts,
+  updateProduct,
+  removeProduct,
+  setLoading,
+  setError,
+} = productSlice.actions;
 
 export default productSlice.reducer;

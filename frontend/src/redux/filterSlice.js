@@ -1,11 +1,53 @@
 import { createSlice } from "@reduxjs/toolkit";
-const initialState = {};
+
+const initialState = {
+  search: "",
+  category: "",
+  sort: "newest", // newest | price_asc | price_desc
+  page: 1,
+  limit: 20,
+};
 
 const filterSlice = createSlice({
-  name: "filter",
+  name: "filters",
   initialState,
-  reducers: {},
+  reducers: {
+    setSearch(state, action) {
+      state.search = action.payload;
+      state.page = 1;
+    },
+    setCategory(state, action) {
+      state.category = action.payload;
+      state.page = 1;
+    },
+    setSort(state, action) {
+      state.sort = action.payload;
+      state.page = 1;
+    },
+    setPage(state, action) {
+      state.page = action.payload;
+    },
+    setLimit(state, action) {
+      state.limit = action.payload;
+      state.page = 1;
+    },
+    resetFilters(state) {
+      state.search = "";
+      state.category = "";
+      state.sort = "newest";
+      state.page = 1;
+      state.limit = 20;
+    },
+  },
 });
 
-export const {} = filterSlice.actions;
+export const {
+  setSearch,
+  setCategory,
+  setSort,
+  setPage,
+  setLimit,
+  resetFilters,
+} = filterSlice.actions;
+
 export default filterSlice.reducer;

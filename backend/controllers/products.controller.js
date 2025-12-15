@@ -1,13 +1,68 @@
 import { Product } from "../models/product.model.js";
+import cloudinary from "../config/cloudinary.js";
+import { ApiError } from "../utils/api-error.js";
+import { uploadToCloudinary } from "../utils/uploadToCloudinary.js";
+
+// Helper function to upload image to Cloudinary with small retry on timeout
 
 export const createProduct = async (req, res) => {
   try {
-    const product = await Product.create(req.body);
-    res
-      .status(201)
-      .json({ success: true, message: "Product created", product });
+    console.log("FILES:", req.files);
+    console.log("BODY:", req.body);
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one image is required",
+      });
+    }
+
+    // Upload images in parallel
+    const imageUrls = await Promise.all(
+      req.files.map((file) => uploadToCloudinary(file))
+    );
+
+    const {
+      title,
+      description,
+      price,
+      discount,
+      stock,
+      category,
+      brand,
+      color,
+    } = req.body;
+
+    const priceNum = Number(price);
+    const discountNum = Number(discount) || 0;
+    const discountedPrice =
+      discountNum > 0 ? priceNum - (priceNum * discountNum) / 100 : priceNum;
+
+    const product = await Product.create({
+      title,
+      description,
+      price: priceNum,
+      discount: discountNum,
+      discountedPrice,
+      stock: Number(stock) || 0,
+      category,
+      brand: brand || "Generic",
+      color: color ? color.split(",").map((c) => c.trim()) : [],
+      thumbnail: imageUrls[0] || "",
+      images: imageUrls,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      product,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Create product error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Product creation failed",
+    });
   }
 };
 export const getAllProducts = async (req, res) => {
@@ -19,7 +74,7 @@ export const getAllProducts = async (req, res) => {
     };
 
     if (search) {
-      query.name = { $regex: search, $options: "i" };
+      query.title = { $regex: search, $options: "i" };
     }
 
     if (category) {
@@ -70,9 +125,14 @@ export const getProductById = async (req, res) => {
 };
 export const updateProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (!product)
       return res
@@ -102,4 +162,13 @@ export const deleteProduct = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
+};
+export const getNewProducts = async (req, res) => {
+  const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  const products = await Product.find({
+    createdAt: { $gte: last24Hours },
+  }).sort({ createdAt: -1 });
+
+  res.json({ success: true, products });
 };
