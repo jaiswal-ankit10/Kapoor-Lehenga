@@ -132,7 +132,6 @@ export default function AddProductForm({ onClose, onSuccess }) {
       });
 
       if (res.data.success) {
-        // Clean up object URLs
         imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
         onSuccess();
         onClose();
@@ -244,14 +243,32 @@ export default function AddProductForm({ onClose, onSuccess }) {
               <label className="block text-sm font-medium mb-1">
                 Category *
               </label>
-              <input
+              {/* <input
                 type="text"
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
-              />
+              /> */}
+              <select
+                name="category"
+                id="category"
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
+                onChange={handleChange}
+                required
+                value={formData.category}
+              >
+                <option value="lehenga">Lehenga</option>
+                <option value="half saree">Half Saree</option>
+                <option value="fashion saree">Fashion Saree</option>
+                <option value="gown">Gown</option>
+                <option value="wedding">Wedding</option>
+                <option value="celebrity outfits">Celebrity Outfits</option>
+                <option value="engagement">Engagement</option>
+                <option value="occassions">Ocassions</option>
+                <option value="reception">Reception</option>
+              </select>
             </div>
           </div>
 

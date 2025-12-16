@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 const CartSummary = () => {
   const { cartItems } = useSelector((store) => store.cart);
   const imageBaseUrl = import.meta.env.VITE_BACKEND_URL;
+  const resolveImage = (url) =>
+    url?.startsWith("http") ? url : `${imageBaseUrl}${url}`;
 
   return (
     <div className=" mb-3 ">
@@ -22,7 +24,7 @@ const CartSummary = () => {
             className="border rounded-md border-gray-300 flex gap-4 relative pr-4"
           >
             <img
-              src={`${imageBaseUrl}${item.product?.images?.[0]}`}
+              src={`${resolveImage(item.product?.images?.[0])}`}
               alt={item.product?.title}
               className="w-25 h-full rounded"
             />

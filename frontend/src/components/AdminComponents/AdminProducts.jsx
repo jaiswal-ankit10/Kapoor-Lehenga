@@ -6,7 +6,7 @@ import {
   updateProductById,
 } from "../../services/productService";
 import { useDispatch } from "react-redux";
-import EditProductForm from "./EditPRoductForm";
+import EditProductForm from "./EditProductForm";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);

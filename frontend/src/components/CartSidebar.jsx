@@ -13,6 +13,10 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const imageBaseUrl = import.meta.env.VITE_BACKEND_URL;
+  const resolveImage = (url) => {
+    if (!url) return "";
+    return url.startsWith("http") ? url : `${imageBaseUrl}${url}`;
+  };
 
   return (
     <>
@@ -50,9 +54,11 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
               className="border rounded-md border-gray-300 flex gap-4 relative pr-4"
             >
               <img
-                src={`${imageBaseUrl}${item.product?.images?.[0]}`}
+                src={resolveImage(
+                  item.product?.images?.[0] || item.product?.thumbnail
+                )}
                 alt={item.product?.title}
-                className="w-25 h-full rounded"
+                className="w-[100px] h-[140px] object-cover rounded"
               />
 
               <div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddressCard from "../components/AddressCard";
 import CartSummary from "../components/CartSummary";
 import CouponBox from "../components/CouponBox";
@@ -8,12 +8,18 @@ import paymentBar from "../assets/icons/address-pay.png";
 import map from "../assets/icons/map.png";
 import { Link, useNavigate } from "react-router-dom";
 import NewAddressSideBar from "../components/NewAddressSideBar";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAddresses } from "../services/addressService";
 
 const Address = () => {
   const navigate = useNavigate();
   const [openNewAddress, setOpenNewAddress] = useState(false);
+  const dispatch = useDispatch();
+  const { addresses, selectedAddress, loading } = useSelector(
+    (state) => state.address
+  );
 
-  const addresses = [
+  const dummyAddress = [
     {
       id: 1,
       name: "Piyush Kalsariya",
@@ -23,6 +29,9 @@ const Address = () => {
     { id: 2, name: "Rohit Kumar", address: "Dindoli Road, Surat" },
     { id: 3, name: "Mehul Desai", address: "146, Laxmi Nagar, Surat" },
   ];
+  useEffect(() => {
+    dispatch(fetchAddresses());
+  }, []);
 
   return (
     <div className="w-full min-h-screen bg-white overflow-x-hidden">
@@ -54,16 +63,24 @@ const Address = () => {
 
       {/* MAIN SECTION */}
       <div className="container mx-auto flex flex-col lg:flex-row gap-2 md:gap-20">
+        {loading && <p>Loading addresses...</p>}
+
+        {!loading && addresses.length === 0 && (
+          <p className="text-gray-500">No addresses found</p>
+        )}
+
         {/* LEFT – ADDRESS LIST */}
         <div className="md:flex-1">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-20 ">
-            {addresses.map((address) => (
-              <AddressCard key={address.id} address={address} />
-            ))}
+            {addresses
+              ?.filter((address) => address && address._id)
+              .map((address) => (
+                <AddressCard key={address._id} address={address} />
+              ))}
 
             {/* ADD NEW ADDRESS CARD */}
             <div
-              onClick={() => setOpenNewAddress(true)}
+              onClick={() => setOpenNewAddress(!openNewAddress)}
               className="rounded-md p-4 bg-[#F6F6F6] hover:shadow-md duration-300 
                          flex flex-col items-center justify-center cursor-pointer w-full md:w-[320px] lg:w-[420px]"
             >

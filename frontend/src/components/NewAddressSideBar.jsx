@@ -2,9 +2,11 @@ import * as React from "react";
 import { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import Switch from "@mui/material/Switch";
+import { useDispatch, useSelector } from "react-redux";
+import { createAddress } from "../services/addressService";
 
 const NewAddressSideBar = ({ openNewAddress, setOpenNewAddress }) => {
-  const [input, setInput] = useState({
+  const initialInputState = {
     country: "",
     fullName: "",
     mobile: "",
@@ -12,10 +14,14 @@ const NewAddressSideBar = ({ openNewAddress, setOpenNewAddress }) => {
     village: "",
     landmark: "",
     pincode: "",
-    town: "",
+    city: "",
     state: "",
-  });
+  };
+
+  const [input, setInput] = useState(initialInputState);
   const [checked, setChecked] = React.useState(true);
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.address);
 
   const handleChange = (event) => {
     event.preventDefault();
@@ -26,8 +32,17 @@ const NewAddressSideBar = ({ openNewAddress, setOpenNewAddress }) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
+    const payload = {
+      ...input,
+      isDefault: checked,
+    };
+    await dispatch(createAddress(payload));
+
+    setInput(initialInputState);
+    setChecked(false);
+    setOpenNewAddress(false);
   };
   return (
     <>
@@ -41,6 +56,7 @@ const NewAddressSideBar = ({ openNewAddress, setOpenNewAddress }) => {
 
       {/* New Address Drawer */}
       <div
+        onClick={(e) => e.stopPropagation()}
         className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white z-50 shadow-xl p-3 transform duration-300 ${
           openNewAddress ? "translate-x-0" : "translate-x-full"
         }`}
@@ -49,7 +65,7 @@ const NewAddressSideBar = ({ openNewAddress, setOpenNewAddress }) => {
           <h2 className="text-xl font-semibold text-black">New Address</h2>
           <IoClose
             className="text-2xl cursor-pointer text-black"
-            onClick={() => setOpenNewAddress(false)}
+            onClick={() => setOpenNewAddress(!openNewAddress)}
           />
         </div>
         <hr className="text-gray-300" />
@@ -59,7 +75,7 @@ const NewAddressSideBar = ({ openNewAddress, setOpenNewAddress }) => {
         >
           <input
             type="text"
-            name="fullName"
+            name="country"
             value={input.country}
             onChange={changeEventHandler}
             placeholder="India"
@@ -115,7 +131,7 @@ const NewAddressSideBar = ({ openNewAddress, setOpenNewAddress }) => {
           />
           <input
             type="text"
-            name="town"
+            name="city"
             value={input.town}
             onChange={changeEventHandler}
             placeholder="Town/City"
@@ -142,8 +158,9 @@ const NewAddressSideBar = ({ openNewAddress, setOpenNewAddress }) => {
             <button
               type="submit"
               className="bg-[#E9B159] text-white px-6 py-2 text-xl w-full"
+              disabled={loading}
             >
-              Submit
+              {loading ? "Saving..." : "Submit"}
             </button>
           </div>
         </form>

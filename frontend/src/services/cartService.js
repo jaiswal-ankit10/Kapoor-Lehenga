@@ -35,6 +35,6 @@ export const removeBackendCartItem = (itemId) => async (dispatch) => {
 };
 
 export const clearBackendCart = () => async (dispatch) => {
-  const res = await axiosInstance.delete("/cart/clear");
+  await axiosInstance.delete("/cart/clear");
   dispatch(clearCartReducer());
 };

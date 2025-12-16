@@ -18,6 +18,7 @@ import UserRoute from "../components/ProtectedRoute/UserRoute";
 import AdminDashboard from "../components/AdminComponents/AdminDashboard";
 import Users from "../components/AdminComponents/Users";
 import AdminProducts from "../components/AdminComponents/AdminProducts";
+import AdminOrders from "../components/AdminComponents/AdminOrders";
 
 export const router = createBrowserRouter([
   {
@@ -46,7 +47,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "order-detail",
+        path: "orders/:id",
         element: (
           <UserRoute>
             <OrderDetail />
@@ -80,7 +81,7 @@ export const router = createBrowserRouter([
     path: "/payment",
     element: (
       <UserRoute>
-        <Address />
+        <PaymentPage />
       </UserRoute>
     ),
   },
@@ -95,6 +96,7 @@ export const router = createBrowserRouter([
       { path: "dashboard", element: <AdminDashboard /> },
       { path: "users", element: <Users /> },
       { path: "products", element: <AdminProducts /> },
+      { path: "orders", element: <AdminOrders /> },
     ],
   },
 ]);

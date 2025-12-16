@@ -9,11 +9,49 @@ import { Link } from "react-router-dom";
 import { IoCardOutline } from "react-icons/io5";
 import { BsCashCoin } from "react-icons/bs";
 import OrderSuccessModal from "../components/OrderSuccessModal";
+import { useDispatch, useSelector } from "react-redux";
+import { createOrder } from "../services/orderService";
+import { clearBackendCart } from "../services/cartService";
 
 const PaymentPage = () => {
   const [openSuccess, setOpenSuccess] = useState(false);
+  const dispatch = useDispatch();
 
-  const placeOrder = () => {
+  const { cartItems } = useSelector((state) => state.cart);
+  const { selectedAddress } = useSelector((state) => state.address);
+
+  const buildOrderData = () => {
+    if (!selectedAddress) {
+      throw new Error("No address selected");
+    }
+
+    const items = cartItems
+      .filter((item) => item.product && item.product._id)
+      .map((item) => ({
+        product: item.product._id,
+        quantity: item.quantity,
+        price: item.product.discountedPrice || item.product.price,
+      }));
+
+    return {
+      shippingAddress: {
+        fullName: selectedAddress.fullName,
+        mobile: selectedAddress.mobile,
+        address: selectedAddress.address,
+        city: selectedAddress.city,
+        state: selectedAddress.state,
+        pincode: selectedAddress.pincode,
+      },
+      items,
+      paymentMethod: selected,
+    };
+  };
+
+  const placeOrder = async () => {
+    if (!cartItems.length) return alert("cart is empty");
+    const orderData = buildOrderData();
+    await dispatch(createOrder(orderData));
+    dispatch(clearBackendCart());
     setOpenSuccess(true);
   };
   const [selected, setSelected] = useState("razorpay");

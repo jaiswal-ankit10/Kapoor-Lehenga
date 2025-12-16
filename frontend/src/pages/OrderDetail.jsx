@@ -1,34 +1,20 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { fetchSingleOrder, cancelOrder } from "../services/orderService";
+
 import { breadcrumbRoutes } from "../utils/breadcrumbRoutes";
 import RoutesSection from "../components/RoutesSection";
-import amazonIcon from "../assets/icons/amazon.png";
 
 export default function OrderDetail() {
-  const [products, setProducts] = useState([
-    {
-      img: "https://via.placeholder.com/120",
-      title: "Peach Art Silk A Line Wear Silk Printed Designer Lehenga Choli",
-      qty: 1,
-      price: "₹4,000",
-      status: "Processing",
-    },
-    {
-      img: "https://via.placeholder.com/120",
-      title: "Peach Art Silk A Line Wear Silk Printed Designer Lehenga Choli",
-      qty: 1,
-      price: "₹4,000",
-      status: "Processing",
-    },
-    {
-      img: "https://via.placeholder.com/120",
-      title: "Peach Art Silk A Line Wear Silk Printed Designer Lehenga Choli",
-      qty: 1,
-      price: "₹4,000",
-      status: "Processing",
-    },
-  ]);
+  const dispatch = useDispatch();
+  const { id } = useParams();
 
-  const [isOrderCancelled, setIsOrderCancelled] = useState(false);
+  const { order, loading } = useSelector((state) => state.order);
+  useEffect(() => {
+    dispatch(fetchSingleOrder(id));
+  }, [dispatch, id]);
   const breadcrumb = [
     breadcrumbRoutes.home,
     breadcrumbRoutes.myOrder,
@@ -36,14 +22,10 @@ export default function OrderDetail() {
   ];
   const handleOrderCancel = (e) => {
     e.preventDefault();
-    setIsOrderCancelled(true);
-    setProducts((prev) =>
-      prev.map((item) => ({
-        ...item,
-        status: "Cancelled",
-      }))
-    );
   };
+  if (loading || !order) {
+    return <p className="text-center py-10">Loading order details...</p>;
+  }
 
   return (
     <>
@@ -53,8 +35,12 @@ export default function OrderDetail() {
 
         <div className="flex justify-between items-center text-sm text-gray-600 mb-6">
           <p>
-            Ordered on 11 December 2025 |{" "}
-            <span className="font-medium">Order# 954-65218741-215513</span>
+            {new Date(order.createdAt).toLocaleDateString("en-IN", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })}
+            <span className="font-medium">Order# {order.orderId}</span>
           </p>
           <button className="text-teal-600 font-medium hover:underline">
             Download Invoice
@@ -65,37 +51,32 @@ export default function OrderDetail() {
           <div>
             <h3 className="font-semibold mb-2">Shipping Address</h3>
             <p className="text-sm text-gray-700 leading-relaxed">
-              146, Laxmi Narayan Nagar-1
+              {order.shippingAddress?.fullName}
               <br />
-              G R P Road, Udhna
+              {order.shippingAddress?.address}
               <br />
-              Road no 3 Surat
+              {order.shippingAddress?.city}, {order.shippingAddress?.state}
               <br />
-              Gujarat - 394250
-              <br />
-              India
+              {order.shippingAddress?.pincode}
             </p>
           </div>
 
           <div>
             <h3 className="font-semibold mb-2">Payment Methods</h3>
-            <div className="flex items-center gap-2">
-              <img src={amazonIcon} alt="amazon pay" className="w-5" />
-              <p className="text-sm">Amazon Pay Balance</p>
-            </div>
+            <p className="text-sm capitalize">{order.paymentMethod}</p>
           </div>
 
           <div>
             <h3 className="font-semibold mb-2">Order Summary</h3>
             <div className="text-sm text-gray-600 space-y-1">
               <p className="flex justify-between">
-                <span>Bag Total:</span> <span>₹10,000.00</span>
+                <span>Bag Total:</span> <span>₹{order.totalAmount}</span>
               </p>
               <p className="flex justify-between">
                 <span>Packing Charge:</span> <span>₹0.00</span>
               </p>
               <p className="flex justify-between">
-                <span>Sub Total:</span> <span>₹10,000.00</span>
+                <span>Sub Total:</span> <span>₹{order.totalAmount}.00</span>
               </p>
               <p className="flex justify-between">
                 <span>Coupon:</span> <span>- ₹1,000.00</span>
@@ -105,53 +86,56 @@ export default function OrderDetail() {
               </p>
 
               <p className="flex justify-between font-bold pt-2">
-                <span>You Pay:</span> <span>₹10,800.00</span>
+                <span>You Pay:</span>{" "}
+                <span>₹{order.totalAmount - 1000 + 1800}.00</span>
               </p>
             </div>
           </div>
         </div>
 
         {/* Product List */}
-        {products.map((item, i) => (
+        {order.items.map((item) => (
           <div
-            key={i}
+            key={item._id}
             className="flex gap-4 border border-gray-100 rounded-lg p-4 mb-5 bg-white shadow-sm"
           >
             <img
-              src={item.img}
-              alt=""
+              src={item.product.images?.[0]}
+              alt={item.product.title}
               className="w-28 h-28 rounded-md object-cover"
             />
 
             <div className="flex-1">
-              <h4 className="font-semibold text-gray-800 mb-1">{item.title}</h4>
+              <h4 className="font-semibold text-gray-800 mb-1">
+                {item.product.title}
+              </h4>
 
               <p className="text-sm text-gray-700 mb-1">
-                Qty : {item.qty} &nbsp; | &nbsp; {item.price} ({item.qty} item)
+                Qty: {item.quantity} | ₹{item.price}
               </p>
 
               <span
                 className={`text-xs px-3 py-1 ${
-                  isOrderCancelled ? "bg-red-200 text-red-500" : "bg-gray-200"
+                  order.status === "Cancelled"
+                    ? "bg-red-200 text-red-500"
+                    : "bg-gray-200"
                 } rounded-md inline-block`}
               >
-                {item.status}
+                {order.status}
               </span>
             </div>
           </div>
         ))}
 
         {/* Cancel Button */}
-        <div className="flex justify-center mt-8">
-          {!isOrderCancelled && (
-            <button
-              className="bg-[#E9B159] px-12 py-3  font-medium text-white text-lg "
-              onClick={handleOrderCancel}
-            >
-              Order Cancel
-            </button>
-          )}
-        </div>
+        {order.status !== "Cancelled" && (
+          <button
+            className="bg-[#E9B159] px-12 py-3 font-medium text-white text-lg"
+            onClick={() => dispatch(cancelOrder(order._id))}
+          >
+            Order Cancel
+          </button>
+        )}
       </div>
     </>
   );

@@ -59,7 +59,8 @@ const Header = () => {
     navigate(`/products?search=${encodeURIComponent(value)}`);
   };
   const handleCategory = (category) => {
-    dispatch(setCategory(category));
+    const normalizedCategory = category.toLowerCase();
+    dispatch(setCategory(normalizedCategory));
     navigate(`/products?category=${encodeURIComponent(category)}`);
   };
 

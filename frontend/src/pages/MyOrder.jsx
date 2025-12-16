@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import RoutesSection from "../components/RoutesSection";
 import { breadcrumbRoutes } from "../utils/breadcrumbRoutes";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchMyOrders } from "../services/orderService";
 
 const MyOrder = () => {
-  const orders = [
+  const dummyOrders = [
     {
       date: "11 December 2025",
       total: "₹10,000 (3 item)",
@@ -35,28 +37,47 @@ const MyOrder = () => {
     Completed: "bg-green-100 text-green-600",
     Cancel: "bg-red-100 text-red-500",
   };
+
   const breadcrumb = [breadcrumbRoutes.home, breadcrumbRoutes.myOrder];
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { orders, loading } = useSelector((state) => state.order);
+
+  useEffect(() => {
+    dispatch(fetchMyOrders());
+  }, []);
+
   return (
     <>
       <div>
         <RoutesSection breadcrumb={breadcrumb} />
       </div>
       <div className="w-full max-w-3xl mx-auto my-10">
+        {loading && <p>Loading orders...</p>}
+
+        {!loading && orders.length === 0 && (
+          <p className="text-gray-500">No order found</p>
+        )}
         {orders.map((order, i) => (
           <div
             key={i}
             className="flex justify-between items-center border border-gray-100 rounded p-4 my-3 shadow-sm bg-white"
-            onClick={() => navigate("/order-detail")}
+            onClick={() => navigate(`/orders/${order._id}`)}
           >
             <div>
               <p className="text-xs text-gray-500 font-semibold">ORDER DATE</p>
-              <p className="text-sm font-medium">{order.date}</p>
+              <p className="text-sm font-medium">
+                {new Date(order.createdAt).toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
             </div>
 
             <div className="">
               <p className="text-xs text-gray-500 font-semibold">ORDER TOTAL</p>
-              <p className="text-sm font-medium">{order.total}</p>
+              <p className="text-sm font-medium">{order.totalAmount}</p>
             </div>
 
             <div className="text-right">

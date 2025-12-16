@@ -16,6 +16,10 @@ import {
 } from "../controllers/products.controller.js";
 import { verifyJWT, verifyRoles } from "../middlewares/auth.middleware.js";
 import { uploadMultipleImages } from "../middlewares/upload.middleware.js";
+import {
+  getAllOrders,
+  updateOrderStatus,
+} from "../controllers/order.controller.js";
 
 const router = express.Router();
 
@@ -40,5 +44,14 @@ router.delete("/products/:id", verifyJWT, verifyRoles("admin"), deleteProduct);
 
 // Dashboard
 router.get("/dashboard", verifyJWT, verifyRoles("admin"), getDashboardStats);
+
+//Orders
+router.get("/orders", verifyJWT, verifyRoles("admin"), getAllOrders);
+router.put(
+  "/orders/:id/status",
+  verifyJWT,
+  verifyRoles("admin"),
+  updateOrderStatus
+);
 
 export default router;
