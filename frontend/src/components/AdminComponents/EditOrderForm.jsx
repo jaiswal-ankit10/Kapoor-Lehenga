@@ -35,10 +35,15 @@ const EditOrderForm = ({ order, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg w-[400px] p-6">
-        <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
+        <h2 className="text-xl font-semibold mb-4">Update Order Status</h2>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          <select name="status" id="status" onChange={handleChange}>
+          <select
+            name="status"
+            id="status"
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
+          >
             <option value="Pending">Pending</option>
             <option value="Confirmed">Confirmed</option>
             <option value="Processing">Processing</option>

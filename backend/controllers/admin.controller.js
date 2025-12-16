@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { ApiError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
+import { Order } from "../models/order.model.js";
 
 //user management
 export const getAllUsers = async (req, res) => {
@@ -73,11 +74,28 @@ export const updateUserRole = async (req, res) => {
 };
 export const getDashboardStats = async (req, res) => {
   const totalUsers = await User.countDocuments();
+  const totalOrders = await Order.countDocuments();
+  const revenueAgg = await Order.aggregate([
+    {
+      $match: {
+        status: { $nin: ["Cancelled", "Returned"] },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalRevenue: { $sum: "$totalAmount" },
+      },
+    },
+  ]);
+  const totalRevenue = revenueAgg[0]?.totalRevenue || 0;
 
   res.json({
     success: true,
     stats: {
       totalUsers,
+      totalOrders,
+      totalRevenue,
     },
   });
 };
