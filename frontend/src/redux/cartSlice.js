@@ -17,7 +17,7 @@ const cartSlice = createSlice({
     clearCartReducer(state) {
       state.cartItems = [];
       state.totalAmount = 0;
-      updateLocalStorage(state);
+      // updateLocalStorage(state);
     },
   },
 });

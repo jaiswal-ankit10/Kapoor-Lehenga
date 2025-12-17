@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema(
     fullName: {
       type: String,
       required: function () {
-        return this.authProvider === "local"; // Required only for normal signup
+        return this.authProvider === "local";
       },
       trim: true,
     },
@@ -39,7 +39,6 @@ const userSchema = new mongoose.Schema(
       },
     },
 
-    // 🔹 OTP fields (same as before)
     otp: {
       type: String,
     },

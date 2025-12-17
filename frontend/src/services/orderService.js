@@ -61,7 +61,7 @@ export const updateOrderStatus = (id, status) => async (dispatch) => {
 export const cancelOrder = (id) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    const res = await axiosInstance.put(`/admin/orders/${id}/cancel`);
+    const res = await axiosInstance.put(`/orders/${id}/cancel`);
     dispatch(updateOrder(res.data.data));
   } catch (error) {
     dispatch(setError("Failed to cancel order"));
@@ -70,9 +70,18 @@ export const cancelOrder = (id) => async (dispatch) => {
 export const returnOrder = (id) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    const res = await axiosInstance.put(`/admin/orders/${id}/return`);
+    const res = await axiosInstance.put(`/orders/${id}/return`);
     dispatch(updateOrder(res.data.data));
   } catch (error) {
     dispatch(setError("Failed to return order"));
+  }
+};
+export const fetchReturnedOrders = () => async (dispatch) => {
+  try {
+    dispatch(setLoading());
+    const res = await axiosInstance.get("/orders/returned");
+    dispatch(setOrders(res.data.data));
+  } catch (error) {
+    dispatch(setError("Failed to fetch returned orders"));
   }
 };

@@ -59,7 +59,6 @@ export const getOrderById = asyncHandler(async (req, res) => {
 
   let order;
 
-  // Try Mongo _id
   if (mongoose.Types.ObjectId.isValid(id)) {
     order = await Order.findById(id)
       .populate("items.product", "title images price discountedPrice")
@@ -67,7 +66,6 @@ export const getOrderById = asyncHandler(async (req, res) => {
       .populate("user", "email");
   }
 
-  // If not found, try orderId (UUID)
   if (!order) {
     order = await Order.findOne({ orderId: id })
       .populate("items.product", "title images price discountedPrice")
@@ -79,7 +77,6 @@ export const getOrderById = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Order not found");
   }
 
-  // Authorization
   if (req.user.role !== "admin" && order.user._id.toString() !== req.user.id) {
     throw new ApiError(403, "Unauthorized access");
   }
@@ -161,8 +158,28 @@ export const returnOrder = asyncHandler(async (req, res) => {
   }
 
   order.status = "Returned";
+  order.isReturned = true;
   await order.save();
   return res
     .status(200)
     .json(new ApiResponse(200, order, "Order returned updated"));
+});
+
+export const getReturnedOrder = asyncHandler(async (req, res) => {
+  console.log("REQ USER ID:", req.user.id);
+
+  const returnOrders = await Order.find({
+    user: req.user.id,
+    isReturned: true,
+  })
+    .populate("user", "fullName email")
+    .populate("items.product", "images title price");
+
+  console.log("Returned Orders:", returnOrders);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, returnOrders, "Returned orders fetched successfully")
+    );
 });

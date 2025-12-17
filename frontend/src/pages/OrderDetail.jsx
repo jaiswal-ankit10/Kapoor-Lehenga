@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import { fetchSingleOrder, cancelOrder } from "../services/orderService";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  fetchSingleOrder,
+  cancelOrder,
+  returnOrder,
+} from "../services/orderService";
 
 import { breadcrumbRoutes } from "../utils/breadcrumbRoutes";
 import RoutesSection from "../components/RoutesSection";
 
 export default function OrderDetail() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { id } = useParams();
 
   const { order, loading } = useSelector((state) => state.order);
@@ -22,9 +27,30 @@ export default function OrderDetail() {
   ];
   const handleOrderCancel = (e) => {
     e.preventDefault();
+    const answer = confirm("Do you really want to cancel order");
+    if (answer) {
+      dispatch(cancelOrder(order._id));
+      navigate("/my-order");
+    } else {
+      return;
+    }
   };
-  if (loading || !order) {
+  const handleReturnOrder = (e) => {
+    e.preventDefault();
+    const answer = confirm("Do you really want to return order");
+
+    if (answer) {
+      dispatch(returnOrder(order._id));
+      navigate("/my-order");
+    } else {
+      return;
+    }
+  };
+  if (loading) {
     return <p className="text-center py-10">Loading order details...</p>;
+  }
+  if (!order) {
+    return <p className="text-center py-10">No order found</p>;
   }
 
   return (
@@ -127,15 +153,26 @@ export default function OrderDetail() {
           </div>
         ))}
 
-        {/* Cancel Button */}
-        {order.status !== "Cancelled" && (
-          <button
-            className="bg-[#E9B159] px-12 py-3 font-medium text-white text-lg"
-            onClick={() => dispatch(cancelOrder(order._id))}
-          >
-            Order Cancel
-          </button>
-        )}
+        <div className="flex justify-center items-center">
+          {order.status !== "Cancelled" &&
+            order.status !== "Delivered" &&
+            order.status !== "Returned" && (
+              <button
+                className="bg-[#E9B159] px-12 py-3 font-medium text-white text-lg"
+                onClick={handleOrderCancel}
+              >
+                Order Cancel
+              </button>
+            )}
+          {order.status === "Delivered" && (
+            <button
+              className="bg-[#E9B159] px-12 py-3 font-medium text-white text-lg"
+              onClick={handleReturnOrder}
+            >
+              Return Order
+            </button>
+          )}
+        </div>
       </div>
     </>
   );
