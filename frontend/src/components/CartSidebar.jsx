@@ -3,10 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { IoClose } from "react-icons/io5";
 import {
+  loadCartFromBackend,
   removeBackendCartItem,
   updateQtyBackend,
 } from "../services/cartService";
-import { clearBackendCart } from "../services/cartService";
+import { useEffect } from "react";
 
 const CartSidebar = ({ openCart, setOpenCart }) => {
   const { cartItems, totalAmount } = useSelector((store) => store.cart);
@@ -17,6 +18,11 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
     if (!url) return "";
     return url.startsWith("http") ? url : `${imageBaseUrl}${url}`;
   };
+  useEffect(() => {
+    if (openCart) {
+      dispatch(loadCartFromBackend());
+    }
+  }, [openCart, dispatch]);
 
   return (
     <>
@@ -50,7 +56,7 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
 
           {cartItems?.map((item) => (
             <div
-              key={item.product?._id}
+              key={item?._id}
               className="border rounded-md border-gray-300 flex gap-4 relative pr-4"
             >
               <img
@@ -69,11 +75,13 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
 
                 <div className="flex items-center gap-2 mt-2 text-black">
                   <button
-                    onClick={() =>
-                      dispatch(
-                        updateQtyBackend(item.product._id, item.quantity - 1)
-                      )
-                    }
+                    onClick={() => {
+                      if (item.quantity > 1) {
+                        dispatch(
+                          updateQtyBackend(item.product._id, item.quantity - 1)
+                        );
+                      }
+                    }}
                     className="border px-2"
                   >
                     -

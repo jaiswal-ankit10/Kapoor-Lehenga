@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { ApiError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { Order } from "../models/order.model.js";
+import { Product } from "../models/product.model.js";
 
 //user management
 export const getAllUsers = async (req, res) => {
@@ -75,6 +76,7 @@ export const updateUserRole = async (req, res) => {
 export const getDashboardStats = async (req, res) => {
   const totalUsers = await User.countDocuments();
   const totalOrders = await Order.countDocuments();
+  const totalProducts = await Product.countDocuments();
   const revenueAgg = await Order.aggregate([
     {
       $match: {
@@ -89,6 +91,110 @@ export const getDashboardStats = async (req, res) => {
     },
   ]);
   const totalRevenue = revenueAgg[0]?.totalRevenue || 0;
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999);
+
+  const todaysOrders = await Order.countDocuments({
+    createdAt: {
+      $gte: startOfToday,
+      $lte: endOfToday,
+    },
+  });
+
+  const completedOrders = await Order.countDocuments({
+    status: "Delivered",
+  });
+  const cancelledOrders = await Order.countDocuments({
+    status: "Cancelled",
+  });
+
+  //todaysRevneue
+  const resultOfTodayRevenue = await Order.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: startOfToday,
+          $lte: endOfToday,
+        },
+        status: { $ne: "Cancelled" },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        todaysRevenue: { $sum: "$totalAmount" },
+      },
+    },
+  ]);
+
+  const todaysRevenue = resultOfTodayRevenue[0]?.todaysRevenue || 0;
+
+  //monthlyRevenue
+  const now = new Date();
+  const startOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+
+  const endOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0,
+    23,
+    59,
+    59,
+    999
+  );
+
+  const resultOfMonthlyRevenue = await Order.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: startOfMonth,
+          $lte: endOfMonth,
+        },
+        status: { $nin: ["Cancelled", "Returned"] },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        monthlyRevenue: { $sum: "$totalAmount" },
+      },
+    },
+  ]);
+  const monthlyRevenue = resultOfMonthlyRevenue[0]?.monthlyRevenue || 0;
+
+  //yearlyRevenue
+  const startOfYear = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+  const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+
+  const resultOfYearlyRevenue = await Order.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: startOfYear,
+          $lte: endOfYear,
+        },
+        status: { $nin: ["Cancelled", "Returned"] },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        yearlyRevenue: { $sum: "$totalAmount" },
+      },
+    },
+  ]);
+  const yearlyRevenue = resultOfYearlyRevenue[0]?.yearlyRevenue || 0;
 
   res.json({
     success: true,
@@ -96,6 +202,13 @@ export const getDashboardStats = async (req, res) => {
       totalUsers,
       totalOrders,
       totalRevenue,
+      totalProducts,
+      todaysOrders,
+      completedOrders,
+      cancelledOrders,
+      todaysRevenue,
+      monthlyRevenue,
+      yearlyRevenue,
     },
   });
 };

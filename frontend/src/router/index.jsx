@@ -19,6 +19,9 @@ import AdminDashboard from "../components/AdminComponents/AdminDashboard";
 import Users from "../components/AdminComponents/Users";
 import AdminProducts from "../components/AdminComponents/AdminProducts";
 import AdminOrders from "../components/AdminComponents/AdminOrders";
+import Categories from "../components/AdminComponents/Categories";
+import PaymentHistory from "../components/AdminComponents/PaymentHistory";
+import CouponList from "../components/AdminComponents/CouponList";
 
 export const router = createBrowserRouter([
   {
@@ -93,10 +96,14 @@ export const router = createBrowserRouter([
       </AdminRoute>
     ),
     children: [
+      { path: "", element: <AdminDashboard /> },
       { path: "dashboard", element: <AdminDashboard /> },
       { path: "users", element: <Users /> },
       { path: "products", element: <AdminProducts /> },
       { path: "orders", element: <AdminOrders /> },
+      { path: "categories", element: <Categories /> },
+      { path: "payments", element: <PaymentHistory /> },
+      { path: "coupon", element: <CouponList /> },
     ],
   },
 ]);

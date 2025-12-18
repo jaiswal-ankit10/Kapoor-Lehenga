@@ -44,6 +44,7 @@ const PaymentPage = () => {
       },
       items,
       paymentMethod: selected,
+      paymentStatus,
     };
   };
 

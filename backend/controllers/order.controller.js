@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 
 export const createOrder = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const { items, shippingAddress, paymentMethod } = req.body;
+  const { items, shippingAddress, paymentMethod, paymentStatus } = req.body;
 
   if (!items || items.length === 0) {
     throw new ApiError(400, "Order Items are required");
@@ -34,6 +34,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     totalItems,
     shippingAddress,
     paymentMethod,
+    paymentStatus,
   });
   return res
     .status(200)
@@ -70,7 +71,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
     order = await Order.findOne({ orderId: id })
       .populate("items.product", "title images price discountedPrice")
       .populate("shippingAddress")
-      .populate("user", "email");
+      .populate("user", "email fullName");
   }
 
   if (!order) {
@@ -91,7 +92,7 @@ export const getAllOrders = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 })
     .populate("items.product", "title images price discountedPrice")
     .populate("shippingAddress")
-    .populate("user", "email");
+    .populate("user", "email fullName");
 
   if (!orders) {
     throw new ApiError(404, "Orders not found");

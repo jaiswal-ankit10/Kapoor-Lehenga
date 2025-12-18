@@ -10,8 +10,7 @@ import EditProductForm from "./EditProductForm";
 import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
 import PageHeader from "./PageHeader";
 import { Edit, Plus, Search, Trash } from "lucide-react";
-
-export default function AdminProducts() {
+const Categories = () => {
   const [products, setProducts] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const dispatch = useDispatch();
@@ -56,15 +55,14 @@ export default function AdminProducts() {
     setIsEditOpen(false);
   };
 
-  const breadcrumb = [breadcrumbAdmin.home, breadcrumbAdmin.product];
-
+  const breadcrumb = [breadcrumbAdmin.home, breadcrumbAdmin.categories];
   return (
     <div>
       <div>
         <PageHeader
-          title={"Product List"}
+          title={"Categories List"}
           breadcrumbs={breadcrumb}
-          buttonText={"Add Product"}
+          buttonText={"Add Categories"}
           Icon={Plus}
           handleClick={() => setShowAddForm(true)}
           buttonBg={"bg-[#E9B159]"}
@@ -101,33 +99,18 @@ export default function AdminProducts() {
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left table-auto">
+          <table className="w-full text-left">
             <thead className="bg-gray-50 text-gray-500">
               <tr className="text-sm text-gray-500">
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  ACTION
-                </th>
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  PRODUCT NAME{" "}
-                </th>
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  BRAND NAME{" "}
-                </th>
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
+                <th className="px-5 py-3 text-center">ACTION</th>
+                <th className="px-5 py-3 text-center">NAME</th>
+                <th className="px-5 py-3 text-center">BRAND</th>
+                <th className="px-5 py-3 text-center">DESCRIPTION</th>
+                <th className="px-5 py-3 text-center">CATEGORY</th>
+                <th className="px-5 py-3 text-center">
                   PRODUCT THUMBNAIL IMAGE
                 </th>
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  PRODUCT MRP
-                </th>
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  PRODUCT PRICE
-                </th>
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  PRODUCT DISCOUNT
-                </th>
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  UPDATED AT
-                </th>
+                <th className="px-5 py-3 text-center">UPDATED AT</th>
               </tr>
             </thead>
             <tbody>
@@ -149,6 +132,8 @@ export default function AdminProducts() {
                   </td>
                   <td className="py-2 px-5 text-center">{p.title}</td>
                   <td className="py-2 px-5 text-center">{p.brand}</td>
+                  <td className="py-2 px-5 text-center">{p.description}</td>
+                  <td className="py-2 px-5 text-center">{p.category}</td>
                   <td className="py-2 px-5 text-center">
                     <div className="flex items-center justify-center ">
                       <img
@@ -158,11 +143,7 @@ export default function AdminProducts() {
                       />
                     </div>
                   </td>
-                  <td className="py-2 px-5 text-center">₹{p.price}</td>
-                  <td className="py-2 px-5 text-center">
-                    ₹{p.discountedPrice || p.price}
-                  </td>
-                  <td className="py-2 px-5 text-center">{p.discount}%</td>
+
                   <td className="py-2 px-5 text-center">
                     {new Date(p.createdAt).toLocaleDateString()}
                   </td>
@@ -183,4 +164,6 @@ export default function AdminProducts() {
       </div>
     </div>
   );
-}
+};
+
+export default Categories;

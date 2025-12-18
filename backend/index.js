@@ -51,6 +51,7 @@ import wishlistRoutes from "./routes/wishlist.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import addressRoutes from "./routes/address.routes.js";
+import bannerRoutes from "./routes/banner.routes.js";
 
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/auth", authRegister);
@@ -59,6 +60,7 @@ app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/wishlist", wishlistRoutes);
 app.use("/api/v1", orderRoutes);
 app.use("/api/v1", addressRoutes);
+app.use("/api/v1/banners", addressRoutes);
 
 app.use((req, res, next) => {
   res.status(404).json({

@@ -46,6 +46,7 @@ const EditProductForm = ({ product, onClose }) => {
         <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
 
         <form onSubmit={handleSubmit} className="space-y-3">
+          <label>Title</label>
           <input
             name="title"
             value={formData.title}
@@ -53,7 +54,7 @@ const EditProductForm = ({ product, onClose }) => {
             placeholder="Product title"
             className="w-full border p-2"
           />
-
+          <label>Price</label>
           <input
             type="number"
             name="price"
@@ -62,7 +63,7 @@ const EditProductForm = ({ product, onClose }) => {
             placeholder="Price"
             className="w-full border p-2"
           />
-
+          <label>Discount</label>
           <input
             type="number"
             name="discount"
@@ -71,7 +72,7 @@ const EditProductForm = ({ product, onClose }) => {
             placeholder="Discount (%)"
             className="w-full border p-2"
           />
-
+          <label>Stock</label>
           <input
             type="number"
             name="stock"
@@ -80,7 +81,7 @@ const EditProductForm = ({ product, onClose }) => {
             placeholder="Stock"
             className="w-full border p-2"
           />
-
+          <label>Category</label>
           <input
             name="category"
             value={formData.category}

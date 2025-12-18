@@ -118,7 +118,7 @@ export const logout = asyncHandler(async (req, res) => {
 
 export const sendOtp = asyncHandler(async (req, res) => {
   const { mobile } = req.body;
-  const { purpose } = req.query; // "signup" OR "login"
+  const { purpose } = req.query;
 
   if (!mobile) {
     throw new ApiError(400, "Mobile number is required");

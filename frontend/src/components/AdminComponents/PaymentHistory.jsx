@@ -1,21 +1,15 @@
+import { Download, Filter, Search, TrendingUp } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import axiosInstance from "../../api/axiosInstance";
+import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
+import PageHeader from "./PageHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllOrders } from "../../services/orderService";
-import EditOrderForm from "./EditOrderForm";
-import PageHeader from "./PageHeader";
-import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
-import {
-  ShoppingCart,
-  CheckCircle,
-  XCircle,
-  Search,
-  Filter,
-  SquarePen,
-  Plus,
-} from "lucide-react";
+import axiosInstance from "../../api/axiosInstance";
 
-export default function AdminOrders() {
+const PaymentHistory = () => {
+  const [stats, setStats] = useState({});
+  const breadcrumb = [breadcrumbAdmin.home, breadcrumbAdmin.payment];
+
   const dispatch = useDispatch();
   const { orders } = useSelector((state) => state.order);
 
@@ -23,23 +17,6 @@ export default function AdminOrders() {
     dispatch(fetchAllOrders());
   }, []);
 
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const openEditModal = (order) => {
-    setIsEditOpen(true);
-    setSelectedOrder(order);
-  };
-
-  const closeEditModal = () => {
-    setIsEditOpen(false);
-  };
-
-  const [stats, setStats] = useState({
-    todaysOrders: 0,
-    completedOrders: 0,
-    cancelledOrders: 0,
-    totalOrders: 0,
-  });
   useEffect(() => {
     (async () => {
       try {
@@ -50,83 +27,76 @@ export default function AdminOrders() {
       }
     })();
   }, []);
-
-  const breadcrumb = [breadcrumbAdmin.home, breadcrumbAdmin.orders];
-
   return (
-    <div className="">
-      <div>
-        <PageHeader
-          title={"Order List"}
-          breadcrumbs={breadcrumb}
-          buttonText={"Export"}
-          Icon={Plus}
-          handleClick={(e) => e.preventDefault()}
-          buttonBg={"bg-none"}
-          buttonTextColor={"text-green-900"}
-        />
-      </div>
-
-      {/* cards */}
+    <div>
+      <PageHeader
+        title={"Payment History List"}
+        breadcrumbs={breadcrumb}
+        buttonText={"Export"}
+        Icon={Download}
+        handleClick={(e) => e.preventDefault()}
+        buttonBg={"bg-none"}
+        buttonTextColor={"text-green-900"}
+      />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  gap-6">
         <div className="bg-white rounded-xl shadow-sm p-5 flex justify-between items-center">
           <div>
-            <h3 className="text-2xl font-semibold text-gray-800">
-              {stats.todaysOrders}
+            <h3 className="text-2xl font-semibold text-gray-600">
+              ₹{stats.todaysRevenue}
             </h3>
-            <p className="text-sm text-gray-500 mt-1">Today's Orders</p>
+            <p className="text-md text-gray-500 mt-1">Today's Revenue</p>
           </div>
 
           <div
             className={`w-11 h-11 flex items-center justify-center rounded-full bg-green-100`}
           >
-            <ShoppingCart className="text-green-700" size={20} />
+            <TrendingUp className="text-green-700" size={20} />
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-5 flex justify-between items-center">
           <div>
-            <h3 className="text-2xl font-semibold text-gray-800">
-              {stats.completedOrders}
+            <h3 className="text-2xl font-semibold text-gray-600">
+              ₹{stats.monthlyRevenue}
             </h3>
-            <p className="text-sm text-gray-500 mt-1">Total Complete Orders</p>
+            <p className="text-md text-gray-500 mt-1">This Month's Revenue</p>
           </div>
 
           <div
             className={`w-11 h-11 flex items-center justify-center rounded-full bg-cyan-100`}
           >
-            <CheckCircle className="text-cyan-600" size={20} />
+            <TrendingUp className="text-cyan-600" size={20} />
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-5 flex justify-between items-center">
           <div>
-            <h3 className="text-2xl font-semibold text-gray-800">
-              {stats.cancelledOrders}
+            <h3 className="text-2xl font-semibold text-gray-600">
+              ₹{stats.yearlyRevenue}
             </h3>
-            <p className="text-sm text-gray-500 mt-1">Total Cancel Orders</p>
+            <p className="text-md text-gray-500 mt-1">This Year's Revenue</p>
           </div>
 
           <div
             className={`w-11 h-11 flex items-center justify-center rounded-full bg-green-100`}
           >
-            <XCircle className="text-green-600" size={20} />
+            <TrendingUp className="text-green-600" size={20} />
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-5 flex justify-between items-center">
           <div>
-            <h3 className="text-2xl font-semibold text-gray-800">
-              {stats.totalOrders}
+            <h3 className="text-2xl font-semibold text-gray-600">
+              ₹{stats.totalRevenue}
             </h3>
-            <p className="text-sm text-gray-500 mt-1">Total Orders</p>
+            <p className="text-md text-gray-500 mt-1">Total Revenue</p>
           </div>
 
           <div
             className={`w-11 h-11 flex items-center justify-center rounded-full bg-orange-100`}
           >
-            <ShoppingCart className="text-orange-500" size={20} />
+            <TrendingUp className="text-orange-500" size={20} />
           </div>
         </div>
       </div>
-      {/* table */}
+
       <div className="bg-white p-4 rounded shadow-xl my-6">
         <div className="flex flex-wrap gap-4 items-center justify-between p-5 ">
           <select className="border rounded-md px-3 py-2 text-sm text-gray-600">
@@ -136,15 +106,14 @@ export default function AdminOrders() {
           </select>
 
           <div className="flex items-center gap-3">
-            <div className="relative w-52 lg:w-64">
+            <div className="relative">
               <Search
                 size={16}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
-                name="search"
                 placeholder="Search"
-                className="pl-9 pr-4 py-2 border rounded-md text-sm w-full"
+                className="pl-9 pr-4 py-2 border rounded-md text-sm w-64"
               />
             </div>
 
@@ -155,45 +124,44 @@ export default function AdminOrders() {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm table-auto">
-            <thead className="bg-gray-50 text-gray-500 border-gray-300">
+            <thead className="bg-gray-50 text-gray-500">
               <tr>
                 <th className="px-5 py-3 text-left whitespace-nowrap min-w-max">
-                  Edit Status
+                  ORDER BY
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
                   ORDER NUMBER
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  ORDER BY
+                  STATUS
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  ORDER STATUS
+                  PAYMENT METHOD
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  PAYMENT TYPE
+                  AMOUNT
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  TOTAL AMOUNT
-                </th>
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  ORDER DATE
+                  PAYMENT DATE
                 </th>
               </tr>
             </thead>
             <tbody>
               {orders?.map((order) => (
-                <tr key={order._id} className="border-t">
-                  <td className="px-5 py-4">
+                <tr key={order._id} className="border-t border-gray-300">
+                  <td className="px-5 py-4">{order.user?.email}</td>
+                  <td className="py-2 px-5 text-center">{order.orderId}</td>
+                  <td className="py-2 px-5 text-center">
                     <div
-                      className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center"
-                      onClick={() => openEditModal(order)}
+                      className={`rounded ${
+                        order.paymentStatus === "complete"
+                          ? "bg-green-400 text-white"
+                          : "bg-red-400 text-white"
+                      }`}
                     >
-                      <SquarePen size={16} />
+                      {order.paymentStatus}
                     </div>
                   </td>
-                  <td className="py-2 px-5 text-center">{order.orderId}</td>
-                  <td className="py-2 px-5 text-center">{order.user?.email}</td>
-                  <td className="py-2 px-5 text-center">{order.status}</td>
                   <td className="py-2 px-5 text-center uppercase">
                     {order.paymentMethod}
                   </td>
@@ -208,10 +176,9 @@ export default function AdminOrders() {
             </tbody>
           </table>
         </div>
-        {isEditOpen && selectedOrder && (
-          <EditOrderForm order={selectedOrder} onClose={closeEditModal} />
-        )}
       </div>
     </div>
   );
-}
+};
+
+export default PaymentHistory;

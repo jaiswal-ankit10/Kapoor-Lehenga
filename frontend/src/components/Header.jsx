@@ -294,7 +294,7 @@ const Header = () => {
             <li
               onClick={() => handleCategory(item)}
               key={index}
-              className="cursor-pointer hover:text-gray-200"
+              className="cursor-pointer hover:text-gray-200 whitespace-nowrap min-w-max"
             >
               {item}
             </li>
