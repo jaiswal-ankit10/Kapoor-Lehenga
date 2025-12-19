@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import AddProductForm from "./AddProductForm";
-import {
-  deleteProductById,
-  updateProductById,
-} from "../../services/productService";
+import { deleteProductById } from "../../services/productService";
 import { useDispatch } from "react-redux";
-import EditProductForm from "./EditProductForm";
 import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
 import PageHeader from "./PageHeader";
 import { Edit, Plus, Search, Trash } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const fetchProducts = async () => {
     try {
@@ -34,27 +32,12 @@ export default function AdminProducts() {
       return;
 
     dispatch(deleteProductById(p._id));
+    fetchProducts();
   };
 
   useEffect(() => {
     fetchProducts();
-  }, [handleDelete]);
-
-  const handleSuccess = () => {
-    fetchProducts();
-  };
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
-  const openEditModal = (product) => {
-    setSelectedProduct(product);
-    setIsEditOpen(true);
-  };
-
-  const closeEditModal = () => {
-    setSelectedProduct(null);
-    setIsEditOpen(false);
-  };
+  }, []);
 
   const breadcrumb = [breadcrumbAdmin.home, breadcrumbAdmin.product];
 
@@ -66,7 +49,7 @@ export default function AdminProducts() {
           breadcrumbs={breadcrumb}
           buttonText={"Add Product"}
           Icon={Plus}
-          handleClick={() => setShowAddForm(true)}
+          handleClick={() => navigate("/admin/productform")}
           buttonBg={"bg-[#E9B159]"}
           buttonTextColor={"text-white"}
         />
@@ -74,13 +57,13 @@ export default function AdminProducts() {
       <div className="bg-white p-4 rounded shadow">
         <div className="flex flex-wrap gap-4 items-center justify-between p-5 ">
           <div className="flex gap-4">
-            <select className="border rounded-md px-3 py-2 text-sm text-gray-600">
+            <select className="border border-gray-300 rounded-md px-3  py-2 text-sm text-gray-600">
               <option>Action</option>
               <option>Active All</option>
               <option>Deactive All</option>
               <option>Delete All</option>
             </select>
-            <select className="border rounded-md px-3 py-2 text-sm text-gray-600">
+            <select className="border border-gray-300 rounded-md px-3  py-2 text-sm text-gray-600">
               <option>10 rows</option>
               <option>20 rows</option>
               <option>50 rows</option>
@@ -95,7 +78,7 @@ export default function AdminProducts() {
               />
               <input
                 placeholder="Search"
-                className="pl-9 pr-4 py-2 border rounded-md text-sm w-64"
+                className="pl-9 pr-4 py-2 border border-gray-300 rounded-md text-sm w-40 md:w-64"
               />
             </div>
           </div>
@@ -108,13 +91,16 @@ export default function AdminProducts() {
                   ACTION
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  PRODUCT NAME{" "}
+                  PRODUCT NAME
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  BRAND NAME{" "}
+                  BRAND NAME
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
                   PRODUCT THUMBNAIL IMAGE
+                </th>
+                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
+                  PRODUCT STOCK
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
                   PRODUCT MRP
@@ -136,7 +122,11 @@ export default function AdminProducts() {
                   <td className="px-5 py-4 flex items-center gap-2">
                     <div
                       className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center"
-                      onClick={() => openEditModal(p)}
+                      onClick={() =>
+                        navigate("/admin/productform", {
+                          state: { product: p },
+                        })
+                      }
                     >
                       <Edit size={16} className="text-green-950" />
                     </div>
@@ -158,6 +148,7 @@ export default function AdminProducts() {
                       />
                     </div>
                   </td>
+                  <td className="py-2 px-5 text-center">{p.stock}</td>
                   <td className="py-2 px-5 text-center">₹{p.price}</td>
                   <td className="py-2 px-5 text-center">
                     ₹{p.discountedPrice || p.price}
@@ -171,15 +162,6 @@ export default function AdminProducts() {
             </tbody>
           </table>
         </div>
-        {showAddForm && (
-          <AddProductForm
-            onClose={() => setShowAddForm(false)}
-            onSuccess={handleSuccess}
-          />
-        )}
-        {isEditOpen && selectedProduct && (
-          <EditProductForm product={selectedProduct} onClose={closeEditModal} />
-        )}
       </div>
     </div>
   );

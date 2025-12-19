@@ -1,9 +1,18 @@
 import { Product } from "../models/product.model.js";
-import cloudinary from "../config/cloudinary.js";
-import { ApiError } from "../utils/api-error.js";
 import { uploadToCloudinary } from "../utils/uploadToCloudinary.js";
 
-// Helper function to upload image to Cloudinary with small retry on timeout
+const uploadWithRetry = async (buffer, retries = 1) => {
+  try {
+    return await uploadToCloudinary(buffer);
+  } catch (err) {
+    console.error("Cloudinary upload failed:", err.message);
+    if (err.http_code === 499 && retries > 0) {
+      console.warn("Retrying Cloudinary upload...");
+      return uploadWithRetry(buffer, retries - 1);
+    }
+    throw err;
+  }
+};
 
 export const createProduct = async (req, res) => {
   try {
@@ -17,9 +26,8 @@ export const createProduct = async (req, res) => {
       });
     }
 
-    // Upload images in parallel
     const imageUrls = await Promise.all(
-      req.files.map((file) => uploadToCloudinary(file))
+      req.files.map((file) => uploadWithRetry(file.buffer))
     );
 
     const {
@@ -34,6 +42,12 @@ export const createProduct = async (req, res) => {
     } = req.body;
 
     const priceNum = Number(price);
+    if (isNaN(priceNum)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid price",
+      });
+    }
     const discountNum = Number(discount) || 0;
     const discountedPrice =
       discountNum > 0 ? priceNum - (priceNum * discountNum) / 100 : priceNum;
@@ -125,27 +139,38 @@ export const getProductById = async (req, res) => {
 };
 export const updateProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { ...req.body },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    let updateData = { ...req.body };
 
-    if (!product)
+    if (req.files && req.files.length > 0) {
+      const imageUrls = await Promise.all(
+        req.files.map((file) => uploadWithRetry(file.buffer))
+      );
+
+      updateData.images = imageUrls;
+      updateData.thumbnail = imageUrls[0];
+    }
+
+    const product = await Product.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!product) {
       return res
         .status(404)
         .json({ success: false, message: "Product not found" });
+    }
 
-    res
-      .status(200)
-      .json({ success: true, message: "Product updated", product });
+    res.status(200).json({
+      success: true,
+      message: "Product updated",
+      product,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);

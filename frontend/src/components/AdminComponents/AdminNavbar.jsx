@@ -27,7 +27,7 @@ const AdminNavbar = ({ setIsSidebarOpen }) => {
   }, []);
 
   return (
-    <header className="w-full bg-white shadow-xl px-6 py-3 flex items-center justify-between">
+    <header className="w-full bg-white shadow-xl px-6 py-3 flex items-center justify-between rounded">
       <div>
         <Menu
           className="block lg:hidden"

@@ -16,12 +16,13 @@ import {
   ChevronDown,
   Circle,
   CircleSmall,
+  CircleStop,
 } from "lucide-react";
 
 import blackLogo from "../assets/icons/blackLogo.png";
 import AdminNavbar from "../components/AdminComponents/AdminNavbar";
 
-const SidebarLink = ({ to, icon: Icon, label }) => (
+const SidebarLink = ({ to, icon: Icon, label, showLabel }) => (
   <NavLink
     to={to}
     className={({ isActive }) =>
@@ -32,7 +33,7 @@ const SidebarLink = ({ to, icon: Icon, label }) => (
     }
   >
     <Icon size={18} />
-    <span className="text-md font-medium">{label}</span>
+    {showLabel && <span className="text-md font-medium">{label}</span>}
   </NavLink>
 );
 
@@ -43,6 +44,7 @@ export default function AdminPanel() {
     home: false,
   });
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [showLabel, setShowLabel] = useState(true);
 
   const toggle = (key) => setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
   useEffect(() => {
@@ -62,15 +64,21 @@ export default function AdminPanel() {
         className={`
     fixed lg:static top-0 left-0 z-40
     h-screen
-    w-64 bg-white shadow-2xl
+    ${showLabel ? "w-64" : "w-20"} bg-white shadow-2xl
     transform transition-transform duration-300
     ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
     lg:translate-x-0
     flex flex-col overflow-y-auto
   `}
       >
-        <div className="p-6 flex justify-between">
+        <div className="p-6 flex justify-between items-center">
           <img src={blackLogo} alt="logo" className="w-40" />
+          <div
+            className="hidden md:block"
+            onClick={() => setShowLabel((prev) => !prev)}
+          >
+            <CircleStop color="#b2b1b4" />
+          </div>
           <div className="flex justify-end p-4 md:hidden">
             <button onClick={() => setIsSidebarOpen(false)}>✕</button>
           </div>
@@ -78,13 +86,24 @@ export default function AdminPanel() {
 
         {/* Menu */}
         <nav className="flex-1 p-4 ">
-          <SidebarLink to="/admin/dashboard" icon={Home} label="Dashboard" />
-          <SidebarLink to="/admin/users" icon={Users} label="Users" />
+          <SidebarLink
+            to="/admin/dashboard"
+            icon={Home}
+            label="Dashboard"
+            showLabel={showLabel}
+          />
+          <SidebarLink
+            to="/admin/users"
+            icon={Users}
+            label="Users"
+            showLabel={showLabel}
+          />
 
           <SidebarLink
             to="/admin/products"
             icon={ShoppingBag}
             label="Product"
+            showLabel={showLabel}
           />
 
           {/* Product Config */}
@@ -94,12 +113,16 @@ export default function AdminPanel() {
           >
             <div className="flex items-center gap-3 text-gray-700">
               <Settings size={18} />
-              <span className="text-md font-medium">Product Config</span>
+              {showLabel && (
+                <span className="text-md font-medium">Product Config</span>
+              )}
             </div>
-            <ChevronDown
-              size={16}
-              className={`transition ${open.product ? "rotate-180" : ""}`}
-            />
+            {showLabel && (
+              <ChevronDown
+                size={16}
+                className={`transition ${open.product ? "rotate-180" : ""}`}
+              />
+            )}
           </button>
 
           {open.product && (
@@ -110,6 +133,7 @@ export default function AdminPanel() {
                   to="/admin/categories"
                   icon={CircleSmall}
                   label="Categories"
+                  showLabel={showLabel}
                 />
               </div>
             </>
@@ -122,12 +146,16 @@ export default function AdminPanel() {
           >
             <div className="flex items-center gap-3 text-gray-700">
               <ShoppingCart size={18} />
-              <span className="text-md font-medium">Order Management</span>
+              {showLabel && (
+                <span className="text-md font-medium">Order Management</span>
+              )}
             </div>
-            <ChevronDown
-              size={16}
-              className={`transition ${open.order ? "rotate-180" : ""}`}
-            />
+            {showLabel && (
+              <ChevronDown
+                size={16}
+                className={`transition ${open.order ? "rotate-180" : ""}`}
+              />
+            )}
           </button>
 
           {open.order && (
@@ -136,26 +164,40 @@ export default function AdminPanel() {
                 to="/admin/orders"
                 icon={ShoppingCart}
                 label="Orders"
+                showLabel={showLabel}
               />
               <SidebarLink
                 to="/admin/payments"
                 icon={CreditCard}
                 label="Payment History"
+                showLabel={showLabel}
               />
             </div>
           )}
           <SidebarLink
+            to="/admin/coupon"
+            icon={Tag}
+            label="Coupon"
+            showLabel={showLabel}
+          />
+          <SidebarLink
             to="/admin/product-review"
             icon={Star}
             label="Product Review"
+            showLabel={showLabel}
           />
-          <SidebarLink to="/admin/coupon" icon={Tag} label="Coupon" />
           <SidebarLink
             to="/admin/inquiry"
             icon={MessageCircle}
             label="Inquiry"
+            showLabel={showLabel}
           />
-          <SidebarLink to="/admin/clients" icon={Users} label="Clients" />
+          <SidebarLink
+            to="/admin/clients"
+            icon={Users}
+            label="Clients"
+            showLabel={showLabel}
+          />
         </nav>
       </aside>
 

@@ -5,6 +5,10 @@ import PageHeader from "./PageHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllOrders } from "../../services/orderService";
 import axiosInstance from "../../api/axiosInstance";
+import {
+  exportToCSV,
+  formatPaymentHistorForCSV,
+} from "../../utils/exportToCSV";
 
 const PaymentHistory = () => {
   const [stats, setStats] = useState({});
@@ -12,6 +16,11 @@ const PaymentHistory = () => {
 
   const dispatch = useDispatch();
   const { orders } = useSelector((state) => state.order);
+
+  const handlePaymentExport = (e) => {
+    e.preventDefault();
+    exportToCSV(formatPaymentHistorForCSV(orders), "payments.csv");
+  };
 
   useEffect(() => {
     dispatch(fetchAllOrders());
@@ -34,7 +43,7 @@ const PaymentHistory = () => {
         breadcrumbs={breadcrumb}
         buttonText={"Export"}
         Icon={Download}
-        handleClick={(e) => e.preventDefault()}
+        handleClick={handlePaymentExport}
         buttonBg={"bg-none"}
         buttonTextColor={"text-green-900"}
       />
@@ -99,7 +108,7 @@ const PaymentHistory = () => {
 
       <div className="bg-white p-4 rounded shadow-xl my-6">
         <div className="flex flex-wrap gap-4 items-center justify-between p-5 ">
-          <select className="border rounded-md px-3 py-2 text-sm text-gray-600">
+          <select className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600">
             <option>10 rows</option>
             <option>20 rows</option>
             <option>50 rows</option>
@@ -113,7 +122,7 @@ const PaymentHistory = () => {
               />
               <input
                 placeholder="Search"
-                className="pl-9 pr-4 py-2 border rounded-md text-sm w-64"
+                className="pl-9 pr-4 py-2 border border-gray-300 rounded-md text-sm w-40 md:w-64"
               />
             </div>
 

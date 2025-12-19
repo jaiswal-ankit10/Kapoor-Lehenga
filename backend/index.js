@@ -12,11 +12,11 @@ import dns from "dns";
 dns.setDefaultResultOrder("ipv4first");
 
 process.on("unhandledRejection", (reason, promise) => {
-  console.error("❌ Unhandled Rejection:", reason);
+  console.error("Unhandled Rejection:", reason);
 });
 
 process.on("uncaughtException", (error) => {
-  console.error("❌ Uncaught Exception:", error);
+  console.error("Uncaught Exception:", error);
 });
 
 const app = express();

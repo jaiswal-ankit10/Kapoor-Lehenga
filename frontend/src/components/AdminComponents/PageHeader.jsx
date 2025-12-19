@@ -44,7 +44,7 @@ const PageHeader = ({
       {buttonText && (
         <button
           onClick={handleClick}
-          className={`flex items-center gap-2 ${buttonBg} ${buttonTextColor} px-4 py-2 rounded-md text-xs md:text-sm font-medium transition border`}
+          className={`flex items-center gap-2 ${buttonBg} ${buttonTextColor} px-4 py-2 rounded-md text-xs md:text-sm font-medium transition border cursor-pointer`}
         >
           <Icon size={16} />
           {buttonText}

@@ -1,7 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import axiosInstance from "../../api/axiosInstance";
+import PageHeader from "./PageHeader";
+import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
+import {
+  DescriptionSection,
+  ImagesSection,
+  GeneralInfoSection,
+  PricingSection,
+} from "./FormComponents/FormSections";
+import { Save, BookmarkX } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-export default function AddProductForm({ onClose, onSuccess }) {
+export default function AddProductForm() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -12,16 +24,33 @@ export default function AddProductForm({ onClose, onSuccess }) {
     brand: "",
     color: "",
   });
+
+  // Pre-fill data
+  const product = location.state?.product || null;
+  useEffect(() => {
+    if (!product) return;
+    if (product) {
+      setFormData({
+        title: product.title || "",
+        description: product.description || "",
+        price: product.price || "",
+        discount: product.discount || "",
+        stock: product.stock || "",
+        category: product.category || "",
+        brand: product.brand || "",
+      });
+    }
+  }, [product?._id]);
   const [selectedImages, setSelectedImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
 
-  const handleChange = (e) => {
+  const handleChange = (name, value) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
@@ -79,10 +108,6 @@ export default function AddProductForm({ onClose, onSuccess }) {
     setImagePreviews(newPreviews);
   };
 
-  const triggerFilePicker = () => {
-    fileInputRef.current?.click();
-  };
-
   // Cleanup object URLs on component unmount
   useEffect(() => {
     return () => {
@@ -95,46 +120,39 @@ export default function AddProductForm({ onClose, onSuccess }) {
     setLoading(true);
     setError("");
 
+    // Validate that at least one image is selected
+    if (selectedImages.length === 0) {
+      setError("Please select at least one image");
+      setLoading(false);
+      return;
+    }
+
+    // Create FormData for multipart/form-data request
+    const formDataToSend = new FormData();
+
+    // Append text fields
+    Object.entries(formData).forEach(([key, value]) => {
+      formDataToSend.append(key, value);
+    });
+    // Append image files
+    selectedImages.forEach((image) => {
+      formDataToSend.append("images", image);
+    });
     try {
-      // Validate that at least one image is selected
-      if (selectedImages.length === 0) {
-        setError("Please select at least one image");
-        setLoading(false);
-        return;
-      }
-
-      // Create FormData for multipart/form-data request
-      const formDataToSend = new FormData();
-
-      // Append text fields
-      formDataToSend.append("title", formData.title);
-      formDataToSend.append("description", formData.description);
-      formDataToSend.append("price", formData.price);
-      formDataToSend.append("discount", formData.discount || 0);
-      formDataToSend.append("stock", formData.stock || 0);
-      formDataToSend.append("category", formData.category);
-      formDataToSend.append("brand", formData.brand || "Generic");
-
-      // Append colors
-      if (formData.color) {
-        formDataToSend.append("color", formData.color);
-      }
-
-      // Append image files
-      selectedImages.forEach((image) => {
-        formDataToSend.append("images", image);
-      });
-
-      const res = await axiosInstance.post("/admin/products", formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const res = product
+        ? await axiosInstance.put(
+            `/admin/products/${product._id}`,
+            formDataToSend
+          )
+        : await axiosInstance.post("/admin/products", formDataToSend, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
 
       if (res.data.success) {
         imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
-        onSuccess();
-        onClose();
+        navigate(-1);
       }
     } catch (err) {
       console.error("Error creating product:", err);
@@ -149,222 +167,56 @@ export default function AddProductForm({ onClose, onSuccess }) {
     }
   };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Add New Product</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            ✕
-          </button>
-        </div>
+  const breadcrumbs = [
+    breadcrumbAdmin.home,
+    breadcrumbAdmin.product,
+    breadcrumbAdmin.productform,
+  ];
 
+  return (
+    <div>
+      <PageHeader title={"Product Form"} breadcrumbs={breadcrumbs} />
+      <div className="p-4  my-6">
         {error && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Title *</label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <GeneralInfoSection data={formData} updateField={handleChange} />
+          <DescriptionSection data={formData} updateField={handleChange} />
+          <ImagesSection
+            handleImageChange={handleImageChange}
+            fileInputRef={fileInputRef}
+            selectedImages={selectedImages}
+            imagePreviews={imagePreviews}
+            removeImage={removeImage}
+          />
+          <PricingSection data={formData} updateField={handleChange} />
 
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Description *
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-              rows={3}
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Price *</label>
-              <input
-                type="number"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                required
-                min="0"
-                step="0.01"
-                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Discount (%)
-              </label>
-              <input
-                type="number"
-                name="discount"
-                value={formData.discount}
-                onChange={handleChange}
-                min="0"
-                max="100"
-                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Stock</label>
-              <input
-                type="number"
-                name="stock"
-                value={formData.stock}
-                onChange={handleChange}
-                min="0"
-                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Category *
-              </label>
-              {/* <input
-                type="text"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
-              /> */}
-              <select
-                name="category"
-                id="category"
-                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
-                onChange={handleChange}
-                required
-                value={formData.category}
-              >
-                <option value="lehenga">Lehenga</option>
-                <option value="half saree">Half Saree</option>
-                <option value="fashion saree">Fashion Saree</option>
-                <option value="gown">Gown</option>
-                <option value="wedding">Wedding</option>
-                <option value="celebrity outfits">Celebrity Outfits</option>
-                <option value="engagement">Engagement</option>
-                <option value="occassions">Ocassions</option>
-                <option value="reception">Reception</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Brand</label>
-            <input
-              type="text"
-              name="brand"
-              value={formData.brand}
-              onChange={handleChange}
-              placeholder="Generic"
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Colors (comma separated)
-            </label>
-            <input
-              type="text"
-              name="color"
-              value={formData.color}
-              onChange={handleChange}
-              placeholder="Red, Blue, Green"
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
-            />
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-sm font-medium">
-                Product Images * (Max 10 images, 5MB each)
-              </label>
+          <div className="bg-white rounded-xl shadow-sm p-6 flex justify-end">
+            <div className="flex gap-5">
               <button
-                type="button"
-                onClick={triggerFilePicker}
-                className="flex items-center gap-1 text-sm text-[#E9B159] hover:text-[#d49d4a]"
+                className="bg-gray-400 text-white p-2 rounded"
+                onClick={() => navigate(-1)}
               >
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#E9B159] text-[#E9B159]">
-                  +
-                </span>
-                <span>Add images</span>
+                <div className="flex gap-2 items-center">
+                  <BookmarkX size={18} />
+                  Close
+                </div>
+              </button>
+              <button
+                className="bg-[#E9B159] text-white p-2 rounded"
+                disabled={loading}
+                type="submit"
+              >
+                <div className="flex gap-2 items-center">
+                  <Save size={18} />
+                  {loading ? "Saving..." : "Save Product"}
+                </div>
               </button>
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              name="images"
-              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-              multiple
-              onChange={handleImageChange}
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
-            />
-            {selectedImages.length > 0 && (
-              <div className="mt-3">
-                <p className="text-sm text-gray-600 mb-2">
-                  Selected: {selectedImages.length} image(s)
-                </p>
-                <div className="grid grid-cols-4 gap-2">
-                  {imagePreviews.map((preview, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={preview}
-                        alt={`Preview ${index + 1}`}
-                        className="w-full h-24 object-cover rounded border"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 border rounded hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-2 bg-[#E9B159] text-white rounded hover:bg-[#d49d4a] disabled:opacity-50"
-            >
-              {loading ? "Creating..." : "Create Product"}
-            </button>
           </div>
         </form>
       </div>

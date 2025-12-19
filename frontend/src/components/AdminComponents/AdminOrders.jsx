@@ -12,8 +12,9 @@ import {
   Search,
   Filter,
   SquarePen,
-  Plus,
+  Download,
 } from "lucide-react";
+import { exportToCSV, formatOrdersForCSV } from "../../utils/exportToCSV";
 
 export default function AdminOrders() {
   const dispatch = useDispatch();
@@ -53,6 +54,11 @@ export default function AdminOrders() {
 
   const breadcrumb = [breadcrumbAdmin.home, breadcrumbAdmin.orders];
 
+  const exportCSV = (e) => {
+    e.preventDefault();
+    exportToCSV(formatOrdersForCSV(orders), "orders.csv");
+  };
+
   return (
     <div className="">
       <div>
@@ -60,8 +66,8 @@ export default function AdminOrders() {
           title={"Order List"}
           breadcrumbs={breadcrumb}
           buttonText={"Export"}
-          Icon={Plus}
-          handleClick={(e) => e.preventDefault()}
+          Icon={Download}
+          handleClick={exportCSV}
           buttonBg={"bg-none"}
           buttonTextColor={"text-green-900"}
         />
@@ -129,14 +135,14 @@ export default function AdminOrders() {
       {/* table */}
       <div className="bg-white p-4 rounded shadow-xl my-6">
         <div className="flex flex-wrap gap-4 items-center justify-between p-5 ">
-          <select className="border rounded-md px-3 py-2 text-sm text-gray-600">
+          <select className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600">
             <option>10 rows</option>
             <option>20 rows</option>
             <option>50 rows</option>
           </select>
 
           <div className="flex items-center gap-3">
-            <div className="relative w-52 lg:w-64">
+            <div className="relative ">
               <Search
                 size={16}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -144,11 +150,11 @@ export default function AdminOrders() {
               <input
                 name="search"
                 placeholder="Search"
-                className="pl-9 pr-4 py-2 border rounded-md text-sm w-full"
+                className="pl-9 pr-4 py-2 border border-gray-300 rounded-md text-sm w-40 md:w-64"
               />
             </div>
 
-            <button className="border px-3 py-2 rounded-md hover:bg-gray-50">
+            <button className="border px-3 py-2 rounded-md hover:bg-gray-50 ">
               <Filter size={16} />
             </button>
           </div>
@@ -161,7 +167,7 @@ export default function AdminOrders() {
                   Edit Status
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  ORDER NUMBER
+                  ORDER ID
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
                   ORDER BY

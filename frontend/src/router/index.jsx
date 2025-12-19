@@ -22,6 +22,7 @@ import AdminOrders from "../components/AdminComponents/AdminOrders";
 import Categories from "../components/AdminComponents/Categories";
 import PaymentHistory from "../components/AdminComponents/PaymentHistory";
 import CouponList from "../components/AdminComponents/CouponList";
+import AddProductForm from "../components/AdminComponents/AddProductForm";
 
 export const router = createBrowserRouter([
   {
@@ -104,6 +105,7 @@ export const router = createBrowserRouter([
       { path: "categories", element: <Categories /> },
       { path: "payments", element: <PaymentHistory /> },
       { path: "coupon", element: <CouponList /> },
+      { path: "productform", element: <AddProductForm /> },
     ],
   },
 ]);

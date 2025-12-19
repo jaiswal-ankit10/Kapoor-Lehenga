@@ -70,7 +70,12 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
               <div>
                 <h3 className=" text-md text-black ">{item.product?.title}</h3>
                 <h3 className=" text-sm text-black mb-2">
-                  {item.product?.description}
+                  <div
+                    className="prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: item.product?.description,
+                    }}
+                  />
                 </h3>
 
                 <div className="flex items-center gap-2 mt-2 text-black">

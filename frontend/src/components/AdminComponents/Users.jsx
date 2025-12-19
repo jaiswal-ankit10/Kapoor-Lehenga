@@ -6,6 +6,7 @@ import { deleteUser } from "../../redux/userSlice";
 import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
 import PageHeader from "./PageHeader";
 import { Download, Search, Trash } from "lucide-react";
+import { exportToCSV, formatUsersForCSV } from "../../utils/exportToCSV";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -28,6 +29,10 @@ export default function Users() {
       console.error(error);
     }
   };
+  const handleUserExport = (e) => {
+    e.preventDefault();
+    exportToCSV(formatUsersForCSV(users), "users.csv");
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -45,21 +50,21 @@ export default function Users() {
         breadcrumbs={breadcrumb}
         buttonText={"Export"}
         Icon={Download}
-        handleClick={(e) => e.preventDefault()}
+        handleClick={handleUserExport}
         buttonBg={"bg-none"}
         buttonTextColor={"text-green-900"}
       />
       <div className="bg-white p-4 rounded shadow">
         <div className="overflow-auto">
           <div className="flex flex-wrap gap-4 items-center justify-between p-5 ">
-            <select className="border rounded-md px-3 py-2 text-sm text-gray-600">
+            <select className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600">
               <option>10 rows</option>
               <option>20 rows</option>
               <option>50 rows</option>
             </select>
 
             <div className="flex items-center gap-3">
-              <div className="relative w-52 lg:w-64">
+              <div className="relative ">
                 <Search
                   size={16}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -67,7 +72,7 @@ export default function Users() {
                 <input
                   name="search"
                   placeholder="Search"
-                  className="pl-9 pr-4 py-2 border rounded-md text-sm w-full"
+                  className="pl-9 pr-4 py-2 border border-gray-300 rounded-md text-sm w-40 lg:w-64"
                 />
               </div>
             </div>

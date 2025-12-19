@@ -36,6 +36,8 @@ const MyOrder = () => {
     Pending: "bg-yellow-100 text-yellow-600",
     Completed: "bg-green-100 text-green-600",
     Cancel: "bg-red-100 text-red-500",
+    Processing: "bg-blue-100 text-blue-500",
+    Returned: "bg-gray-100 text-gray-500",
   };
 
   const breadcrumb = [breadcrumbRoutes.home, breadcrumbRoutes.myOrder];

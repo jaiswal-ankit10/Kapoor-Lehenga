@@ -6,7 +6,6 @@ import {
   updateProductById,
 } from "../../services/productService";
 import { useDispatch } from "react-redux";
-import EditProductForm from "./EditProductForm";
 import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
 import PageHeader from "./PageHeader";
 import { Edit, Plus, Search, Trash } from "lucide-react";
@@ -72,13 +71,13 @@ const Categories = () => {
       <div className="bg-white p-4 rounded shadow">
         <div className="flex flex-wrap gap-4 items-center justify-between p-5 ">
           <div className="flex gap-4">
-            <select className="border rounded-md px-3 py-2 text-sm text-gray-600">
+            <select className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600">
               <option>Action</option>
               <option>Active All</option>
               <option>Deactive All</option>
               <option>Delete All</option>
             </select>
-            <select className="border rounded-md px-3 py-2 text-sm text-gray-600">
+            <select className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600">
               <option>10 rows</option>
               <option>20 rows</option>
               <option>50 rows</option>
@@ -93,7 +92,7 @@ const Categories = () => {
               />
               <input
                 placeholder="Search"
-                className="pl-9 pr-4 py-2 border rounded-md text-sm w-64"
+                className="pl-9 pr-4 py-2 border border-gray-300 rounded-md text-sm w-40 md:w-64"
               />
             </div>
           </div>
@@ -102,12 +101,22 @@ const Categories = () => {
           <table className="w-full text-left">
             <thead className="bg-gray-50 text-gray-500">
               <tr className="text-sm text-gray-500">
-                <th className="px-5 py-3 text-center">ACTION</th>
-                <th className="px-5 py-3 text-center">NAME</th>
-                <th className="px-5 py-3 text-center">BRAND</th>
-                <th className="px-5 py-3 text-center">DESCRIPTION</th>
-                <th className="px-5 py-3 text-center">CATEGORY</th>
-                <th className="px-5 py-3 text-center">
+                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
+                  ACTION
+                </th>
+                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
+                  NAME
+                </th>
+                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
+                  BRAND
+                </th>
+                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
+                  DESCRIPTION
+                </th>
+                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
+                  CATEGORY
+                </th>
+                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
                   PRODUCT THUMBNAIL IMAGE
                 </th>
                 <th className="px-5 py-3 text-center">UPDATED AT</th>
@@ -132,7 +141,12 @@ const Categories = () => {
                   </td>
                   <td className="py-2 px-5 text-center">{p.title}</td>
                   <td className="py-2 px-5 text-center">{p.brand}</td>
-                  <td className="py-2 px-5 text-center">{p.description}</td>
+                  <td className="py-2 px-5 text-center">
+                    <div
+                      className="prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: p.description }}
+                    />
+                  </td>
                   <td className="py-2 px-5 text-center">{p.category}</td>
                   <td className="py-2 px-5 text-center">
                     <div className="flex items-center justify-center ">
@@ -159,7 +173,7 @@ const Categories = () => {
           />
         )}
         {isEditOpen && selectedProduct && (
-          <EditProductForm product={selectedProduct} onClose={closeEditModal} />
+          <AddProductForm product={selectedProduct} onClose={closeEditModal} />
         )}
       </div>
     </div>

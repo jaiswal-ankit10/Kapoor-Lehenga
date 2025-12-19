@@ -101,7 +101,10 @@ const ProductDetail = () => {
         {/* Right Panel */}
         <div className="flex-1">
           <h2 className="text-3xl font-bold">{product.title}</h2>
-          <p className="text-gray-600 mt-1 text-sm">{product.description}</p>
+          <div
+            className="prose prose-sm max-w-none text-gray-500 text-sm mt-4"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
 
           <div className="flex items-center gap-2 mt-2">
             <span className="bg-green-600 text-white px-2 rounded text-sm flex items-center gap-1">
@@ -115,8 +118,13 @@ const ProductDetail = () => {
           {/* Price */}
           <div className="mt-4">
             <div className="flex gap-4 items-center">
-              <p className="text-3xl font-bold">₹{product.price}</p>
-              <p className="text-green-500 text-3xl">{product.discount}% Off</p>
+              <p className="text-xl font-bold line-through text-gray-500">
+                ₹{product.price}
+              </p>
+              <p className="text-xl font-bold text-gray-700">
+                ₹{product.discountedPrice}
+              </p>
+              <p className="text-green-500 text-xl">{product.discount}% Off</p>
             </div>
             <p className="text-gray-400 text-sm">Inclusive of all taxes</p>
           </div>
@@ -124,11 +132,6 @@ const ProductDetail = () => {
           <hr className="my-4 text-gray-300" />
           {/* Color Options */}
           <p className="text-sm font-semibold mt-6">Select Color</p>
-
-          {/* Selected Color Name */}
-          <p className="text-gray-600">
-            {selectedThumb?.split("/").pop().split(".")[0]}
-          </p>
 
           <div className="flex gap-2 mt-2">
             {(product?.images || [product?.thumbnail])
