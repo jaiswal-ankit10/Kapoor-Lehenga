@@ -29,7 +29,7 @@ const upload = multer({
 });
 
 // Middleware for multiple image uploads
-export const uploadMultipleImages = upload.array("images", 5); // Max 5 images
+export const uploadMultipleImages = upload.array("images", 4); // Max 4 images
 
 // Middleware for single image upload
 export const uploadSingleImage = upload.single("image");

@@ -21,6 +21,7 @@ import {
 
 import blackLogo from "../assets/icons/blackLogo.png";
 import AdminNavbar from "../components/AdminComponents/AdminNavbar";
+import AdminFooter from "../components/AdminComponents/AdminFooter";
 
 const SidebarLink = ({ to, icon: Icon, label, showLabel }) => (
   <NavLink
@@ -207,6 +208,7 @@ export default function AdminPanel() {
         <div className="pt-6">
           <Outlet />
         </div>
+        <AdminFooter />
       </main>
     </div>
   );

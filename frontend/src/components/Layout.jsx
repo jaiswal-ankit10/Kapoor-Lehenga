@@ -5,6 +5,7 @@ import Footer from "./Footer";
 import SidebarRouteWrapper from "./SidebarRouterWrapper";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
+import ScrollToTop from "./ScrollToTop";
 
 const Layout = () => {
   const { pathname } = useLocation();
@@ -14,6 +15,7 @@ const Layout = () => {
 
   return (
     <>
+      <ScrollToTop />
       <Header />
 
       {/* Only hide Outlet when popup route */}

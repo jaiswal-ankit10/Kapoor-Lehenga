@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   cartItems: [],
   totalAmount: 0,
+  appliedCoupon: null,
 };
 
 const cartSlice = createSlice({
@@ -19,6 +20,13 @@ const cartSlice = createSlice({
       state.totalAmount = 0;
       // updateLocalStorage(state);
     },
+
+    applyCoupon(state, action) {
+      state.appliedCoupon = action.payload;
+    },
+    removeCoupon(state) {
+      state.appliedCoupon = null;
+    },
   },
 });
 
@@ -29,6 +37,8 @@ export const {
   increaseQty,
   decreaseQty,
   clearCartReducer,
+  applyCoupon,
+  removeCoupon,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

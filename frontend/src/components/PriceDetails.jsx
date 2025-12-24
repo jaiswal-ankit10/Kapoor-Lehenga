@@ -2,13 +2,22 @@ import { useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useSelector } from "react-redux";
+
 const PriceDetails = () => {
-  const { cartItems, totalAmount } = useSelector((store) => store.cart);
+  const { totalAmount, appliedCoupon } = useSelector((store) => store.cart);
+
   const [isOpen, setIsOpen] = useState(true);
-  const handleToggle = (e) => {
-    e.preventDefault();
-    setIsOpen(!isOpen);
-  };
+
+  const gstRate = 18;
+
+  const couponDiscount = appliedCoupon
+    ? (totalAmount * appliedCoupon.discount) / 100
+    : 0;
+
+  const gstAmount = ((totalAmount - couponDiscount) * gstRate) / 100;
+
+  const payableAmount = totalAmount - couponDiscount + gstAmount;
+
   return (
     <div className="bg-white rounded-md p-3">
       <div className="flex justify-between">
@@ -16,7 +25,7 @@ const PriceDetails = () => {
           <LiaRupeeSignSolid size={24} className="border rounded-2xl p-1" />
           <h3 className="font-semibold">Price Details</h3>
         </div>
-        <div onClick={handleToggle}>
+        <div onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <IoIosArrowUp size={24} /> : <IoIosArrowDown size={24} />}
         </div>
       </div>
@@ -27,26 +36,32 @@ const PriceDetails = () => {
             <span>Bag Total</span>
             <span>₹{totalAmount}</span>
           </div>
+
           <div className="flex justify-between mb-1">
             <span>Packing Charge</span>
             <span>₹0.00</span>
           </div>
-          <div className="flex justify-between mb-1">
-            <span>Coupon</span>
-            <span>-₹1,000</span>
-          </div>
+
+          {appliedCoupon && (
+            <div className="flex justify-between mb-1 text-green-600">
+              <span>Coupon ({appliedCoupon.code})</span>
+              <span>-₹{couponDiscount.toFixed(0)}</span>
+            </div>
+          )}
+
           <div className="flex justify-between mb-1">
             <span>GST 18%</span>
-            <span>₹1,800</span>
+            <span>₹{gstAmount.toFixed(0)}</span>
           </div>
 
           <div className="flex justify-between font-semibold text-green-600 mt-2">
             <span>You Pay</span>
-            <span>₹{totalAmount - 1000 + 1800}</span>
+            <span>₹{payableAmount.toFixed(0)}</span>
           </div>
         </div>
       )}
     </div>
   );
 };
+
 export default PriceDetails;

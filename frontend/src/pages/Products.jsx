@@ -69,8 +69,10 @@ const Products = () => {
           {/* TOP HEADER */}
           <div className="flex justify-between items-center pb-4 ">
             <div>
-              <h2 className="text-2xl font-semibold">
-                Lehenga Wedding Dresses Collection
+              <h2 className="text-2xl font-semibold capitalize">
+                {filters.category
+                  ? `${filters.category} Collection`
+                  : "All Products"}
               </h2>
               <p className="text-sm text-gray-500 mt-1">
                 Showing {products.length} of {total || products.length} results

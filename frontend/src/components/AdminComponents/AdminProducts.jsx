@@ -10,21 +10,27 @@ import { useNavigate } from "react-router-dom";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const fetchProducts = async () => {
     try {
-      // fetch a larger page for admin (up to 200)
-      const res = await axiosInstance.get(
-        "/admin/products?limit=200&page=1&sort=newest"
-      );
+      const res = await axiosInstance.get("/admin/products?sort=newest");
       if (res.data.success) setProducts(res.data.products || []);
     } catch (err) {
       console.error(err);
     }
   };
+
+  //pagination
+  const totalPages = Math.ceil(products.length / rowsPerPage);
+
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+
+  const visibleProducts = products.slice(startIndex, endIndex);
 
   const handleDelete = (e, p) => {
     e.preventDefault();
@@ -63,10 +69,18 @@ export default function AdminProducts() {
               <option>Deactive All</option>
               <option>Delete All</option>
             </select>
-            <select className="border border-gray-300 rounded-md px-3  py-2 text-sm text-gray-600">
-              <option>10 rows</option>
-              <option>20 rows</option>
-              <option>50 rows</option>
+            <select
+              className="border border-gray-300 rounded-md px-3  py-2 text-sm text-gray-600 outline-none"
+              value={rowsPerPage}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={5}>5 rows</option>
+              <option value={10}>10 rows</option>
+              <option value={20}>20 rows</option>
+              <option value={50}>50 rows</option>
             </select>
           </div>
 
@@ -117,7 +131,7 @@ export default function AdminProducts() {
               </tr>
             </thead>
             <tbody>
-              {products.map((p) => (
+              {visibleProducts.map((p) => (
                 <tr key={p._id} className="border-t border-gray-300">
                   <td className="px-5 py-4 flex items-center gap-2">
                     <div
@@ -161,6 +175,50 @@ export default function AdminProducts() {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-5 flex justify-between items-center">
+          <p className="text-gray-300 text-sm">{`Showing ${
+            startIndex + 1
+          } to ${endIndex} of ${products.length} results`}</p>
+          <div className="flex ">
+            <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                className="px-2 text-gray-500 disabled:opacity-40"
+              >
+                ‹
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 rounded-full text-sm font-medium
+          ${
+            currentPage === page
+              ? "bg-[#E9B159] text-white"
+              : "text-gray-600 hover:bg-gray-200"
+          }
+        `}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(p + 1, totalPages))
+                }
+                className="px-2 text-gray-500 disabled:opacity-40"
+              >
+                ›
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

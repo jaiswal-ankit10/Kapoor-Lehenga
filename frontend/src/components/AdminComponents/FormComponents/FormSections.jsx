@@ -130,7 +130,7 @@ export function ImagesSection({
         {/* RIGHT FORM */}
         <div className="col-span-12 md:col-span-9 space-y-5">
           <label className="block text-sm text-gray-600 mb-1">
-            Product Images * (Max 5 images, 5MB each)
+            Product Images * (Max 4 images, 5MB each)
           </label>
           <input
             ref={fileInputRef}

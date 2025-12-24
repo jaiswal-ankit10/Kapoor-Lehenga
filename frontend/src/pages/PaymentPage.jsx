@@ -33,6 +33,8 @@ const PaymentPage = () => {
         price: item.product.discountedPrice || item.product.price,
       }));
 
+    const paymentStatus = selected === "cod" ? "pending" : "complete";
+
     return {
       shippingAddress: {
         fullName: selectedAddress.fullName,

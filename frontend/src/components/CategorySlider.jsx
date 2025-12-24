@@ -9,23 +9,29 @@ import saree3 from "../assets/images/sarees/saree3.png";
 import saree4 from "../assets/images/sarees/saree4.png";
 import saree5 from "../assets/images/sarees/saree5.png";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const categories = [
-  { title: "Crush(Pleated) Work", img: saree1 },
-  { title: "Lehenga Saree", img: saree2 },
-  { title: "Designer Saree", img: saree3 },
-  { title: "Printed Embroidered", img: saree4 },
-  { title: "Floral Saree", img: saree5 },
-  { title: "Floral Saree", img: saree5 },
-  { title: "Floral Saree", img: saree5 },
-  { title: "Floral Saree", img: saree5 },
-  { title: "Floral Saree", img: saree5 },
-  { title: "Floral Saree", img: saree5 },
-  { title: "Floral Saree", img: saree5 },
-];
+// const categories = [
+//   { title: "Crush(Pleated) Work", img: saree1 },
+//   { title: "Lehenga Saree", img: saree2 },
+//   { title: "Designer Saree", img: saree3 },
+//   { title: "Printed Embroidered", img: saree4 },
+//   { title: "Floral Saree", img: saree5 },
+//   { title: "Floral Saree", img: saree5 },
+//   { title: "Floral Saree", img: saree5 },
+//   { title: "Floral Saree", img: saree5 },
+//   { title: "Floral Saree", img: saree5 },
+//   { title: "Floral Saree", img: saree5 },
+//   { title: "Floral Saree", img: saree5 },
+// ];
 
 const CategorySlider = () => {
   const navigate = useNavigate();
+  const { products } = useSelector((store) => store.products);
+  const sarees = products.filter((item) =>
+    item.category.toLowerCase().includes("saree")
+  );
+
   return (
     <div className=" my-6">
       <Swiper
@@ -66,13 +72,14 @@ const CategorySlider = () => {
           </div>
         </SwiperSlide> */}
         {/* SLIDER IMAGES */}
-        {categories.map((item, index) => (
+        {sarees.map((item, index) => (
           <SwiperSlide key={index} className="shrink-0">
             <div className="flex flex-col items-center relative">
               <img
-                src={item.img}
+                src={item.images[0]}
                 alt={item.title}
                 className="h-[300px] w-[220px] object-cover "
+                onClick={() => navigate("/products?category=saree")}
               />
               <h3
                 className="absolute bottom-3  text-center text-white drop-shadow-md"

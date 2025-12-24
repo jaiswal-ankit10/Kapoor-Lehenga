@@ -91,8 +91,8 @@ export const getAllProducts = async (req, res) => {
       query.title = { $regex: search, $options: "i" };
     }
 
-    if (category) {
-      query.category = category;
+    if (query.category) {
+      query.category = { $regex: query.category, $options: "i" };
     }
 
     let mongooseQuery = Product.find(query);

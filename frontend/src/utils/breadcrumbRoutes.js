@@ -21,4 +21,7 @@ export const breadcrumbAdmin = {
   payment: { label: "Payment History List", to: "/admin/payments" },
   coupon: { label: "Coupon List", to: "/admin/coupon" },
   productform: { label: "Product Form", to: "/admin/productform" },
+  productReview: { label: "Product Review List", to: "/admin/productReview" },
+  inquiry: { label: "Inquiry List", to: "/admin/inquiry" },
+  clients: { label: "Clients List", to: "/admin/clients" },
 };

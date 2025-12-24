@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { breadcrumbRoutes } from "../utils/breadcrumbRoutes";
 import RoutesSection from "../components/RoutesSection";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { fetchProductById } from "../services/productService";
 import { FaStar } from "react-icons/fa";
 import cart from "../assets/icons/cart.png";
@@ -18,13 +18,16 @@ import {
   addItemToWishlist,
   removeFromWishlistBackend,
 } from "../services/wishlistService";
+import { toast, ToastContainer } from "react-toastify";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { product, products, loading } = useSelector((store) => store.products);
   const { wishlistItems } = useSelector((store) => store.wishlist);
+  const { cartItems } = useSelector((store) => store.cart);
 
   const [selectedThumb, setSelectedThumb] = useState(null);
   const [stitchOption, setStitchOption] = useState("unstitched");
@@ -52,8 +55,12 @@ const ProductDetail = () => {
   if (loading) return <p>Loading product...</p>;
   if (!product) return <p>Product not found</p>;
 
+  const isInCart = cartItems?.some((item) => item.product?._id === product._id);
+
   const addItemToCart = () => {
+    if (isInCart) return;
     dispatch(addItemToBackendCart(product));
+    toast("Item added to cart");
   };
 
   const toggleWishlist = () => {
@@ -61,7 +68,13 @@ const ProductDetail = () => {
       dispatch(removeFromWishlistBackend(product._id));
     } else {
       dispatch(addItemToWishlist(product._id));
+      toast("Added to wishlist");
     }
+  };
+
+  const handleCopy = (code) => {
+    navigator.clipboard.writeText(code);
+    toast("Code copied");
   };
 
   const breadcrumb = [
@@ -74,8 +87,9 @@ const ProductDetail = () => {
     <>
       <RoutesSection breadcrumb={breadcrumb} />
       <div className="max-w-[85vw] mx-auto px-12 py-10 flex gap-10 flex-col md:flex-row">
+        <ToastContainer />
         {/* Thumbnails */}
-        <div className="flex flex-row md:flex-col gap-3">
+        <div className="flex flex-row md:flex-col gap-3 overflow-hidden ">
           {(product?.images || [product?.thumbnail])
             .filter(Boolean)
             .map((thumb, i) => (
@@ -164,8 +178,14 @@ const ProductDetail = () => {
                 code: "NEW25",
                 offer: "Get FLAT 25% OFF",
                 desc: "On 1st New User Shopping",
+                discount: 25,
               },
-              { code: "NEW10", offer: "Flat 10% off", desc: "On All Orders" },
+              {
+                code: "NEW10",
+                offer: "Flat 10% off",
+                desc: "On All Orders",
+                discount: 10,
+              },
             ].map((offer, index) => (
               <div
                 key={index}
@@ -177,34 +197,13 @@ const ProductDetail = () => {
                     Use Code: {offer.code}
                   </p>
                 </div>
-                <button className="border px-3 py-1 rounded text-sm">
+                <button
+                  className="border px-3 py-1 rounded text-sm cursor-pointer"
+                  onClick={() => handleCopy(offer.code)}
+                >
                   COPY
                 </button>
               </div>
-            ))}
-          </div>
-          {/* Stitching Options */}
-          <div className="mt-6">
-            <p className="font-semibold">Lehenga Choli:</p>
-
-            {[
-              { id: "unstitched", label: "Unstitched Lehenga Choli", price: 0 },
-              { id: "standard", label: "Standard Stitching", price: 1499 },
-              { id: "custom", label: "Customize Stitching", price: 1899 },
-            ].map((option) => (
-              <label
-                key={option.id}
-                className="flex items-center gap-2 mt-2 cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  name="stitch"
-                  checked={stitchOption === option.id}
-                  onChange={() => setStitchOption(option.id)}
-                />
-                <span>{option.label}</span>
-                <span className="text-gray-600">₹{option.price}</span>
-              </label>
             ))}
           </div>
 
@@ -247,13 +246,21 @@ const ProductDetail = () => {
 
             <button
               onClick={addItemToCart}
-              className="bg-[#E9B159] w-full py-4 text-xl text-white flex items-center justify-center gap-4 cursor-pointer"
+              disabled={isInCart}
+              className={`bg-[#E9B159] w-full py-4 text-xl text-white flex items-center justify-center gap-4 cursor-pointer ${
+                isInCart
+                  ? "bg-gray-600 cursor-not-allowed opacity-70"
+                  : "bg-[#E9B159] cursor-pointer hover:bg-[#d89f3f]"
+              }`}
             >
               <img src={cart} className="w-10" />
-              <h2>Add to Bag</h2>
+              <h2>{isInCart ? "Added to Bag" : "Add to Bag"}</h2>
             </button>
 
-            <button className="bg-[#03A685] w-full py-4 text-xl text-white cursor-pointer">
+            <button
+              onClick={() => navigate("/address")}
+              className="bg-[#03A685] w-full py-4 text-xl text-white cursor-pointer"
+            >
               Buy Now
             </button>
           </div>

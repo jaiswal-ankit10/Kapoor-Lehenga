@@ -2,8 +2,19 @@ import { useState } from "react";
 import coupon from "../assets/icons/receipt-tax.png";
 import { IoIosArrowForward } from "react-icons/io";
 import CouponCodeSlider from "./CouponCodeSlider";
+import { useDispatch } from "react-redux";
+import { applyCoupon } from "../redux/cartSlice";
 const CouponBox = () => {
   const [openCoupon, setCoupon] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponInput, setCouponInput] = useState("");
+  const dispatch = useDispatch();
+
+  const handleCouponApply = (coupon) => {
+    setAppliedCoupon(coupon);
+    setCouponInput(coupon.code);
+    dispatch(applyCoupon(coupon));
+  };
   return (
     <div className="bg-white rounded-md p-3 mb-3">
       <div className="flex justify-between">
@@ -12,17 +23,26 @@ const CouponBox = () => {
           <h3 className="font-semibold text-lg">Coupon Code</h3>
         </div>
         <IoIosArrowForward size={24} onClick={() => setCoupon(!openCoupon)} />
-        <CouponCodeSlider openCoupon={openCoupon} setCoupon={setCoupon} />
+        <CouponCodeSlider
+          openCoupon={openCoupon}
+          setCoupon={setCoupon}
+          onApplyCoupon={handleCouponApply}
+        />
       </div>
-
       <div className="flex gap-2 mt-2 ml-12">
         <input
           type="text"
           placeholder="Enter coupon code"
           className="border border-gray-200 p-2 flex-1 rounded-md"
+          value={couponInput}
         />
         <button className="bg-[#E9B159] text-white px-4 rounded">Apply</button>
       </div>
+      {appliedCoupon && (
+        <p className="text-green-600 text-sm mt-2">
+          Coupon <b>{appliedCoupon.code}</b> applied successfully
+        </p>
+      )}
     </div>
   );
 };

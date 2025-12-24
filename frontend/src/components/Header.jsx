@@ -22,6 +22,7 @@ import CartSidebar from "./CartSidebar";
 import { loadCartFromBackend } from "../services/cartService";
 import { loadWishlistFromBackend } from "../services/wishlistService";
 import { setCategory, setSearch } from "../redux/filterSlice";
+import { ToastContainer, toast } from "react-toastify";
 
 const Header = () => {
   const [openMenu, setOpenMenu] = useState(false);
@@ -66,6 +67,7 @@ const Header = () => {
 
   return (
     <div className="bg-[#E9B159] w-full  px-6 md:px-10 py-3">
+      <ToastContainer />
       {/* TOP ROW */}
       <div className="flex  justify-between items-center gap-4">
         {/* Mobile Hamburger Menu */}
@@ -227,6 +229,7 @@ const Header = () => {
                         dispatch(logout());
                         setOpenDropdown(false);
                         navigate("/");
+                        toast("Logged out successfully");
                       }}
                     >
                       <IoExitOutline size={24} className="-ml-1.5" />

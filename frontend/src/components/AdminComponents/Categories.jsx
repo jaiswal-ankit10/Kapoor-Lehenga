@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
-import AddProductForm from "./AddProductForm";
 import {
   deleteProductById,
   updateProductById,
@@ -9,10 +8,11 @@ import { useDispatch } from "react-redux";
 import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
 import PageHeader from "./PageHeader";
 import { Edit, Plus, Search, Trash } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 const Categories = () => {
   const [products, setProducts] = useState([]);
-  const [showAddForm, setShowAddForm] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const fetchProducts = async () => {
     try {
@@ -38,35 +38,11 @@ const Categories = () => {
     fetchProducts();
   }, [handleDelete]);
 
-  const handleSuccess = () => {
-    fetchProducts();
-  };
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
-  const openEditModal = (product) => {
-    setSelectedProduct(product);
-    setIsEditOpen(true);
-  };
-
-  const closeEditModal = () => {
-    setSelectedProduct(null);
-    setIsEditOpen(false);
-  };
-
   const breadcrumb = [breadcrumbAdmin.home, breadcrumbAdmin.categories];
   return (
     <div>
       <div>
-        <PageHeader
-          title={"Categories List"}
-          breadcrumbs={breadcrumb}
-          buttonText={"Add Categories"}
-          Icon={Plus}
-          handleClick={() => setShowAddForm(true)}
-          buttonBg={"bg-[#E9B159]"}
-          buttonTextColor={"text-white"}
-        />
+        <PageHeader title={"Categories List"} breadcrumbs={breadcrumb} />
       </div>
       <div className="bg-white p-4 rounded shadow">
         <div className="flex flex-wrap gap-4 items-center justify-between p-5 ">
@@ -166,15 +142,6 @@ const Categories = () => {
             </tbody>
           </table>
         </div>
-        {showAddForm && (
-          <AddProductForm
-            onClose={() => setShowAddForm(false)}
-            onSuccess={handleSuccess}
-          />
-        )}
-        {isEditOpen && selectedProduct && (
-          <AddProductForm product={selectedProduct} onClose={closeEditModal} />
-        )}
       </div>
     </div>
   );

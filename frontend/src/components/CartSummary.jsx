@@ -31,16 +31,17 @@ const CartSummary = () => {
 
             <div>
               <h3 className=" text-md text-black ">{item.product?.title}</h3>
-              <h3 className=" text-sm text-black mb-2">
-                {item.product?.description}
-              </h3>
+              {/* <div
+                className="prose prose-sm max-w-none text-gray-500 text-sm mt-4"
+                dangerouslySetInnerHTML={{ __html: item.product?.description }}
+              /> */}
 
               <div className="flex items-center gap-2 mt-2 text-black">
                 Qty:
                 <span className="font-semibold">{item.quantity}</span>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 mt-10">
                 <p className="text-green-700 font-semibold text-lg mt-1">
                   ₹{item.product?.discountedPrice}
                 </p>
