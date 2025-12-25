@@ -9,12 +9,14 @@ import {
   addItemToWishlist,
   removeFromWishlistBackend,
 } from "../services/wishlistService";
+import { toast } from "react-toastify";
 
 const ProductCard = ({ product }) => {
   if (!product) return null;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { wishlistItems } = useSelector((store) => store.wishlist);
+  const { isAuthenticated } = useSelector((store) => store.user);
 
   const actualProduct = product.product ? product.product : product;
 
@@ -29,6 +31,10 @@ const ProductCard = ({ product }) => {
 
   const toggleWishlist = (e) => {
     e.stopPropagation();
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
     if (isWishlisted) {
       dispatch(removeFromWishlistBackend(productId));
     } else {
@@ -38,7 +44,12 @@ const ProductCard = ({ product }) => {
 
   const addItemToCart = (e) => {
     e.stopPropagation();
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
     dispatch(addItemToBackendCart(actualProduct));
+    toast.success("Item added to cart");
   };
 
   return (

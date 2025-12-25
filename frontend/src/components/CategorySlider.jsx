@@ -73,7 +73,7 @@ const CategorySlider = () => {
         </SwiperSlide> */}
         {/* SLIDER IMAGES */}
         {sarees.map((item, index) => (
-          <SwiperSlide key={index} className="shrink-0">
+          <SwiperSlide key={index} className="shrink-0 ">
             <div className="flex flex-col items-center relative">
               <img
                 src={item.images[0]}

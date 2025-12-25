@@ -1,16 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiChevronDown } from "react-icons/fi";
+import axiosInstance from "../api/axiosInstance";
 
-const categories = [
-  "LEHENGA",
-  "SAREE",
-  "KURTI",
-  "GOWN",
-  "SUIT",
-  "DRESS",
-];
+// const categories = ["LEHENGA", "SAREE", "KURTI", "GOWN", "SUIT", "DRESS"];
 
 const FilterSidebar = ({ onCategorySelect, selected }) => {
+  const [categories, setCategories] = useState([]);
+
   const [open, setOpen] = useState({
     category: true,
     fabric: false,
@@ -26,9 +22,23 @@ const FilterSidebar = ({ onCategorySelect, selected }) => {
     if (!onCategorySelect) return;
     onCategorySelect(selected === cat ? "" : cat);
   };
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axiosInstance.get("/products/categories");
+        if (res.data.success) {
+          setCategories(res.data.categories);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
-    <div className="w-[250px]">
+    <div className="hidden md:block w-[250px]">
       <h3 className="text-lg font-semibold">Filter</h3>
 
       {/* Category */}
@@ -42,7 +52,7 @@ const FilterSidebar = ({ onCategorySelect, selected }) => {
         </button>
 
         {open.category && (
-          <div className="pl-2 mt-2 flex flex-col gap-2 ">
+          <div className="pl-2 mt-2 flex flex-col gap-2 overflow-hidden">
             {categories.map((cat) => (
               <label key={cat} className="flex items-center gap-2">
                 <input
@@ -50,7 +60,7 @@ const FilterSidebar = ({ onCategorySelect, selected }) => {
                   checked={selected === cat}
                   onChange={() => handleCategory(cat)}
                 />
-                <span>{cat}</span>
+                <span className="capitalize">{cat}</span>
               </label>
             ))}
             <button

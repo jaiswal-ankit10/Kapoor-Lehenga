@@ -34,7 +34,12 @@ const Home = () => {
       <CategorySlider />
       {/* Luxe Section */}
       <section className="bg-[#310914] w-full min-h-[40%] md:min-h-screen flex  md:flex-row md:justify-between px-4 md:px-8 lg:px-16 ">
-        <img src={luxeImg} alt="luxe img" className="w-full" />
+        <img
+          src={luxeImg}
+          alt="luxe img"
+          className="w-full"
+          onClick={() => navigate("/products")}
+        />
       </section>
 
       {/* newly launched banner */}

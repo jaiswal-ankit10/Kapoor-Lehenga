@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import RoutesSection from "../components/RoutesSection";
 import { breadcrumbRoutes } from "../utils/breadcrumbRoutes";
-import FilterSidebar from "../components/FilterSideBar";
+
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/pagination";
 import FAQs from "../components/Faqs";
@@ -10,6 +10,8 @@ import { fetchAllProducts } from "../services/productService";
 import { useDispatch, useSelector } from "react-redux";
 import { setCategory, setSort, setPage, setSearch } from "../redux/filterSlice";
 import { useSearchParams } from "react-router-dom";
+import FilterSidebar from "../components/FilterSidebar";
+import { ToastContainer } from "react-toastify";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -54,6 +56,7 @@ const Products = () => {
 
   return (
     <>
+      <ToastContainer />
       {/* routes section */}
       <RoutesSection breadcrumb={breadcrumb} />
 
@@ -67,7 +70,7 @@ const Products = () => {
 
         <div className="flex-1">
           {/* TOP HEADER */}
-          <div className="flex justify-between items-center pb-4 ">
+          <div className="flex flex-col md:flex-row justify-between items-center pb-4 ">
             <div>
               <h2 className="text-2xl font-semibold capitalize">
                 {filters.category
@@ -95,7 +98,7 @@ const Products = () => {
           </div>
 
           {/* PRODUCTS GRID */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
             {products?.map((product) => (
               <ProductCard key={product._id || product.id} product={product} />
             ))}

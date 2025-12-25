@@ -91,8 +91,8 @@ export const getAllProducts = async (req, res) => {
       query.title = { $regex: search, $options: "i" };
     }
 
-    if (query.category) {
-      query.category = { $regex: query.category, $options: "i" };
+    if (category) {
+      query.category = { $regex: category, $options: "i" };
     }
 
     let mongooseQuery = Product.find(query);
@@ -196,4 +196,14 @@ export const getNewProducts = async (req, res) => {
   }).sort({ createdAt: -1 });
 
   res.json({ success: true, products });
+};
+export const getProductCategories = async (req, res) => {
+  const categories = await Product.distinct("category", {
+    isDeleted: false,
+  });
+
+  res.status(200).json({
+    success: true,
+    categories,
+  });
 };

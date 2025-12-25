@@ -46,8 +46,8 @@ const Login = () => {
     }
   };
   return (
-    <div className="flex flex-col items-center gap-5 mt-5 w-full px-4">
-      <div className="w-full max-w-[350px] flex flex-col items-center gap-5">
+    <div className="h-screen w-full flex justify-center overflow-hidden">
+      <div className="w-full max-w-[350px] flex flex-col items-center gap-5 overflow-y-auto py-5 px-4">
         <img src={brandLogo} alt="logo" className="w-40" />
 
         <p className="border border-[#C18B32] px-4 py-2 rounded text-sm text-center">

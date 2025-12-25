@@ -132,16 +132,18 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
         </div>
 
         {/* Footer */}
-        <div className="absolute bottom-0 left-0 w-full border-t p-4 flex items-center justify-between bg-white">
-          <p className="text-lg font-semibold text-black">₹{totalAmount}</p>
+        {cartItems.length > 0 && (
+          <div className="absolute bottom-0 left-0 w-full border-t p-4 flex items-center justify-between bg-white">
+            <p className="text-lg font-semibold text-black">₹{totalAmount}</p>
 
-          <button
-            className="bg-[#E9B159] text-white px-6 py-2 text-xl"
-            onClick={() => navigate("/address")}
-          >
-            Proceed to Buy
-          </button>
-        </div>
+            <button
+              className="bg-[#E9B159] text-white px-6 py-2 text-xl"
+              onClick={() => navigate("/address")}
+            >
+              Proceed to Buy
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
