@@ -108,62 +108,45 @@ export function DescriptionSection({ data, updateField }) {
 export function ImagesSection({
   handleImageChange,
   fileInputRef,
-  selectedImages,
   imagePreviews,
   removeImage,
 }) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-10">
       <div className="grid grid-cols-12 gap-6">
-        {/* LEFT INFO */}
-        <div className="col-span-12 md:col-span-3 flex gap-4">
-          <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
-            <Package className="text-[#04441f]" size={22} />
-          </div>
-
-          <div>
-            <h3 className="text-lg  text-gray-600">Images</h3>
-            <p className="text-sm text-gray-500">Add Images</p>
-          </div>
+        <div className="col-span-12 md:col-span-3">
+          <h3 className="text-lg text-gray-600">Images</h3>
+          <p className="text-sm text-gray-500">Add / Edit product images</p>
         </div>
 
-        {/* RIGHT FORM */}
-        <div className="col-span-12 md:col-span-9 space-y-5">
-          <label className="block text-sm text-gray-600 mb-1">
-            Product Images * (Max 4 images, 5MB each)
-          </label>
+        <div className="col-span-12 md:col-span-9 space-y-4">
           <input
             ref={fileInputRef}
             type="file"
-            name="images"
-            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+            accept="image/*"
             multiple
             onChange={handleImageChange}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-md text-sm outline-none"
+            className="w-full px-4 py-2 border border-gray-200 rounded"
           />
-          {selectedImages.length > 0 && (
-            <div className="mt-3">
-              <p className="text-sm text-gray-600 mb-2">
-                Selected: {selectedImages.length} image(s)
-              </p>
-              <div className="grid grid-cols-4 gap-2">
-                {imagePreviews.map((preview, index) => (
-                  <div key={index} className="relative w-32 h-32">
-                    <img
-                      src={preview}
-                      alt={`Preview ${index + 1}`}
-                      className="w-32 h-32 object-fit rounded border"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
+
+          {imagePreviews.length > 0 && (
+            <div className="grid grid-cols-4 gap-3">
+              {imagePreviews.map((img, index) => (
+                <div key={index} className="relative  w-32 h-32">
+                  <img
+                    src={img}
+                    alt="Preview"
+                    className="w-full h-32 object-fit rounded border"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
             </div>
           )}
         </div>

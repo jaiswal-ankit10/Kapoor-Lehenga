@@ -26,6 +26,7 @@ import AddProductForm from "../components/AdminComponents/AddProductForm";
 import ProductReview from "../components/AdminComponents/ProductReview";
 import Inquiry from "../components/AdminComponents/Inquiry";
 import Clients from "../components/AdminComponents/Clients";
+import Banner from "../components/AdminComponents/Banner";
 
 export const router = createBrowserRouter([
   {
@@ -112,6 +113,7 @@ export const router = createBrowserRouter([
       { path: "product-review", element: <ProductReview /> },
       { path: "inquiry", element: <Inquiry /> },
       { path: "clients", element: <Clients /> },
+      { path: "banner", element: <Banner /> },
     ],
   },
 ]);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import bannerImage from "../assets/images/banner.png";
 import mobileImage from "../assets/images/mobile-banner.png";
 import CategorySlider from "../components/CategorySlider";
@@ -17,18 +17,40 @@ import mapImage from "../assets/images/cropped_map.png";
 import { useLocation, useNavigate } from "react-router-dom";
 import Login from "./Login";
 import Signup from "./Signup";
+import axiosInstance from "../api/axiosInstance";
 
 const Home = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const [bannerImg, setBannerImg] = useState(null);
 
   const isLogin = pathname === "/login";
   const isSignup = pathname === "/signup";
+
+  useEffect(() => {
+    const fetchBanner = async () => {
+      try {
+        const res = await axiosInstance.get("/banners/active");
+
+        if (res.data.success && res.data.data.length > 0) {
+          setBannerImg(res.data.data[0]);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchBanner();
+  }, []);
   return (
     <div>
       {/* Banner section */}
       <section className="">
-        <img src={bannerImage} alt="" className="hidden md:block" />
+        <img
+          src={bannerImg?.image?.url || bannerImage}
+          alt="banner image"
+          className="hidden md:block"
+        />
         <img src={mobileImage} alt="" className="block md:hidden w-full" />
       </section>
       <CategorySlider />

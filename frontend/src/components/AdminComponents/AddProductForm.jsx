@@ -14,6 +14,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 export default function AddProductForm() {
   const location = useLocation();
   const navigate = useNavigate();
+  const product = location.state?.product || null;
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -25,93 +27,89 @@ export default function AddProductForm() {
     color: "",
   });
 
-  // Pre-fill data
-  const product = location.state?.product || null;
-  useEffect(() => {
-    if (!product) return;
-    if (product) {
-      setFormData({
-        title: product.title || "",
-        description: product.description || "",
-        price: product.price || "",
-        discount: product.discount || "",
-        stock: product.stock || "",
-        category: product.category || "",
-        brand: product.brand || "",
-      });
-    }
-  }, [product?._id]);
-  const [selectedImages, setSelectedImages] = useState([]);
-  const [imagePreviews, setImagePreviews] = useState([]);
+  const [existingImages, setExistingImages] = useState([]); // DB images
+  const [selectedImages, setSelectedImages] = useState([]); // new files
+  const [imagePreviews, setImagePreviews] = useState([]); // urls
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
 
-  const handleChange = (name, value) => {
+  // PREFILL DATA ON EDIT
+  useEffect(() => {
+    if (!product) return;
+
     setFormData({
-      ...formData,
-      [name]: value,
+      title: product.title || "",
+      description: product.description || "",
+      price: product.price || "",
+      discount: product.discount || 0,
+      stock: product.stock || 0,
+      category: product.category || "",
+      brand: product.brand || "",
+      color: product.color || "",
     });
+
+    if (product.images?.length) {
+      setExistingImages(product.images);
+      setImagePreviews(product.images.map((img) => img));
+    }
+  }, [product?._id]);
+
+  const handleChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // ADD NEW IMAGES
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
+    if (!files.length) return;
 
-    // Validate file types
-    const validFiles = files.filter((file) => {
-      const validTypes = [
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/gif",
-        "image/webp",
-      ];
-      return validTypes.includes(file.type);
-    });
+    const validTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
 
-    if (validFiles.length !== files.length) {
-      setError(
-        "Some files are not valid image types. Please select only images (jpeg, jpg, png, gif, webp)"
-      );
-      return;
+    for (let file of files) {
+      if (!validTypes.includes(file.type)) {
+        setError("Invalid image type");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image must be under 5MB");
+        return;
+      }
     }
 
-    // Validate file size (5MB max)
-    const oversizedFiles = validFiles.filter(
-      (file) => file.size > 5 * 1024 * 1024
-    );
-    if (oversizedFiles.length > 0) {
-      setError("Some files are too large. Maximum file size is 5MB");
-      return;
-    }
+    setSelectedImages((prev) => [...prev, ...files]);
+    setImagePreviews((prev) => [
+      ...prev,
+      ...files.map((f) => URL.createObjectURL(f)),
+    ]);
 
-    // Append to existing selections
-    setSelectedImages((prev) => [...prev, ...validFiles]);
-
-    // Create previews and append
-    const previews = validFiles.map((file) => URL.createObjectURL(file));
-    setImagePreviews((prev) => [...prev, ...previews]);
-    setError("");
-
-    // allow picking the same file again
     e.target.value = "";
+    setError("");
   };
 
+  // REMOVE IMAGE (existing OR new)
   const removeImage = (index) => {
-    const newImages = selectedImages.filter((_, i) => i !== index);
-    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+    if (index < existingImages.length) {
+      setExistingImages((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      const newIndex = index - existingImages.length;
+      setSelectedImages((prev) => prev.filter((_, i) => i !== newIndex));
+    }
 
-    // Revoke object URLs to prevent memory leaks
     URL.revokeObjectURL(imagePreviews[index]);
-
-    setSelectedImages(newImages);
-    setImagePreviews(newPreviews);
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Cleanup object URLs on component unmount
+  // CLEANUP PREVIEWS
   useEffect(() => {
     return () => {
-      imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [imagePreviews]);
 
@@ -120,63 +118,56 @@ export default function AddProductForm() {
     setLoading(true);
     setError("");
 
-    // Validate that at least one image is selected
-    if (selectedImages.length === 0) {
-      setError("Please select at least one image");
+    if (existingImages.length === 0 && selectedImages.length === 0) {
+      setError("At least one image is required");
       setLoading(false);
       return;
     }
 
-    // Create FormData for multipart/form-data request
     const formDataToSend = new FormData();
 
-    // Append text fields
     Object.entries(formData).forEach(([key, value]) => {
       formDataToSend.append(key, value);
     });
-    // Append image files
-    selectedImages.forEach((image) => {
-      formDataToSend.append("images", image);
+
+    // keep remaining old images
+    formDataToSend.append("existingImages", JSON.stringify(existingImages));
+
+    // new images
+    selectedImages.forEach((img) => {
+      formDataToSend.append("images", img);
     });
+
     try {
       const res = product
         ? await axiosInstance.put(
             `/admin/products/${product._id}`,
             formDataToSend
           )
-        : await axiosInstance.post("/admin/products", formDataToSend, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
+        : await axiosInstance.post("/admin/products", formDataToSend);
 
-      if (res.data.success) {
-        imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
-        navigate(-1);
-      }
+      if (res.data.success) navigate(-1);
     } catch (err) {
-      console.error("Error creating product:", err);
-      const errorMessage =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.message ||
-        "Failed to create product";
-      setError(errorMessage);
+      setError(
+        err.response?.data?.message || err.message || "Failed to save product"
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const breadcrumbs = [
-    breadcrumbAdmin.home,
-    breadcrumbAdmin.product,
-    breadcrumbAdmin.productform,
-  ];
-
   return (
     <div>
-      <PageHeader title={"Product Form"} breadcrumbs={breadcrumbs} />
-      <div className="p-4  my-6">
+      <PageHeader
+        title={product ? "Edit Product" : "Add Product"}
+        breadcrumbs={[
+          breadcrumbAdmin.home,
+          breadcrumbAdmin.product,
+          breadcrumbAdmin.productform,
+        ]}
+      />
+
+      <div className="p-4 my-6">
         {error && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
             {error}
@@ -186,37 +177,37 @@ export default function AddProductForm() {
         <form onSubmit={handleSubmit} className="space-y-8">
           <GeneralInfoSection data={formData} updateField={handleChange} />
           <DescriptionSection data={formData} updateField={handleChange} />
+
           <ImagesSection
             handleImageChange={handleImageChange}
             fileInputRef={fileInputRef}
-            selectedImages={selectedImages}
             imagePreviews={imagePreviews}
             removeImage={removeImage}
           />
+
           <PricingSection data={formData} updateField={handleChange} />
 
-          <div className="bg-white rounded-xl shadow-sm p-6 flex justify-end">
-            <div className="flex gap-5">
-              <button
-                className="bg-gray-400 text-white p-2 rounded"
-                onClick={() => navigate(-1)}
-              >
-                <div className="flex gap-2 items-center">
-                  <BookmarkX size={18} />
-                  Close
-                </div>
-              </button>
-              <button
-                className="bg-[#E9B159] text-white p-2 rounded"
-                disabled={loading}
-                type="submit"
-              >
-                <div className="flex gap-2 items-center">
-                  <Save size={18} />
-                  {loading ? "Saving..." : "Save Product"}
-                </div>
-              </button>
-            </div>
+          <div className="bg-white rounded-xl shadow-sm p-6 flex justify-end gap-5">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="bg-gray-400 text-white px-4 py-2 rounded"
+            >
+              <BookmarkX size={18} /> Close
+            </button>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-[#E9B159] text-white px-4 py-2 rounded"
+            >
+              <Save size={18} />
+              {loading
+                ? "Saving..."
+                : product
+                ? "Update Product"
+                : "Save Product"}
+            </button>
           </div>
         </form>
       </div>

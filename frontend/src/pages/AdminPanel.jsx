@@ -193,6 +193,35 @@ export default function AdminPanel() {
             label="Inquiry"
             showLabel={showLabel}
           />
+
+          {/* Home page */}
+          <button
+            onClick={() => toggle("home")}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
+          >
+            <div className="flex items-center gap-3 text-gray-700">
+              <Settings size={18} />
+              {showLabel && (
+                <span className="text-md font-medium">Home Page</span>
+              )}
+            </div>
+            {showLabel && (
+              <ChevronDown
+                size={16}
+                className={`transition ${open.home ? "rotate-180" : ""}`}
+              />
+            )}
+          </button>
+          {open.home && (
+            <div className="ml-9 space-y-1">
+              <SidebarLink
+                to="/admin/banner"
+                icon={CircleSmall}
+                label="Banner"
+                showLabel={showLabel}
+              />
+            </div>
+          )}
           <SidebarLink
             to="/admin/clients"
             icon={Users}

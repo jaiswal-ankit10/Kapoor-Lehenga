@@ -60,7 +60,7 @@ app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/wishlist", wishlistRoutes);
 app.use("/api/v1", orderRoutes);
 app.use("/api/v1", addressRoutes);
-app.use("/api/v1/banners", addressRoutes);
+app.use("/api/v1/banners", bannerRoutes);
 
 app.use((req, res, next) => {
   res.status(404).json({

@@ -24,4 +24,5 @@ export const breadcrumbAdmin = {
   productReview: { label: "Product Review List", to: "/admin/productReview" },
   inquiry: { label: "Inquiry List", to: "/admin/inquiry" },
   clients: { label: "Clients List", to: "/admin/clients" },
+  banner: { label: "Banner List", to: "/admin/banner" },
 };
