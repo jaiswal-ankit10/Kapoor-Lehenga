@@ -1,11 +1,25 @@
+import { useEffect } from "react";
 import { IoClose } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
+import { applyCoupon, fetchCoupons } from "../redux/couponSlice";
 
-const CouponCodeSlider = ({ openCoupon, setCoupon, onApplyCoupon }) => {
-  const handleApply = (offer) => {
-    onApplyCoupon(offer);
+const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
+  const dispatch = useDispatch();
+  const { cartItems, totalAmount } = useSelector((state) => state.cart);
+  const { coupons } = useSelector((state) => state.coupon);
+  const handleApply = (coupon) => {
+    dispatch(
+      applyCoupon({
+        code: coupon.code,
+        cartItems,
+        cartTotal: totalAmount,
+      })
+    );
     setCoupon(false);
   };
-
+  useEffect(() => {
+    dispatch(fetchCoupons());
+  }, [dispatch]);
   return (
     <>
       {openCoupon && (
@@ -21,42 +35,32 @@ const CouponCodeSlider = ({ openCoupon, setCoupon, onApplyCoupon }) => {
         }`}
       >
         <div className="flex justify-between p-4">
-          <h2 className="text-xl font-semibold">Coupons List</h2>
+          <h2 className="text-xl ">Coupons List</h2>
           <IoClose
             className="text-2xl cursor-pointer"
             onClick={() => setCoupon(false)}
           />
         </div>
 
-        <hr />
+        <hr className="text-gray-200" />
 
         <div className="mt-3 space-y-3">
-          {[
-            {
-              code: "NEW25",
-              offer: "Get FLAT 25% OFF",
-              desc: "On 1st New User Shopping",
-              discount: 25,
-            },
-            {
-              code: "NEW10",
-              offer: "Flat 10% off",
-              desc: "On All Orders",
-              discount: 10,
-            },
-          ].map((offer, index) => (
+          {coupons.map((coupon) => (
             <div
-              key={index}
-              className="border rounded-lg flex justify-between p-3 items-center"
+              key={coupon._id}
+              className="border bg-gray-100 rounded-lg flex justify-between p-3 items-center"
             >
-              <div>
-                <p className="font-semibold">{offer.offer}</p>
-                <p className="text-gray-500 text-sm">Use Code: {offer.code}</p>
+              <div className="">
+                <p className="font-semibold">{coupon.title}</p>
+                <p className="text-gray-500 text-sm">Use Code: {coupon.code}</p>
+                <p className="text-gray-500 text-sm">
+                  Minimum Purchase Amount: {coupon.minPurchaseAmount}
+                </p>
               </div>
 
               <button
                 className="bg-black text-white px-3 py-1 rounded text-sm"
-                onClick={() => handleApply(offer)}
+                onClick={() => handleApply(coupon)}
               >
                 Apply
               </button>

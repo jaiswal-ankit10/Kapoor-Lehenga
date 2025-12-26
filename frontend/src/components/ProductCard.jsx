@@ -55,7 +55,7 @@ const ProductCard = ({ product }) => {
   return (
     <div
       onClick={() => navigate(`/products/${productId}`)}
-      className="group w-[220px] lg:w-[260px] shrink-0 overflow-hidden hover:shadow-xl duration-300 cursor-pointer relative bg-white"
+      className="group w-full lg:w-[260px] shrink-0 overflow-hidden hover:shadow-xl duration-300 cursor-pointer relative bg-white"
     >
       {/* Wishlist Icon */}
       <button
@@ -71,7 +71,11 @@ const ProductCard = ({ product }) => {
 
       {/* Slider */}
       <div className="relative h-[330px]" onClick={(e) => e.stopPropagation()}>
-        <Swiper navigation={true} modules={[Navigation]} className="h-full">
+        <Swiper
+          navigation={true}
+          modules={[Navigation]}
+          className="w-full h-full"
+        >
           {(actualProduct?.images || [actualProduct?.thumbnail])
             ?.filter(Boolean)
             .map((img, index) => (
@@ -88,7 +92,7 @@ const ProductCard = ({ product }) => {
         {/* Add to Cart button */}
         <button
           onClick={addItemToCart}
-          className="absolute bottom-4 left-7 w-[200px] bg-white py-2 font-semibold text-sm opacity-0 group-hover:opacity-100 duration-300 pointer-events-auto z-20 cursor-pointer"
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[80%] max-w-[200px] bg-white py-2 font-semibold text-sm opacity-0 group-hover:opacity-100 duration-300 z-20"
         >
           {isWishlisted ? "Move to Bag" : "Add to Cart"}
         </button>

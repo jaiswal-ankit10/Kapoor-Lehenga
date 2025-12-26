@@ -72,7 +72,7 @@ const Products = () => {
           {/* TOP HEADER */}
           <div className="flex flex-col md:flex-row justify-between items-center pb-4 ">
             <div>
-              <h2 className="text-2xl font-semibold capitalize">
+              <h2 className="text-lg lg:text-2xl font-semibold capitalize">
                 {filters.category
                   ? `${filters.category} Collection`
                   : "All Products"}
@@ -98,7 +98,7 @@ const Products = () => {
           </div>
 
           {/* PRODUCTS GRID */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+          <div className="grid grid-cols-2  lg:grid-cols-4 gap-6 mt-6 ">
             {products?.map((product) => (
               <ProductCard key={product._id || product.id} product={product} />
             ))}

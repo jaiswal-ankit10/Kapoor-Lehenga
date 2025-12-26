@@ -1,19 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
 import PageHeader from "./PageHeader";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, SquarePen, Trash } from "lucide-react";
+import CouponForm from "./CouponForm";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCoupons } from "../../redux/couponSlice";
+import dayjs from "dayjs";
+import { ToastContainer } from "react-toastify";
+import axiosInstance from "../../api/axiosInstance";
 
 const CouponList = () => {
-  const [coupons, setCoupons] = useState([]);
+  const dispatch = useDispatch();
+  const { coupons } = useSelector((state) => state.coupon);
+  const [showCouponForm, setShowCouponForm] = useState(false);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
   const breadcrumb = [breadcrumbAdmin.home, breadcrumbAdmin.coupon];
+  const handleClick = (e) => {
+    e.preventDefault();
+    setSelectedCoupon(null);
+    setShowCouponForm((prev) => !prev);
+  };
+  const handleEdit = (coupon) => {
+    setSelectedCoupon(coupon);
+    setShowCouponForm(true);
+  };
+  const handleDelete = async (coupon) => {
+    try {
+      await axiosInstance.delete(`/coupons/delete/${coupon._id}`);
+      dispatch(fetchCoupons());
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    dispatch(fetchCoupons());
+  }, [dispatch]);
+
   return (
     <div>
+      <ToastContainer />
       <PageHeader
         title={"Coupon List"}
         breadcrumbs={breadcrumb}
         buttonText={"Add Coupon"}
         Icon={Plus}
-        handleClick={(e) => e.preventDefault()}
+        handleClick={handleClick}
         buttonBg={"bg-[#E9B159]"}
         buttonTextColor={"text-white"}
       />
@@ -43,7 +74,7 @@ const CouponList = () => {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-500">
               <tr>
-                <th className="px-5 py-3 text-left whitespace-nowrap min-w-max">
+                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
                   ACTION
                 </th>
                 <th className="px-5 py-3 text-left whitespace-nowrap min-w-max">
@@ -68,9 +99,6 @@ const CouponList = () => {
                   FOR NEW MEMBER
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
-                  USER USAGE TYPE
-                </th>
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
                   COUPON START DATE
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
@@ -79,13 +107,57 @@ const CouponList = () => {
               </tr>
             </thead>
             <tbody>
-              {coupons?.map((coupon, index) => {
-                <tr key="index">{!coupon && "Data not found"}</tr>;
-              })}
+              {coupons?.map((coupon) => (
+                <tr key={coupon._id}>
+                  <td className="px-5 py-4 flex gap-2">
+                    <div
+                      className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center cursor-pointer"
+                      onClick={() => handleEdit(coupon)}
+                    >
+                      <SquarePen size={16} />
+                    </div>
+                    <div
+                      className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center cursor-pointer"
+                      onClick={() => handleDelete(coupon._id)}
+                    >
+                      <Trash size={16} color="red" />
+                    </div>
+                  </td>
+                  <td className="py-2 px-5 text-center">{coupon.title}</td>
+                  <td className="py-2 px-5 text-center">{coupon.code}</td>
+                  <td className="py-2 px-5 text-center">
+                    {coupon.isActive ? "Active" : "Deactive"}
+                  </td>
+                  <td className="py-2 px-5 text-center">
+                    {coupon.discountValue}
+                  </td>
+                  <td className="py-2 px-5 text-center">
+                    ₹{coupon.minPurchaseAmount}
+                  </td>
+                  <td className="py-2 px-5 text-center">
+                    {coupon.usagePerUser}
+                  </td>
+                  <td className="py-2 px-5 text-center">
+                    {coupon.forNewUser ? "true" : "false"}
+                  </td>
+                  <td className="py-2 px-5 text-center">
+                    {dayjs(coupon.startDate).format("YYYY-MM-DD HH:mm:ss")}
+                  </td>
+                  <td className="py-2 px-5 text-center">
+                    {dayjs(coupon.expiryDate).format("YYYY-MM-DD HH:mm:ss")}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </div>
+      {showCouponForm && (
+        <CouponForm
+          onClose={() => setShowCouponForm(false)}
+          coupon={selectedCoupon}
+        />
+      )}
     </div>
   );
 };

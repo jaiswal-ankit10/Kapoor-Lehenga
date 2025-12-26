@@ -4,19 +4,16 @@ import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useSelector } from "react-redux";
 
 const PriceDetails = () => {
-  const { totalAmount, appliedCoupon } = useSelector((store) => store.cart);
+  const { totalAmount } = useSelector((state) => state.cart);
+  const { appliedCoupon, discount, finalAmount } = useSelector(
+    (state) => state.coupon
+  );
 
   const [isOpen, setIsOpen] = useState(true);
 
   const gstRate = 18;
 
-  const couponDiscount = appliedCoupon
-    ? (totalAmount * appliedCoupon.discount) / 100
-    : 0;
-
-  const gstAmount = ((totalAmount - couponDiscount) * gstRate) / 100;
-
-  const payableAmount = totalAmount - couponDiscount + gstAmount;
+  const gstAmount = ((totalAmount - discount) * gstRate) / 100;
 
   return (
     <div className="bg-white rounded-md p-3">
@@ -44,8 +41,8 @@ const PriceDetails = () => {
 
           {appliedCoupon && (
             <div className="flex justify-between mb-1 text-green-600">
-              <span>Coupon ({appliedCoupon.code})</span>
-              <span>-₹{couponDiscount.toFixed(0)}</span>
+              <span>Coupon ({appliedCoupon})</span>
+              <span>-₹{discount}</span>
             </div>
           )}
 
@@ -56,7 +53,7 @@ const PriceDetails = () => {
 
           <div className="flex justify-between font-semibold text-green-600 mt-2">
             <span>You Pay</span>
-            <span>₹{payableAmount.toFixed(0)}</span>
+            <span>₹{(finalAmount + gstAmount).toFixed(2)}</span>
           </div>
         </div>
       )}

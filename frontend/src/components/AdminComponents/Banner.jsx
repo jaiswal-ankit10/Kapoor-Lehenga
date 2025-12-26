@@ -11,10 +11,11 @@ const Banner = () => {
   const [editBanner, setEditBanner] = useState(null);
   const [previewImage, setPreviewImage] = useState("");
 
-  const [formData, setFormData] = useState({
+  const initialState = {
     title: "",
     isActive: "true",
-  });
+  };
+  const [formData, setFormData] = useState(initialState);
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -95,7 +96,7 @@ const Banner = () => {
 
       setShowAddBannerForm(false);
       setEditBanner(null);
-      setFormData({ title: "" });
+      setFormData(initialState);
       setImage(null);
       setPreviewImage("");
       fetchAllBanner();

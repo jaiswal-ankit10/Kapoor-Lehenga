@@ -134,7 +134,9 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
         {/* Footer */}
         {cartItems.length > 0 && (
           <div className="absolute bottom-0 left-0 w-full border-t p-4 flex items-center justify-between bg-white">
-            <p className="text-lg font-semibold text-black">₹{totalAmount}</p>
+            <p className="text-lg font-semibold text-black">
+              ₹{totalAmount.toFixed(2)}
+            </p>
 
             <button
               className="bg-[#E9B159] text-white px-6 py-2 text-xl"
