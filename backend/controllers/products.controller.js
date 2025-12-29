@@ -30,17 +30,26 @@ export const createProduct = async (req, res) => {
       req.files.map((file) => uploadWithRetry(file.buffer))
     );
 
-    const {
+    let {
       title,
       description,
+      longDescription,
       price,
       discount,
       stock,
       category,
       brand,
       color,
+      additionalDetails,
     } = req.body;
 
+    if (typeof additionalDetails === "string") {
+      try {
+        additionalDetails = JSON.parse(additionalDetails);
+      } catch (err) {
+        additionalDetails = [];
+      }
+    }
     const priceNum = Number(price);
     if (isNaN(priceNum)) {
       return res.status(400).json({
@@ -55,6 +64,7 @@ export const createProduct = async (req, res) => {
     const product = await Product.create({
       title,
       description,
+      longDescription,
       price: priceNum,
       discount: discountNum,
       discountedPrice,
@@ -62,6 +72,7 @@ export const createProduct = async (req, res) => {
       category,
       brand: brand || "Generic",
       color: color ? color.split(",").map((c) => c.trim()) : [],
+      additionalDetails: additionalDetails || [],
       thumbnail: imageUrls[0] || "",
       images: imageUrls,
     });
@@ -81,18 +92,45 @@ export const createProduct = async (req, res) => {
 };
 export const getAllProducts = async (req, res) => {
   try {
-    const { search, category, sort, page = 1, limit = 10 } = req.query;
+    const {
+      search,
+      category,
+      sort,
+      page = 1,
+      limit = 10,
+      color,
+      maxPrice,
+      discount,
+    } = req.query;
 
     const query = {
       isDeleted: false,
     };
 
+    // Search
     if (search) {
       query.title = { $regex: search, $options: "i" };
     }
 
+    // Category
     if (category) {
       query.category = { $regex: category, $options: "i" };
+    }
+
+    // Color (multiple)
+    if (color) {
+      const colors = Array.isArray(color) ? color : color.split(",");
+      query.color = { $in: colors };
+    }
+
+    // Price
+    if (maxPrice) {
+      query.price = { $lte: Number(maxPrice) };
+    }
+
+    // Discount
+    if (discount) {
+      query.discount = { $gte: Number(discount) };
     }
 
     let mongooseQuery = Product.find(query);
@@ -206,4 +244,24 @@ export const getProductCategories = async (req, res) => {
     success: true,
     categories,
   });
+};
+export const getProductColors = async (req, res) => {
+  try {
+    const colors = await Product.distinct("color", {
+      isDeleted: false,
+    });
+
+    // Flatten array because color is stored as [String]
+    const flatColors = colors.flat().filter(Boolean);
+
+    res.status(200).json({
+      success: true,
+      colors: [...new Set(flatColors)],
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };

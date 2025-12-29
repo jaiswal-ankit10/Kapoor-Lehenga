@@ -15,6 +15,9 @@ export const fetchAllProducts =
     search = "",
     category = "",
     sort = "newest",
+    color = [],
+    maxPrice,
+    discount,
     page = 1,
     limit = 20,
   } = {}) =>
@@ -26,6 +29,9 @@ export const fetchAllProducts =
       if (search) params.append("search", search);
       if (category) params.append("category", category);
       if (sort) params.append("sort", sort);
+      if (color.length) params.append("color", color.join(","));
+      if (maxPrice) params.append("maxPrice", maxPrice);
+      if (discount) params.append("discount", discount);
       params.append("page", page);
       params.append("limit", limit);
 

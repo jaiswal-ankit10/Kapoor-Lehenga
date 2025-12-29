@@ -1,5 +1,21 @@
 import mongoose from "mongoose";
 
+const additionalDetailSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    value: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  },
+  { _id: false }
+);
+
 const productSchema = new mongoose.Schema(
   {
     title: {
@@ -10,6 +26,9 @@ const productSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
+    },
+    longDescription: {
+      type: String,
     },
     thumbnail: {
       type: String,
@@ -53,6 +72,10 @@ const productSchema = new mongoose.Schema(
       default: 0,
       min: 0,
       max: 5,
+    },
+    additionalDetails: {
+      type: [additionalDetailSchema],
+      default: [],
     },
     totalReviews: {
       type: Number,

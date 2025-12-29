@@ -68,6 +68,18 @@ export function GeneralInfoSection({ data, updateField }) {
               />
             </div>
           </div>
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">
+              Product Colors
+            </label>
+            <input
+              type="text"
+              placeholder="Enter Product colors"
+              value={data.color || ""}
+              onChange={(e) => updateField("color", e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-md text-sm outline-none"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -92,12 +104,49 @@ export function DescriptionSection({ data, updateField }) {
         {/* RIGHT FORM */}
         <div className="col-span-12 md:col-span-9 space-y-5">
           <label className="block text-sm text-gray-600 mb-1">
-            Description
+            Short Description
           </label>
           <RichTextEditor
             value={data.description}
             onChange={(val) => updateField("description", val)}
             placeholder="Enter description"
+          />
+          <label className="block text-sm text-gray-600 mb-1">
+            Long Description
+          </label>
+          <RichTextEditor
+            value={data.longDescription}
+            onChange={(val) => updateField("longDescription", val)}
+            placeholder="Enter description"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+export function DetailsSection({ data, updateField }) {
+  return (
+    <div className="bg-white rounded-xl shadow-sm p-10">
+      <div className="grid grid-cols-12 gap-6 items-start">
+        {/* Left Info */}
+        <div className="col-span-12 md:col-span-3 flex gap-4">
+          <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+            <Package className="text-[#04441f]" size={22} />
+          </div>
+
+          <div>
+            <h3 className="text-lg text-gray-600">Details</h3>
+            <p className="text-sm text-gray-500">Add Details</p>
+          </div>
+        </div>
+        {/* Right Form */}
+        <div className="col-span-12 md:col-span-9 space-y-5">
+          <h3 className="text-sm font-medium text-gray-700 mb-4">
+            Product Additional Details
+          </h3>
+          <ProductAdditionalDetails
+            details={data.additionalDetails}
+            setDetails={(val) => updateField("additionalDetails", val)}
           />
         </div>
       </div>
@@ -114,9 +163,14 @@ export function ImagesSection({
   return (
     <div className="bg-white rounded-xl shadow-sm p-10">
       <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-12 md:col-span-3">
-          <h3 className="text-lg text-gray-600">Images</h3>
-          <p className="text-sm text-gray-500">Add / Edit product images</p>
+        <div className="col-span-12 md:col-span-3 flex gap-4">
+          <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+            <Package className="text-[#04441f]" size={22} />
+          </div>
+          <div>
+            <h3 className="text-lg text-gray-600">Images</h3>
+            <p className="text-sm text-gray-500">Add / Edit product images</p>
+          </div>
         </div>
 
         <div className="col-span-12 md:col-span-9 space-y-4">
@@ -166,7 +220,7 @@ export function PricingSection({ data, updateField }) {
           </div>
 
           <div>
-            <h3 className="text-base font-semibold text-gray-800">Pricing</h3>
+            <h3 className="text-lg text-gray-600">Pricing</h3>
             <p className="text-sm text-gray-500">Add Pricing</p>
           </div>
         </div>
@@ -230,6 +284,82 @@ function InputWithPrefix({ label, prefix, value, onChange, placeholder }) {
           placeholder={placeholder}
           className="w-full px-3 py-2.5 text-sm focus:outline-none"
         />
+      </div>
+    </div>
+  );
+}
+
+function ProductAdditionalDetails({ details, setDetails }) {
+  const handleChange = (index, field, val) => {
+    const updated = [...details];
+    updated[index][field] = val;
+    setDetails(updated);
+  };
+
+  const addRow = () => {
+    setDetails([...details, { title: "", value: "" }]);
+  };
+
+  const removeRow = (index) => {
+    setDetails(details.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="border border-gray-200 rounded-lg p-4">
+      <div className="space-y-4">
+        {details.map((item, index) => (
+          <div
+            key={index}
+            className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end"
+          >
+            {/* Title */}
+            <div className="md:col-span-5">
+              <label className="block text-sm text-gray-600 mb-1">Title</label>
+              <input
+                type="text"
+                placeholder="Enter title"
+                value={item.title}
+                onChange={(e) => handleChange(index, "title", e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-md text-sm outline-none "
+              />
+            </div>
+
+            {/* Value */}
+            <div className="md:col-span-5">
+              <label className="block text-sm text-gray-600 mb-1">Value</label>
+              <input
+                type="text"
+                placeholder="Enter value"
+                value={item.value}
+                onChange={(e) => handleChange(index, "value", e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-md text-sm outline-none"
+              />
+            </div>
+
+            {/* Buttons */}
+            <div className="md:col-span-2 flex gap-2 md:justify-end">
+              {details.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeRow(index)}
+                  className="h-12 w-12 flex items-center justify-center rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100 text-xl"
+                >
+                  –
+                </button>
+              )}
+
+              {index === details.length - 1 && (
+                <button
+                  type="button"
+                  onClick={addRow}
+                  className="h-12 w-12 flex items-center justify-center rounded-md bg-[#E9B159] text-white text-xl cursor-pointer"
+                >
+                  +
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

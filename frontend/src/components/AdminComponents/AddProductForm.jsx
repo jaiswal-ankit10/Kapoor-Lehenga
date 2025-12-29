@@ -7,6 +7,7 @@ import {
   ImagesSection,
   GeneralInfoSection,
   PricingSection,
+  DetailsSection,
 } from "./FormComponents/FormSections";
 import { Save, BookmarkX } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -19,12 +20,14 @@ export default function AddProductForm() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    longDescription: "",
     price: "",
     discount: 0,
     stock: 0,
     category: "",
     brand: "",
     color: "",
+    additionalDetails: [{ title: "", value: "" }],
   });
 
   const [existingImages, setExistingImages] = useState([]); // DB images
@@ -41,12 +44,16 @@ export default function AddProductForm() {
     setFormData({
       title: product.title || "",
       description: product.description || "",
+      longDescription: product.longDescription || "",
       price: product.price || "",
       discount: product.discount || 0,
       stock: product.stock || 0,
       category: product.category || "",
       brand: product.brand || "",
       color: product.color || "",
+      additionalDetails: product.additionalDetails || [
+        { title: "", value: "" },
+      ],
     });
 
     if (product.images?.length) {
@@ -127,8 +134,13 @@ export default function AddProductForm() {
     const formDataToSend = new FormData();
 
     Object.entries(formData).forEach(([key, value]) => {
+      if (key === "additionalDetails") return;
       formDataToSend.append(key, value);
     });
+    formDataToSend.append(
+      "additionalDetails",
+      JSON.stringify(formData.additionalDetails)
+    );
 
     // keep remaining old images
     formDataToSend.append("existingImages", JSON.stringify(existingImages));
@@ -177,7 +189,7 @@ export default function AddProductForm() {
         <form onSubmit={handleSubmit} className="space-y-8">
           <GeneralInfoSection data={formData} updateField={handleChange} />
           <DescriptionSection data={formData} updateField={handleChange} />
-
+          <DetailsSection data={formData} updateField={handleChange} />
           <ImagesSection
             handleImageChange={handleImageChange}
             fileInputRef={fileInputRef}
@@ -191,7 +203,7 @@ export default function AddProductForm() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="bg-gray-400 text-white px-4 py-2 rounded"
+              className="bg-gray-400 text-white px-4 py-2 rounded flex items-center gap-2 cursor-pointer"
             >
               <BookmarkX size={18} /> Close
             </button>
@@ -199,7 +211,7 @@ export default function AddProductForm() {
             <button
               type="submit"
               disabled={loading}
-              className="bg-[#E9B159] text-white px-4 py-2 rounded"
+              className="bg-[#E9B159] text-white px-4 py-2 rounded flex items-center gap-2 cursor-pointer"
             >
               <Save size={18} />
               {loading

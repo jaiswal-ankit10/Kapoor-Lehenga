@@ -37,7 +37,7 @@ const Categories = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [handleDelete]);
+  }, []);
 
   const breadcrumb = [breadcrumbAdmin.home, breadcrumbAdmin.categories];
   return (

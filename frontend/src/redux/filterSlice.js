@@ -6,6 +6,9 @@ const initialState = {
   sort: "newest", // newest | price_asc | price_desc
   page: 1,
   limit: 20,
+  color: [],
+  maxPrice: 20000,
+  discount: 0,
 };
 
 const filterSlice = createSlice({
@@ -31,6 +34,22 @@ const filterSlice = createSlice({
       state.limit = action.payload;
       state.page = 1;
     },
+
+    setColor(state, action) {
+      state.color = action.payload;
+      state.page = 1;
+    },
+
+    setMaxPrice(state, action) {
+      state.maxPrice = action.payload;
+      state.page = 1;
+    },
+
+    setDiscount(state, action) {
+      state.discount = action.payload;
+      state.page = 1;
+    },
+
     resetFilters(state) {
       state.search = "";
       state.category = "";
@@ -47,6 +66,9 @@ export const {
   setSort,
   setPage,
   setLimit,
+  setColor,
+  setMaxPrice,
+  setDiscount,
   resetFilters,
 } = filterSlice.actions;
 

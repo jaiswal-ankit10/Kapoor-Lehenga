@@ -34,35 +34,17 @@ const ProductInfo = ({ product }) => {
 
         {openDetails && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 mt-3 pl-10 text-md">
-            <p>
-              <span className="font-semibold">Material:</span> Crepe
-            </p>
-            <p>
-              <span className="font-semibold">Type of Work:</span> Embellished &
-              Sequined
-            </p>
-            <p>
-              <span className="font-semibold">Pattern:</span> Printed
-            </p>
-            <p>
-              <span className="font-semibold">Type:</span> Lehenga Choli
-            </p>
-            <p>
-              <span className="font-semibold">Fit:</span> Comfortable
-            </p>
-            <p>
-              <span className="font-semibold">Neckline Type:</span> Scoop Neck
-            </p>
-            <p>
-              <span className="font-semibold">Sleeve Type:</span> Sleeveless
-            </p>
-            <p>
-              <span className="font-semibold">Closure Type:</span> Back Closure
-            </p>
-            <p>
-              <span className="font-semibold">Care Instructions:</span> Dry
-              Clean Only
-            </p>
+            {product.additionalDetails &&
+            product.additionalDetails.length > 0 ? (
+              product.additionalDetails.map((detail, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <p className="font-medium">{detail.title}:</p>
+                  <p className="text-sm">{detail.value}</p>
+                </div>
+              ))
+            ) : (
+              <p>No additional data available</p>
+            )}
           </div>
         )}
       </div>
@@ -85,7 +67,10 @@ const ProductInfo = ({ product }) => {
 
         {openDescription && (
           <p className="mt-2 pl-10 text-md text-gray-600 leading-relaxed">
-            {product.description}
+            <div
+              className="prose prose-sm max-w-none text-gray-500 text-sm mt-4"
+              dangerouslySetInnerHTML={{ __html: product.longDescription }}
+            />
           </p>
         )}
       </div>
