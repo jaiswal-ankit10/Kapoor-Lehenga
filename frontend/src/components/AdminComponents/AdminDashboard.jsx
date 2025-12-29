@@ -43,7 +43,7 @@ export default function AdminDashboard() {
         />
         <StatCard
           title={"Payment History"}
-          value={stats.totalRevenue}
+          value={stats.totalRevenue?.toFixed(2)}
           Icon={TrendingUp}
           borderColor={"border-blue-400"}
           iconColor={"text-blue-400"}

@@ -7,6 +7,7 @@ import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
 import PageHeader from "./PageHeader";
 import { Edit, Plus, Search, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -125,7 +126,7 @@ export default function AdminProducts() {
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
                   PRODUCT DISCOUNT
                 </th>
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
+                <th className="px-15 py-3 text-center whitespace-nowrap min-w-max">
                   UPDATED AT
                 </th>
               </tr>
@@ -169,7 +170,7 @@ export default function AdminProducts() {
                   </td>
                   <td className="py-2 px-5 text-center">{p.discount}%</td>
                   <td className="py-2 px-5 text-center">
-                    {new Date(p.createdAt).toLocaleDateString()}
+                    {dayjs(p.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
                   </td>
                 </tr>
               ))}

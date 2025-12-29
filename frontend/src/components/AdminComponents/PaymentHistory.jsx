@@ -9,6 +9,7 @@ import {
   exportToCSV,
   formatPaymentHistorForCSV,
 } from "../../utils/exportToCSV";
+import dayjs from "dayjs";
 
 const PaymentHistory = () => {
   const [stats, setStats] = useState({});
@@ -178,7 +179,7 @@ const PaymentHistory = () => {
                     ₹{order.totalAmount}
                   </td>
                   <td className="py-2 px-5 text-center">
-                    {new Date(order.createdAt).toLocaleDateString()}
+                    {dayjs(order.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
                   </td>
                 </tr>
               ))}

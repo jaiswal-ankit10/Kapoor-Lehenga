@@ -14,7 +14,7 @@ const SimilarProductsSlider = ({ products }) => {
   };
 
   return (
-    <div className="max-w-[90vw] mx-auto mt-10 relative">
+    <div className="max-w-7xl mx-auto mt-10 relative">
       <h1 className="text-2xl font-semibold mb-4">Similar Products</h1>
 
       {/* Left Arrow */}

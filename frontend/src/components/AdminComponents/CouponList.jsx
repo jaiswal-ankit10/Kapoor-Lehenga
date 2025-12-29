@@ -126,10 +126,20 @@ const CouponList = () => {
                   <td className="py-2 px-5 text-center">{coupon.title}</td>
                   <td className="py-2 px-5 text-center">{coupon.code}</td>
                   <td className="py-2 px-5 text-center">
-                    {coupon.isActive ? "Active" : "Deactive"}
+                    <span
+                      className={`${
+                        coupon.isActive ? "bg-green-500" : "bg-red-500"
+                      } text-white px-2 py-1 rounded`}
+                    >
+                      {coupon.isActive ? "Active" : "Deactive"}
+                    </span>
                   </td>
                   <td className="py-2 px-5 text-center">
-                    {coupon.discountValue}
+                    <span>{`${
+                      coupon.discountType === "percentage"
+                        ? `${coupon.discountValue}%`
+                        : `₹${coupon.discountValue}`
+                    }`}</span>
                   </td>
                   <td className="py-2 px-5 text-center">
                     ₹{coupon.minPurchaseAmount}

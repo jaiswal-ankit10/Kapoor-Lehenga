@@ -232,9 +232,9 @@ export default function AdminPanel() {
       </aside>
 
       {/* Content */}
-      <main className="flex-1 pt-5 px-5 md:px-10 lg:px-20 overflow-auto">
+      <main className=" flex-1 pt-5 px-5 md:px-10 lg:px-20 overflow-auto">
         <AdminNavbar setIsSidebarOpen={setIsSidebarOpen} />
-        <div className="pt-6">
+        <div className="mx-auto max-w-7xl px-5 md:px-10 py-6">
           <Outlet />
         </div>
         <AdminFooter />

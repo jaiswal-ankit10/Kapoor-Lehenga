@@ -17,7 +17,7 @@ const Wishlist = () => {
     <>
       <RoutesSection breadcrumb={breadcrumb} />
 
-      <div className="max-w-[90vw] mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-4 mt-4">
           <h1 className="text-2xl">My Wishlist</h1>
           <p className="text-gray-500">{wishlistItems.length} products</p>

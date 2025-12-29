@@ -3,6 +3,7 @@ import axiosInstance from "../../api/axiosInstance";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllOrders } from "../../services/orderService";
 import EditOrderForm from "./EditOrderForm";
+import dayjs from "dayjs";
 import PageHeader from "./PageHeader";
 import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
 import {
@@ -34,7 +35,13 @@ export default function AdminOrders() {
   const closeEditModal = () => {
     setIsEditOpen(false);
   };
-
+  const statusStyle = {
+    Pending: "bg-yellow-100 text-yellow-600",
+    Completed: "bg-green-100 text-green-600",
+    Cancel: "bg-red-100 text-red-500",
+    Processing: "bg-blue-100 text-blue-500",
+    Returned: "bg-gray-100 text-gray-500",
+  };
   const [stats, setStats] = useState({
     todaysOrders: 0,
     completedOrders: 0,
@@ -166,7 +173,7 @@ export default function AdminOrders() {
                 <th className="px-5 py-3 text-left whitespace-nowrap min-w-max">
                   Edit Status
                 </th>
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
+                <th className="px-15 py-3 text-center whitespace-nowrap min-w-max">
                   ORDER ID
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
@@ -176,12 +183,15 @@ export default function AdminOrders() {
                   ORDER STATUS
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
+                  PAYMENT STATUS
+                </th>
+                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
                   PAYMENT TYPE
                 </th>
                 <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
                   TOTAL AMOUNT
                 </th>
-                <th className="px-5 py-3 text-center whitespace-nowrap min-w-max">
+                <th className="px-15 py-3 text-center whitespace-nowrap min-w-max">
                   ORDER DATE
                 </th>
               </tr>
@@ -191,7 +201,7 @@ export default function AdminOrders() {
                 <tr key={order._id} className="border-t">
                   <td className="px-5 py-4">
                     <div
-                      className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center"
+                      className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center"
                       onClick={() => openEditModal(order)}
                     >
                       <SquarePen size={16} />
@@ -199,7 +209,26 @@ export default function AdminOrders() {
                   </td>
                   <td className="py-2 px-5 text-center">{order.orderId}</td>
                   <td className="py-2 px-5 text-center">{order.user?.email}</td>
-                  <td className="py-2 px-5 text-center">{order.status}</td>
+                  <td className="py-2 px-5 text-center">
+                    <span
+                      className={`${
+                        statusStyle[order.status]
+                      } px-2 py-1 rounded`}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="py-2 px-5 text-center">
+                    <span
+                      className={`${
+                        order.paymentStatus === "complete"
+                          ? "bg-green-400 text-white"
+                          : "bg-red-400 text-white"
+                      } px-2 py-1 rounded`}
+                    >
+                      {order.paymentStatus}
+                    </span>
+                  </td>
                   <td className="py-2 px-5 text-center uppercase">
                     {order.paymentMethod}
                   </td>
@@ -207,7 +236,7 @@ export default function AdminOrders() {
                     ₹{order.totalAmount}
                   </td>
                   <td className="py-2 px-5 text-center">
-                    {new Date(order.createdAt).toLocaleDateString()}
+                    {dayjs(order.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
                   </td>
                 </tr>
               ))}

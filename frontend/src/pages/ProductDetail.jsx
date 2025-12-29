@@ -19,18 +19,19 @@ import {
   removeFromWishlistBackend,
 } from "../services/wishlistService";
 import { toast, ToastContainer } from "react-toastify";
+import { fetchCoupons } from "../redux/couponSlice";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { product, products, loading } = useSelector((store) => store.products);
-  const { wishlistItems } = useSelector((store) => store.wishlist);
-  const { cartItems } = useSelector((store) => store.cart);
+  const { product, products, loading } = useSelector((state) => state.products);
+  const { wishlistItems } = useSelector((state) => state.wishlist);
+  const { cartItems } = useSelector((state) => state.cart);
+  const { coupons } = useSelector((state) => state.coupon);
 
   const [selectedThumb, setSelectedThumb] = useState(null);
-  const [stitchOption, setStitchOption] = useState("unstitched");
   const [qty, setQty] = useState(1);
 
   const isWishlisted = wishlistItems.some((item) => item.product?._id === id);
@@ -43,6 +44,9 @@ const ProductDetail = () => {
   useEffect(() => {
     dispatch(fetchProductById(id));
   }, [dispatch, id]);
+  useEffect(() => {
+    dispatch(fetchCoupons());
+  }, [dispatch]);
 
   useEffect(() => {
     if (product?.images?.length > 0) {
@@ -86,10 +90,14 @@ const ProductDetail = () => {
   return (
     <>
       <RoutesSection breadcrumb={breadcrumb} />
-      <div className="max-w-[85vw] mx-auto px-12 py-10 flex gap-10 flex-col md:flex-row">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-10 flex gap-10 flex-col md:flex-row">
         <ToastContainer />
         {/* Thumbnails */}
-        <div className="flex flex-row md:flex-col gap-3 overflow-hidden ">
+        <div
+          className="flex flex-row md:flex-col gap-3
+    overflow-auto
+    max-h-[420px] md:max-h-[620px] "
+        >
           {(product?.images || [product?.thumbnail])
             .filter(Boolean)
             .map((thumb, i) => (
@@ -173,26 +181,13 @@ const ProductDetail = () => {
           {/* Available Offers */}
           <h3 className="font-semibold mt-6">Available Offers</h3>
           <div className="mt-3 space-y-3">
-            {[
-              {
-                code: "NEW25",
-                offer: "Get FLAT 25% OFF",
-                desc: "On 1st New User Shopping",
-                discount: 25,
-              },
-              {
-                code: "NEW10",
-                offer: "Flat 10% off",
-                desc: "On All Orders",
-                discount: 10,
-              },
-            ].map((offer, index) => (
+            {coupons.map((offer) => (
               <div
-                key={index}
+                key={offer._id}
                 className="border rounded-lg flex justify-between p-3 items-center"
               >
                 <div>
-                  <p className="font-semibold">{offer.offer}</p>
+                  <p className="font-semibold">{offer.title}</p>
                   <p className="text-gray-500 text-sm">
                     Use Code: {offer.code}
                   </p>

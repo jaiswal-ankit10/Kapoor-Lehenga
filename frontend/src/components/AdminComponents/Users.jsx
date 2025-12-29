@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import AddUserForm from "./AddUserForm";
-import { useDispatch } from "react-redux";
-import { deleteUser } from "../../redux/userSlice";
 import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
 import PageHeader from "./PageHeader";
 import { Download, Search, Trash } from "lucide-react";
 import { exportToCSV, formatUsersForCSV } from "../../utils/exportToCSV";
+import dayjs from "dayjs";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -114,7 +113,7 @@ export default function Users() {
                     </span>
                   </td>
                   <td className="py-3 px-5 text-center">
-                    {new Date(u.createdAt).toLocaleDateString()}
+                    {dayjs(u.createdAt).format("YYYY-MM-DD HH:mm:ss")}
                   </td>
                 </tr>
               ))}

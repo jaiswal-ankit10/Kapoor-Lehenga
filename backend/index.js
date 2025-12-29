@@ -4,8 +4,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import connectDb from "./config/dbConnect.js";
 import path from "path";
-import { asyncHandler } from "./utils/async-handler.js";
 import { fileURLToPath } from "url";
+import helmet from "helmet";
 
 import dns from "dns";
 
@@ -24,6 +24,7 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 //middlewares
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -32,7 +33,7 @@ app.use(
   cors({
     origin: process.env.CORS_ORIGIN?.split(",") || "http://localhost:5173",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
   })
 );
 

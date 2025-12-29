@@ -11,7 +11,7 @@ const ReviewSection = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
 
   return (
-    <div className="max-w-[75vw] mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 gap-10">
+    <div className="max-w-6xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 gap-10">
       {/* LEFT — Rating Summary */}
       <div className=" p-6 ">
         <h2 className="text-xl font-semibold mb-4">Customer reviews</h2>

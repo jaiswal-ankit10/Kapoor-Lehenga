@@ -3,6 +3,7 @@ import PageHeader from "./PageHeader";
 import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
 import { Plus, Save, Search, SquarePen, Trash } from "lucide-react";
 import axiosInstance from "../../api/axiosInstance";
+import dayjs from "dayjs";
 
 const Banner = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -261,7 +262,7 @@ const Banner = () => {
                   <td className="py-2 px-5 text-center">{banner.title}</td>
 
                   <td className="py-2 px-5 text-center">
-                    {new Date(banner.updatedAt).toLocaleDateString()}
+                    {dayjs(banner.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
                   </td>
                 </tr>
               ))}
