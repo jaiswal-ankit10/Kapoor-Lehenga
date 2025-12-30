@@ -1,4 +1,4 @@
-import { Package } from "lucide-react";
+import { Package, Plus } from "lucide-react";
 import CustomSelect from "./CustomSelect";
 import { RichTextEditor } from "./RichTextEditor";
 import { useState } from "react";
@@ -291,8 +291,9 @@ function InputWithPrefix({ label, prefix, value, onChange, placeholder }) {
 
 function ProductAdditionalDetails({ details, setDetails }) {
   const handleChange = (index, field, val) => {
-    const updated = [...details];
-    updated[index][field] = val;
+    const updated = details.map((item, i) =>
+      i === index ? { ...item, [field]: val } : item
+    );
     setDetails(updated);
   };
 
@@ -354,7 +355,7 @@ function ProductAdditionalDetails({ details, setDetails }) {
                   onClick={addRow}
                   className="h-12 w-12 flex items-center justify-center rounded-md bg-[#E9B159] text-white text-xl cursor-pointer"
                 >
-                  +
+                  <Plus size={16} />
                 </button>
               )}
             </div>

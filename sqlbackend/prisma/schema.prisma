@@ -1,0 +1,306 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("PRISMA_DATABASE_URL")
+}
+
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+model User {
+  id String @id @default(uuid())
+
+  fullName String?
+  email    String  @unique
+  mobile   String? @unique
+  password String?
+
+  otp           String?
+  otpExpireTime DateTime?
+
+  role         Role    @default(CUSTOMER)
+  profileImage String?
+
+  authProvider AuthProvider @default(LOCAL)
+  googleId     String?      @unique
+
+  orders       Order[]
+  cart         Cart?
+  addresses    Address[]
+  wishlist     Wishlist?
+  couponUsages CouponUsage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id String @id @default(uuid())
+
+  title           String
+  description     String
+  longDescription String?
+
+  thumbnail String?
+  images    Json
+
+  price           Float
+  discount        Int   @default(0)
+  discountedPrice Float
+
+  stock Int @default(0)
+
+  category String
+  brand    String @default("Generic")
+
+  color Json // array of strings
+
+  ratings      Float @default(0)
+  totalReviews Int   @default(0)
+
+  isDeleted Boolean @default(false)
+
+  additionalDetails ProductAdditionalDetail[]
+  orderItems        OrderItem[]
+  cartItems         CartItem[]
+  wishlistItems     WishlistItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductAdditionalDetail {
+  id        String @id @default(uuid())
+  productId String
+
+  title String
+  value String
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum PaymentMethod {
+  COD
+  RAZORPAY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETE
+}
+
+model Order {
+  id      String @id @default(uuid())
+  orderId String @unique
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  totalAmount Float
+  status      OrderStatus @default(PENDING)
+
+  paymentMethod PaymentMethod @default(COD)
+  paymentStatus PaymentStatus @default(COMPLETE)
+
+  isCancelled Boolean @default(false)
+  isReturned  Boolean @default(false)
+
+  shippingAddress ShippingAddress?
+  items           OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id String @id @default(uuid())
+
+  orderId   String
+  productId String
+
+  title    String
+  price    Float
+  quantity Int    @default(1)
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model ShippingAddress {
+  id String @id @default(uuid())
+
+  orderId  String @unique
+  fullName String
+  mobile   String
+  address  String
+  city     String
+  state    String
+  pincode  String
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id String @id @default(uuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items CartItem[]
+
+  totalItems Int   @default(0)
+  totalPrice Float @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id String @id @default(uuid())
+
+  cartId    String
+  productId String
+
+  quantity Int   @default(1)
+  price    Float
+
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Address {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  fullName String
+  mobile   String
+  address  String
+  city     String
+  state    String
+  pincode  String
+
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Banner {
+  id String @id @default(uuid())
+
+  title    String?
+  imageUrl String
+  publicId String
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FLAT
+}
+
+model Coupon {
+  id String @id @default(uuid())
+
+  code  String @unique
+  title String
+
+  discountType  DiscountType
+  discountValue Float
+
+  minPurchaseAmount Float @default(0)
+
+  startDate  DateTime
+  expiryDate DateTime
+
+  isActive Boolean @default(true)
+
+  usageLimit   Int @default(0)
+  usedCount    Int @default(0)
+  usagePerUser Int @default(1)
+
+  forNewUser Boolean @default(false)
+
+  usages CouponUsage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CouponUsage {
+  id String @id @default(uuid())
+
+  couponId String
+  userId   String
+
+  usedCount Int @default(1)
+
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([couponId, userId])
+}
+
+model Wishlist {
+  id String @id @default(uuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items WishlistItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WishlistItem {
+  id String @id @default(uuid())
+
+  wishlistId String
+  productId  String
+
+  addedAt DateTime @default(now())
+
+  wishlist Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([wishlistId, productId])
+}

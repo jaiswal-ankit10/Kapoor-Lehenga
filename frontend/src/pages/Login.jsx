@@ -39,7 +39,7 @@ const Login = () => {
           })
         );
 
-        navigate(res.data.user.role === "admin" ? "/admin" : "/");
+        navigate(res.data.user.role === "ADMIN" ? "/admin" : "/");
       }
     } catch (error) {
       console.log(error);
