@@ -60,9 +60,9 @@ const Header = () => {
     navigate(`/products?search=${encodeURIComponent(value)}`);
   };
   const handleCategory = (category) => {
-    const normalizedCategory = category.toLowerCase();
+    const normalizedCategory = category.toLowerCase().replace(/\s+/g, "_");
     dispatch(setCategory(normalizedCategory));
-    navigate(`/products?category=${encodeURIComponent(category)}`);
+    navigate(`/products?category=${encodeURIComponent(normalizedCategory)}`);
   };
 
   return (

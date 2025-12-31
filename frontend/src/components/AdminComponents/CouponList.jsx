@@ -26,7 +26,7 @@ const CouponList = () => {
   };
   const handleDelete = async (coupon) => {
     try {
-      await axiosInstance.delete(`/coupons/delete/${coupon._id}`);
+      await axiosInstance.delete(`/coupons/delete/${coupon.id}`);
       dispatch(fetchCoupons());
     } catch (error) {
       console.log(error);
@@ -108,7 +108,7 @@ const CouponList = () => {
             </thead>
             <tbody>
               {coupons?.map((coupon) => (
-                <tr key={coupon._id}>
+                <tr key={coupon.id}>
                   <td className="px-5 py-4 flex gap-2">
                     <div
                       className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center cursor-pointer"
@@ -118,7 +118,7 @@ const CouponList = () => {
                     </div>
                     <div
                       className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center cursor-pointer"
-                      onClick={() => handleDelete(coupon._id)}
+                      onClick={() => handleDelete(coupon.id)}
                     >
                       <Trash size={16} color="red" />
                     </div>

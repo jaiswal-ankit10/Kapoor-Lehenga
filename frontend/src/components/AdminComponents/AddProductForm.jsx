@@ -60,7 +60,7 @@ export default function AddProductForm() {
       setExistingImages(product.images);
       setImagePreviews(product.images.map((img) => img));
     }
-  }, [product?._id]);
+  }, [product?.id]);
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -153,7 +153,7 @@ export default function AddProductForm() {
     try {
       const res = product
         ? await axiosInstance.put(
-            `/admin/products/${product._id}`,
+            `/admin/products/${product.id}`,
             formDataToSend
           )
         : await axiosInstance.post("/admin/products", formDataToSend);

@@ -131,7 +131,7 @@ const couponSlice = createSlice({
         state.loading = false;
 
         const index = state.coupons.findIndex(
-          (c) => c._id === action.payload._id
+          (c) => c.id === action.payload.id
         );
 
         if (index !== -1) {

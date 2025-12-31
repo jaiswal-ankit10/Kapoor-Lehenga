@@ -47,7 +47,7 @@ const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
         <div className="mt-3 space-y-3">
           {coupons.map((coupon) => (
             <div
-              key={coupon._id}
+              key={coupon.id}
               className="border bg-gray-100 rounded-lg flex justify-between p-3 items-center"
             >
               <div className="">

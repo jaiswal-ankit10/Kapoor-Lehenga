@@ -72,8 +72,8 @@ const CouponForm = ({ onClose, coupon }) => {
       setFormData({
         code: coupon.code || "",
         title: coupon.title || "",
-        discountType: coupon.discountType || "percentage",
-        discountValue: coupon.discountValue || "",
+        discountType: coupon.discountType || "PERCENTAGE",
+        discountValue: coupon.discountValue || null,
         minPurchaseAmount: coupon.minPurchaseAmount || "",
         startDate: coupon.startDate
           ? dayjs(coupon.startDate).format("YYYY-MM-DD")
@@ -91,20 +91,29 @@ const CouponForm = ({ onClose, coupon }) => {
     }
   }, [coupon]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    if (coupon) {
-      dispatch(updateCoupon({ id: coupon._id, couponData: formData }));
-      toast.success("Coupon updated successfully");
-    } else {
-      dispatch(createCoupon(formData));
-      toast.success("Coupon created successfully");
+
+    try {
+      if (coupon) {
+        await dispatch(
+          updateCoupon({ id: coupon.id, couponData: formData })
+        ).unwrap();
+        toast.success("Coupon updated successfully");
+      } else {
+        await dispatch(createCoupon(formData)).unwrap();
+        toast.success("Coupon created successfully");
+      }
+
+      dispatch(fetchCoupons());
+
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+    } catch (error) {
+      toast.error(error?.message || "Something went wrong. Please try again.");
     }
-    dispatch(fetchCoupons());
-    setTimeout(() => {
-      onClose();
-    }, 1000);
   };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 ">
@@ -166,8 +175,8 @@ const CouponForm = ({ onClose, coupon }) => {
                   <input
                     type="radio"
                     name="discountType"
-                    value="percentage"
-                    checked={formData.discountType === "percentage"}
+                    value="PERCENTAGE"
+                    checked={formData.discountType === "PERCENTAGE"}
                     onChange={(e) =>
                       handleChange("discountType", e.target.value)
                     }
@@ -180,8 +189,8 @@ const CouponForm = ({ onClose, coupon }) => {
                   <input
                     type="radio"
                     name="discountType"
-                    value="flat"
-                    checked={formData.discountType === "flat"}
+                    value="FLAT"
+                    checked={formData.discountType === "FLAT"}
                     onChange={(e) =>
                       handleChange("discountType", e.target.value)
                     }

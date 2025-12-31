@@ -56,6 +56,8 @@ const filterSlice = createSlice({
       state.sort = "newest";
       state.page = 1;
       state.limit = 20;
+      state.color = [];
+      state.discount = 0;
     },
   },
 });

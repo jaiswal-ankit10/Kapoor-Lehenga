@@ -15,11 +15,12 @@ import {
   deleteProduct,
 } from "../controllers/products.controller.js";
 import { verifyJWT, verifyRoles } from "../middlewares/auth.middleware.js";
-import { uploadMultipleImages } from "../middlewares/upload.middleware.js";
+
 import {
   getAllOrders,
   updateOrderStatus,
 } from "../controllers/order.controller.js";
+import { uploadMultipleImages } from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 

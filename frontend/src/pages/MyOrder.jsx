@@ -64,7 +64,7 @@ const MyOrder = () => {
           <div
             key={i}
             className="flex justify-between items-center border border-gray-100 rounded p-4 my-3 shadow-sm bg-white"
-            onClick={() => navigate(`/orders/${order._id}`)}
+            onClick={() => navigate(`/orders/${order.id}`)}
           >
             <div>
               <p className="text-xs text-gray-500 font-semibold">ORDER DATE</p>

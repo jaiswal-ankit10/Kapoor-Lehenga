@@ -16,6 +16,7 @@ const uploadWithRetry = async (buffer, retries = 1) => {
 /* ================= CREATE PRODUCT ================= */
 export const createProduct = async (req, res) => {
   try {
+    // 1. Validate images
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({
         success: false,
@@ -23,6 +24,7 @@ export const createProduct = async (req, res) => {
       });
     }
 
+    // 2. Upload binary buffers to Cloudinary
     const imageUrls = await Promise.all(
       req.files.map((file) => uploadWithRetry(file.buffer))
     );
@@ -40,14 +42,21 @@ export const createProduct = async (req, res) => {
       additionalDetails,
     } = req.body;
 
+    // 3. SAFE PARSING: Handle additionalDetails without double-parsing
+    let parsedDetails = [];
     if (typeof additionalDetails === "string") {
       try {
-        additionalDetails = JSON.parse(additionalDetails);
-      } catch {
-        additionalDetails = [];
+        parsedDetails = JSON.parse(additionalDetails);
+      } catch (err) {
+        parsedDetails = [];
       }
+    } else if (Array.isArray(additionalDetails)) {
+      parsedDetails = additionalDetails;
     }
 
+    const cleanDetails = parsedDetails.filter((d) => d && d.title && d.value);
+
+    // 4. Numeric conversions
     const priceNum = Number(price);
     if (isNaN(priceNum)) {
       return res.status(400).json({ success: false, message: "Invalid price" });
@@ -57,6 +66,19 @@ export const createProduct = async (req, res) => {
     const discountedPrice =
       discountNum > 0 ? priceNum - (priceNum * discountNum) / 100 : priceNum;
 
+    // 5. Normalization
+    const normalizedCategory = category
+      ? category.toLowerCase().replace(/\s+/g, "_")
+      : "uncategorized";
+
+    // Handle color as it comes from the form
+    const parsedColor = Array.isArray(color)
+      ? color
+      : typeof color === "string" && color.trim()
+      ? color.split(",").map((c) => c.trim())
+      : [];
+
+    // 6. Database creation via Prisma
     const product = await prisma.product.create({
       data: {
         title,
@@ -66,17 +88,14 @@ export const createProduct = async (req, res) => {
         discount: discountNum,
         discountedPrice,
         stock: Number(stock) || 0,
-        category: category.toLowerCase(),
+        category: normalizedCategory,
         brand: brand || "Generic",
-        color: color ? color.split(",").map((c) => c.trim()) : [],
-        thumbnail: imageUrls[0],
-        images: imageUrls,
+        color: parsedColor,
+        thumbnail: imageUrls[0], // Sets the first uploaded image as thumbnail
+        images: imageUrls, // Saves the array of Cloudinary URLs
 
         additionalDetails: {
-          create: (additionalDetails || []).map((d) => ({
-            title: d.title,
-            value: d.value,
-          })),
+          create: cleanDetails, // Creates related records in ProductAdditionalDetail
         },
       },
       include: {
@@ -90,9 +109,12 @@ export const createProduct = async (req, res) => {
       product,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Product creation failed" });
+    console.error("Product Creation Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Product creation failed",
+      error: error.message,
+    });
   }
 };
 
@@ -119,7 +141,8 @@ export const getAllProducts = async (req, res) => {
     }
 
     if (category) {
-      where.category = { contains: category.toLowerCase() };
+      const dbCategory = category.toLowerCase().replace(/\s+/g, "_");
+      where.category = { contains: dbCategory };
     }
 
     if (color) {

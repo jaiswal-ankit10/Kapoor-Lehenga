@@ -94,7 +94,10 @@ export const createCoupon = asyncHandler(async (req, res) => {
   }
 
   const normalizedCode = code.trim().toUpperCase();
-
+  const numericDiscountValue = Number(discountValue);
+  const numericMinPurchase = Number(minPurchaseAmount) || 0;
+  const numericUsageLimit = Number(usageLimit) || 0;
+  const numericUsagePerUser = Number(usagePerUser) || 1;
   const existingCoupon = await prisma.coupon.findUnique({
     where: { code: normalizedCode },
   });
@@ -117,15 +120,15 @@ export const createCoupon = asyncHandler(async (req, res) => {
 
   const coupon = await prisma.coupon.create({
     data: {
-      code: normalizedCode,
+      code: code.trim().toUpperCase(),
       title,
       discountType,
-      discountValue,
-      startDate,
-      expiryDate,
-      minPurchaseAmount,
-      usageLimit,
-      usagePerUser,
+      discountValue: numericDiscountValue,
+      startDate: new Date(startDate),
+      expiryDate: new Date(expiryDate),
+      minPurchaseAmount: numericMinPurchase,
+      usageLimit: numericUsageLimit,
+      usagePerUser: numericUsagePerUser,
       forNewUser,
     },
   });
@@ -221,6 +224,10 @@ export const updateCoupon = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Coupon code already exists");
     }
   }
+  const numericDiscountValue = Number(discountValue);
+  const numericMinPurchase = Number(minPurchaseAmount) || 0;
+  const numericUsageLimit = Number(usageLimit) || 0;
+  const numericUsagePerUser = Number(usagePerUser) || 1;
 
   if (startDate && expiryDate && new Date(startDate) > new Date(expiryDate)) {
     throw new ApiError(400, "Expiry date must be after start date");
@@ -240,12 +247,12 @@ export const updateCoupon = asyncHandler(async (req, res) => {
       code: code ? code.trim().toUpperCase() : undefined,
       title,
       discountType,
-      discountValue,
-      minPurchaseAmount,
-      startDate,
-      expiryDate,
-      usageLimit,
-      usagePerUser,
+      discountValue: numericDiscountValue,
+      startDate: new Date(startDate),
+      expiryDate: new Date(expiryDate),
+      minPurchaseAmount: numericMinPurchase,
+      usageLimit: numericUsageLimit,
+      usagePerUser: numericUsagePerUser,
       forNewUser,
       isActive,
     },

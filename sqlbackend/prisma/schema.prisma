@@ -56,7 +56,7 @@ model Product {
 
   title           String
   description     String
-  longDescription String?
+  longDescription String? @db.Text
 
   thumbnail String?
   images    Json
@@ -201,12 +201,15 @@ model Address {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  country String @default("India")
   fullName String
   mobile   String
   address  String
+  village String?
+  landmark String?
+  pincode  String
   city     String
   state    String
-  pincode  String
 
   isDefault Boolean @default(false)
 

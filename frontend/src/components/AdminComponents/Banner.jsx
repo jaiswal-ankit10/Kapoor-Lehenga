@@ -132,7 +132,7 @@ const Banner = () => {
     });
 
     // show existing image preview
-    setPreviewImage(banner.image?.url || "");
+    setPreviewImage(banner.imageUrl || "");
 
     // reset file input
     setImage(null);
@@ -235,7 +235,7 @@ const Banner = () => {
             </thead>
             <tbody>
               {banners?.map((banner) => (
-                <tr key={banner._id} className="border-t">
+                <tr key={banner.id} className="border-t">
                   <td className="px-5 py-4 text-center flex items-center gap-2">
                     <div
                       className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center cursor-pointer"
@@ -245,7 +245,7 @@ const Banner = () => {
                     </div>
                     <div
                       className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center cursor-pointer"
-                      onClick={() => handleDeleteBanner(banner._id)}
+                      onClick={() => handleDeleteBanner(banner.id)}
                     >
                       <Trash size={16} color="red" />
                     </div>
@@ -253,7 +253,7 @@ const Banner = () => {
 
                   <td className="py-2 px-5 text-center">
                     <img
-                      src={banner.image?.url}
+                      src={banner.imageUrl}
                       alt={banner.title}
                       className="w-12 h-12 object-fit rounded"
                     />

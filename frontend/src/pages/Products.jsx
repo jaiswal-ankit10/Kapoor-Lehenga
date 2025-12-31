@@ -74,7 +74,7 @@ const Products = () => {
             <div>
               <h2 className="text-lg lg:text-2xl font-semibold capitalize">
                 {filters.category
-                  ? `${filters.category} Collection`
+                  ? `${filters.category.replace(/_/g, " ")} Collection`
                   : "All Products"}
               </h2>
               <p className="text-sm text-gray-500 mt-1">
@@ -100,7 +100,7 @@ const Products = () => {
           {/* PRODUCTS GRID */}
           <div className="grid grid-cols-2  lg:grid-cols-4 gap-6 mt-6 ">
             {products?.map((product) => (
-              <ProductCard key={product._id || product.id} product={product} />
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>

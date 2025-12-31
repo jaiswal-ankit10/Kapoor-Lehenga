@@ -8,7 +8,7 @@ export const loadCartFromBackend = () => async (dispatch) => {
 
 export const addItemToBackendCart = (item) => async (dispatch) => {
   const price = item.discountedPrice;
-  const productId = item._id || item.id;
+  const productId = item.id;
 
   const res = await axiosInstance.post("/cart/add", {
     productId,

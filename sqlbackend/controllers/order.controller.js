@@ -13,7 +13,9 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Order Items are required");
   }
 
-  const productIds = items.map((i) => i.productId);
+  const productIds = items
+    .map((i) => i.productId)
+    .filter((id) => id !== undefined && id !== null); // Safety check;
 
   const products = await prisma.product.findMany({
     where: { id: { in: productIds } },
@@ -212,6 +214,7 @@ export const cancelOrder = asyncHandler(async (req, res) => {
     where: { id: order.id },
     data: {
       status: "CANCELLED",
+      paymentStatus: "REFUNDED",
       isCancelled: true,
     },
   });

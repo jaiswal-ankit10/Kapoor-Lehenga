@@ -73,9 +73,9 @@ const Address = () => {
         <div className="md:flex-1">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-20 ">
             {addresses
-              ?.filter((address) => address && address._id)
+              ?.filter((address) => address && address.id)
               .map((address) => (
-                <AddressCard key={address._id} address={address} />
+                <AddressCard key={address.id} address={address} />
               ))}
 
             {/* ADD NEW ADDRESS CARD */}

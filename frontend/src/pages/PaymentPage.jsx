@@ -12,6 +12,7 @@ import OrderSuccessModal from "../components/OrderSuccessModal";
 import { useDispatch, useSelector } from "react-redux";
 import { createOrder } from "../services/orderService";
 import { clearBackendCart } from "../services/cartService";
+import { toast, ToastContainer } from "react-toastify";
 
 const PaymentPage = () => {
   const [openSuccess, setOpenSuccess] = useState(false);
@@ -26,14 +27,15 @@ const PaymentPage = () => {
     }
 
     const items = cartItems
-      .filter((item) => item.product && item.product._id)
+      .filter((item) => item.product && item.product.id)
       .map((item) => ({
-        product: item.product._id,
+        productId: item.product.id, // Changed from 'product' to 'productId'
         quantity: item.quantity,
         price: item.product.discountedPrice || item.product.price,
       }));
 
-    const paymentStatus = selected === "cod" ? "pending" : "complete";
+    // Ensure status is uppercase to match Prisma Enums if necessary
+    const paymentStatus = selected === "cod" ? "PENDING" : "COMPLETE";
 
     return {
       shippingAddress: {
@@ -45,21 +47,30 @@ const PaymentPage = () => {
         pincode: selectedAddress.pincode,
       },
       items,
-      paymentMethod: selected,
+      paymentMethod: selected.toUpperCase(),
       paymentStatus,
     };
   };
 
   const placeOrder = async () => {
-    if (!cartItems.length) return alert("cart is empty");
-    const orderData = buildOrderData();
-    await dispatch(createOrder(orderData));
-    dispatch(clearBackendCart());
-    setOpenSuccess(true);
+    if (!cartItems.length) return toast.warning("Your cart is empty");
+
+    try {
+      const orderData = buildOrderData();
+
+      await dispatch(createOrder(orderData)).unwrap();
+
+      dispatch(clearBackendCart());
+      setOpenSuccess(true);
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error(error?.message || "Payment failed. Please try again.");
+    }
   };
   const [selected, setSelected] = useState("razorpay");
   return (
     <div className="w-full min-h-screen bg-white">
+      <ToastContainer />
       <div className="bg-[#E9B159] p-5 flex justify-center text-white text-xl font-semibold">
         <Link to={"/"}>
           <img src={logo} alt="logo" />

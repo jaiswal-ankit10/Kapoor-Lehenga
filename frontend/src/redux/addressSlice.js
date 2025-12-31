@@ -26,7 +26,7 @@ const addressSlice = createSlice({
     },
 
     addAddress: (state, action) => {
-      if (!action.payload || !action.payload._id) return;
+      if (!action.payload || !action.payload.id) return;
 
       state.loading = false;
       state.addresses.push(action.payload);
@@ -35,18 +35,18 @@ const addressSlice = createSlice({
 
     updateAddress: (state, action) => {
       state.addresses = state.addresses.map((addr) =>
-        addr._id === action.payload._id ? action.payload : addr
+        addr.id === action.payload.id ? action.payload : addr
       );
     },
 
     deleteAddress: (state, action) => {
       state.addresses = state.addresses.filter(
-        (addr) => addr._id !== action.payload
+        (addr) => addr.id !== action.payload
       );
 
       if (
         state.selectedAddress &&
-        state.selectedAddress._id === action.payload
+        state.selectedAddress.id === action.payload
       ) {
         state.selectedAddress = state.addresses[0] || null;
       }

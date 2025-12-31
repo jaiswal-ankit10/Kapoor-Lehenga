@@ -103,7 +103,7 @@ export default function Users() {
                   <td className="py-3 px-5 text-center">{u.mobile || "-"}</td>
                   <td className="py-3 px-5 text-center">
                     <span
-                      className={`p-2 rounded text-md ${
+                      className={`p-2 rounded text-sm ${
                         u.role === "admin"
                           ? "bg-purple-100 text-purple-700"
                           : "bg-gray-100 text-gray-700"

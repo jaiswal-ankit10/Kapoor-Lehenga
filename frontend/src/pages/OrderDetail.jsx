@@ -29,7 +29,7 @@ export default function OrderDetail() {
     e.preventDefault();
     const answer = confirm("Do you really want to cancel order");
     if (answer) {
-      dispatch(cancelOrder(order._id));
+      dispatch(cancelOrder(order.id));
       navigate("/my-order");
     } else {
       return;
@@ -40,7 +40,7 @@ export default function OrderDetail() {
     const answer = confirm("Do you really want to return order");
 
     if (answer) {
-      dispatch(returnOrder(order._id));
+      dispatch(returnOrder(order.id));
       navigate("/my-order");
     } else {
       return;
@@ -122,7 +122,7 @@ export default function OrderDetail() {
         {/* Product List */}
         {order.items.map((item) => (
           <div
-            key={item._id}
+            key={item.id}
             className="flex gap-4 border border-gray-100 rounded-lg p-4 mb-5 bg-white shadow-sm"
           >
             <img

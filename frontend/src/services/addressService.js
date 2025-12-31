@@ -27,7 +27,7 @@ export const createAddress = (addressData) => async (dispatch) => {
 
     const address = res.data.data;
 
-    if (!address || !address._id) {
+    if (!address || !address.id) {
       throw new Error("Invalid address response");
     }
 

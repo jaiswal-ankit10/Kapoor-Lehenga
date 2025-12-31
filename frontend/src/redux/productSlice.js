@@ -35,11 +35,11 @@ const productSlice = createSlice({
     },
     updateProduct(state, action) {
       state.products = state.products.map((product) =>
-        product._id === action.payload._id ? action.payload : product
+        product.id === action.payload.id ? action.payload : product
       );
     },
     removeProduct(state, action) {
-      state.products = state.products.filter((p) => p._id !== action.payload);
+      state.products = state.products.filter((p) => p.id !== action.payload);
     },
     setLoading(state) {
       state.loading = true;

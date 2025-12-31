@@ -95,7 +95,7 @@ const FilterSidebar = ({ onCategorySelect, selected }) => {
                   checked={selected === cat}
                   onChange={() => handleCategory(cat)}
                 />
-                <span className="capitalize">{cat}</span>
+                <span className="capitalize">{cat.replace(/_/g, " ")}</span>
               </label>
             ))}
             <button
