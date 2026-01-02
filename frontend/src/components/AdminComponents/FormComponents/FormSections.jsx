@@ -3,7 +3,13 @@ import CustomSelect from "./CustomSelect";
 import { RichTextEditor } from "./RichTextEditor";
 import { useState } from "react";
 
-export function GeneralInfoSection({ data, updateField }) {
+export function GeneralInfoSection({
+  data,
+  updateField,
+  categories = [],
+  selectedCategory = null,
+  setSelectedCategory = () => {},
+}) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-10">
       <div className="grid grid-cols-12 gap-6">
@@ -51,33 +57,54 @@ export function GeneralInfoSection({ data, updateField }) {
             <div>
               <CustomSelect
                 label="Product Category"
-                value={data.category}
-                onChange={(val) => updateField("category", val)}
-                options={[
-                  "NEW ARRIVAL",
-                  "HALF SAREE",
-                  "FASHION SAREE",
-                  "LEHENGA",
-                  "GOWN",
-                  "WEDDING",
-                  "CELEBRITY OUTFITS",
-                  "OCCASIONS",
-                  "ENGAGEMENT",
-                  "RECEPTION",
-                ]}
+                placeholder="Select Category"
+                value={
+                  categories?.find((c) => c.id === data.categoryId)?.name || ""
+                }
+                options={categories?.map((c) => c.name)}
+                onChange={(val) => {
+                  const cat = categories?.find((c) => c.name === val);
+                  if (!cat) return;
+
+                  setSelectedCategory(cat);
+                  updateField("categoryId", cat.id);
+                  updateField("subCategoryId", "");
+                }}
               />
             </div>
           </div>
-          <div>
-            <label className="block text-sm text-gray-600 mb-1">
-              Product Colors
-            </label>
-            <input
-              type="text"
-              placeholder="Enter Product colors"
-              value={data.color || ""}
-              onChange={(e) => updateField("color", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-md text-sm outline-none"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">
+                Product Colors
+              </label>
+              <input
+                type="text"
+                placeholder="Enter Product colors"
+                value={data.color || ""}
+                onChange={(e) => updateField("color", e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-md text-sm outline-none"
+              />
+            </div>
+            <CustomSelect
+              label="Product SubCategory"
+              placeholder="Select SubCategory"
+              value={
+                selectedCategory?.subCategories?.find(
+                  (sc) => sc.id === data.subCategoryId
+                )?.name || ""
+              }
+              options={
+                selectedCategory
+                  ? selectedCategory.subCategories?.map((sc) => sc.name)
+                  : []
+              }
+              onChange={(val) => {
+                const sc = selectedCategory?.subCategories?.find(
+                  (s) => s.name === val
+                );
+                updateField("subCategoryId", sc.id);
+              }}
             />
           </div>
         </div>

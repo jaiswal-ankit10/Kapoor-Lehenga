@@ -29,6 +29,9 @@ const Address = () => {
     { id: 2, name: "Rohit Kumar", address: "Dindoli Road, Surat" },
     { id: 3, name: "Mehul Desai", address: "146, Laxmi Nagar, Surat" },
   ];
+  const handleContinue = () => {
+    navigate("/payment");
+  };
   useEffect(() => {
     dispatch(fetchAddresses());
   }, []);
@@ -105,7 +108,7 @@ const Address = () => {
           <PriceDetails />
 
           <button
-            onClick={() => navigate("/payment")}
+            onClick={handleContinue}
             className="bg-[#E9B159] text-white w-full py-3 rounded-md mt-4 text-lg font-medium"
           >
             Continue

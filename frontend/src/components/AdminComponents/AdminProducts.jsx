@@ -133,7 +133,7 @@ export default function AdminProducts() {
             </thead>
             <tbody>
               {visibleProducts.map((p) => (
-                <tr key={p._id} className="border-t border-gray-300">
+                <tr key={p.id} className="border-t border-gray-300">
                   <td className="px-5 py-4 flex items-center gap-2">
                     <div
                       className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center"

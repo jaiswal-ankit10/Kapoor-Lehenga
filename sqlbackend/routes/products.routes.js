@@ -6,6 +6,7 @@ import {
   deleteProduct,
   getProductCategories,
   getProductColors,
+  getSearchSuggestions,
 } from "../controllers/products.controller.js";
 
 const router = express.Router();
@@ -13,6 +14,7 @@ const router = express.Router();
 router.get("/", getAllProducts);
 router.get("/categories", getProductCategories);
 router.get("/colors", getProductColors);
+router.get("/suggestions", getSearchSuggestions);
 router.get("/:id", getProductById);
 
 // router.put("/:id", updateProduct);

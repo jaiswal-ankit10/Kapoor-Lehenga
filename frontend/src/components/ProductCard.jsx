@@ -26,7 +26,7 @@ const ProductCard = ({ product }) => {
     url?.startsWith("http") ? url : `${imageBaseUrl}${url}`;
 
   const isWishlisted = wishlistItems.some(
-    (item) => item?.product?._id === productId || item?._id === productId
+    (item) => item?.product?.id === productId || item?.id === productId
   );
 
   const toggleWishlist = (e) => {

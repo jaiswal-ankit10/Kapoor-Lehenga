@@ -1,10 +1,16 @@
-import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loadCartFromBackend } from "../services/cartService";
 
 const CartSummary = () => {
+  const dispatch = useDispatch();
   const { cartItems } = useSelector((store) => store.cart);
   const imageBaseUrl = import.meta.env.VITE_BACKEND_URL;
   const resolveImage = (url) =>
     url?.startsWith("http") ? url : `${imageBaseUrl}${url}`;
+  useEffect(() => {
+    dispatch(loadCartFromBackend());
+  }, [dispatch]);
 
   return (
     <div className=" mb-3 ">

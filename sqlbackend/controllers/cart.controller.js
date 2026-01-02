@@ -18,13 +18,22 @@ const recalcTotals = async (cartId) => {
   });
 };
 
-/* ================= ADD TO CART ================= */
+/*  ADD TO CART  */
 export const addToCart = asyncHandler(async (req, res) => {
   const { productId, price, quantity = 1 } = req.body;
   const userId = req.user.id;
 
   if (!productId || !price) {
     throw new ApiError(400, "productId and price are required");
+  }
+
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { stock: true },
+  });
+
+  if (!product) {
+    throw new ApiError(404, "Product not found");
   }
 
   const cart = await prisma.cart.upsert({
@@ -40,10 +49,18 @@ export const addToCart = asyncHandler(async (req, res) => {
     },
   });
 
+  const newQuantity = existingItem
+    ? existingItem.quantity + Number(quantity)
+    : Number(quantity);
+
+  if (newQuantity > product.stock) {
+    throw new ApiError(400, "Out of stock");
+  }
+
   if (existingItem) {
     await prisma.cartItem.update({
       where: { id: existingItem.id },
-      data: { quantity: existingItem.quantity + Number(quantity) },
+      data: { quantity: newQuantity },
     });
   } else {
     await prisma.cartItem.create({
@@ -72,7 +89,7 @@ export const addToCart = asyncHandler(async (req, res) => {
   });
 });
 
-/* ================= UPDATE ITEM ================= */
+/*  UPDATE ITEM  */
 export const updateCartItem = asyncHandler(async (req, res) => {
   const { productId, quantity } = req.body;
   const userId = req.user.id;
@@ -87,8 +104,21 @@ export const updateCartItem = asyncHandler(async (req, res) => {
   });
   if (!item) throw new ApiError(404, "Item not found in cart");
 
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { stock: true },
+  });
+
+  if (!product) {
+    throw new ApiError(404, "Product not found");
+  }
+
   if (quantity <= 0) {
-    await prisma.cartItem.delete({ where: { id: item.id } });
+    await prisma.cartItem.delete({
+      where: { id: item.id },
+    });
+  } else if (Number(quantity) > product.stock) {
+    throw new ApiError(400, "Out of stock");
   } else {
     await prisma.cartItem.update({
       where: { id: item.id },
@@ -112,7 +142,7 @@ export const updateCartItem = asyncHandler(async (req, res) => {
   });
 });
 
-/* ================= REMOVE ITEM ================= */
+/*  REMOVE ITEM  */
 export const removeCartItem = asyncHandler(async (req, res) => {
   const { productId } = req.body;
   const userId = req.user.id;
@@ -144,7 +174,7 @@ export const removeCartItem = asyncHandler(async (req, res) => {
   });
 });
 
-/* ================= GET CART ================= */
+/*  GET CART  */
 export const getCart = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
@@ -161,7 +191,7 @@ export const getCart = asyncHandler(async (req, res) => {
   });
 });
 
-/* ================= CLEAR CART ================= */
+/*  CLEAR CART  */
 export const clearCart = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 

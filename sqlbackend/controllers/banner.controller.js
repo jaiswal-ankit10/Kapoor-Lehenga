@@ -4,7 +4,7 @@ import { asyncHandler } from "../utils/async-handler.js";
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 
-/* ================= CLOUDINARY UPLOAD ================= */
+/*  CLOUDINARY UPLOAD  */
 export const uploadToCloudinary = async (fileBuffer) => {
   return new Promise((resolve, reject) => {
     cloudinary.uploader
@@ -16,7 +16,7 @@ export const uploadToCloudinary = async (fileBuffer) => {
   });
 };
 
-/* ================= CREATE BANNER ================= */
+/*  CREATE BANNER  */
 export const createBanner = asyncHandler(async (req, res) => {
   if (!req.file) {
     throw new ApiError(400, "Banner image is required");
@@ -37,7 +37,7 @@ export const createBanner = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, banner, "Banner created successfully"));
 });
 
-/* ================= UPDATE BANNER ================= */
+/*  UPDATE BANNER  */
 export const updateBanner = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -69,7 +69,7 @@ export const updateBanner = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, updatedBanner, "Banner updated successfully"));
 });
 
-/* ================= GET ALL BANNERS ================= */
+/*  GET ALL BANNERS  */
 export const getBanners = asyncHandler(async (req, res) => {
   const banners = await prisma.banner.findMany({
     orderBy: { createdAt: "desc" },
@@ -78,7 +78,7 @@ export const getBanners = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, banners, "Banners fetched"));
 });
 
-/* ================= GET ACTIVE BANNERS ================= */
+/*  GET ACTIVE BANNERS  */
 export const getActiveBanners = asyncHandler(async (req, res) => {
   const banners = await prisma.banner.findMany({
     where: { isActive: true },
@@ -90,7 +90,7 @@ export const getActiveBanners = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, banners, "Active banners fetched"));
 });
 
-/* ================= REMOVE BANNER ================= */
+/*  REMOVE BANNER  */
 export const removeBanner = asyncHandler(async (req, res) => {
   const { id } = req.params;
 

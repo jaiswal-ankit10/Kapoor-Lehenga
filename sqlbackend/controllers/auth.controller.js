@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import axios from "axios";
 
-/* ================= REGISTER ================= */
+/*  REGISTER  */
 export const registerUser = asyncHandler(async (req, res) => {
   const { fullName, email, mobile, password, adminSecret } = req.body;
 
@@ -56,7 +56,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   );
 });
 
-/* ================= LOGIN ================= */
+/*  LOGIN  */
 export const login = asyncHandler(async (req, res) => {
   const { email, mobile, password } = req.body;
 
@@ -106,7 +106,7 @@ export const login = asyncHandler(async (req, res) => {
     });
 });
 
-/* ================= LOGOUT ================= */
+/*  LOGOUT  */
 export const logout = asyncHandler(async (req, res) => {
   res.cookie("token", "", {
     httpOnly: true,
@@ -115,7 +115,7 @@ export const logout = asyncHandler(async (req, res) => {
   return res.json(new ApiResponse(200, {}, "Logged out successfully"));
 });
 
-/* ================= SEND OTP ================= */
+/*  SEND OTP  */
 export const sendOtp = asyncHandler(async (req, res) => {
   const { mobile } = req.body;
   const { purpose } = req.query;
@@ -162,7 +162,7 @@ export const sendOtp = asyncHandler(async (req, res) => {
   });
 });
 
-/* ================= VERIFY OTP ================= */
+/*  VERIFY OTP  */
 export const verifyOtp = asyncHandler(async (req, res) => {
   const { mobile, otp } = req.body;
 
@@ -196,7 +196,7 @@ export const verifyOtp = asyncHandler(async (req, res) => {
   });
 });
 
-/* ================= GOOGLE AUTH ================= */
+/*  GOOGLE AUTH  */
 export const googleAuthController = async (req, res) => {
   try {
     const { code } = req.body;

@@ -13,7 +13,10 @@ const PriceDetails = () => {
 
   const gstRate = 18;
 
-  const gstAmount = ((totalAmount - discount) * gstRate) / 100;
+  const baseAmount = appliedCoupon ? finalAmount : totalAmount;
+
+  const gstAmount = (baseAmount * gstRate) / 100;
+  const totalToPay = baseAmount + gstAmount;
 
   return (
     <div className="bg-white rounded-md p-3">
@@ -53,7 +56,7 @@ const PriceDetails = () => {
 
           <div className="flex justify-between font-semibold text-green-600 mt-2">
             <span>You Pay</span>
-            <span>₹{(finalAmount + gstAmount).toFixed(2)}</span>
+            <span>₹{totalToPay.toFixed(2)}</span>
           </div>
         </div>
       )}

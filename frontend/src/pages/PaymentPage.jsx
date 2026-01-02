@@ -79,7 +79,7 @@ const PaymentPage = () => {
 
       {/* Steps */}
       <div className="flex justify-center items-center py-10 ">
-        <img src={paymentBar} alt="" />
+        <img src={paymentBar} alt="" className="w-[80%] sm:w-[60%]" />
       </div>
 
       <div className="max-w-[85%] mx-auto flex justify-between items-center mb-10">

@@ -6,7 +6,7 @@ import { applyCoupon, fetchCoupons } from "../redux/couponSlice";
 const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
   const dispatch = useDispatch();
   const { cartItems, totalAmount } = useSelector((state) => state.cart);
-  const { coupons } = useSelector((state) => state.coupon);
+  const { coupons, error, loading } = useSelector((state) => state.coupon);
   const handleApply = (coupon) => {
     dispatch(
       applyCoupon({
@@ -15,6 +15,7 @@ const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
         cartTotal: totalAmount,
       })
     );
+
     setCoupon(false);
   };
   useEffect(() => {
@@ -62,11 +63,16 @@ const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
                 className="bg-black text-white px-3 py-1 rounded text-sm"
                 onClick={() => handleApply(coupon)}
               >
-                Apply
+                {loading ? "Applying..." : "Apply"}
               </button>
             </div>
           ))}
         </div>
+        {error && (
+          <div className="mx-4 mt-3 p-2 rounded bg-red-100 text-red-600 text-sm ">
+            {error}
+          </div>
+        )}
       </div>
     </>
   );

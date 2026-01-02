@@ -1,122 +1,135 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import RoutesSection from "../components/RoutesSection";
 import { breadcrumbRoutes } from "../utils/breadcrumbRoutes";
 
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/pagination";
 import FAQs from "../components/Faqs";
-import { fetchAllProducts } from "../services/productService";
-
-import { useDispatch, useSelector } from "react-redux";
-import { setCategory, setSort, setPage, setSearch } from "../redux/filterSlice";
-import { useSearchParams } from "react-router-dom";
 import FilterSidebar from "../components/FilterSidebar";
+import ProductGridLoader from "../components/ProductGridLoader";
+import MobileFilterDrawer from "../components/MobileFilterDrawer";
+import EmptyState from "../components/EmptyState";
+
+import { useProducts } from "../hooks/useProducts";
+import { useDispatch } from "react-redux";
+import { setSort, setPage } from "../redux/filterSlice";
 import { ToastContainer } from "react-toastify";
 
 const Products = () => {
   const dispatch = useDispatch();
-  const [searchParams] = useSearchParams();
-  const { products, loading, error, total, pages, page } = useSelector(
-    (store) => store.products
-  );
-  const filters = useSelector((store) => store.filters);
+  const [openFilter, setOpenFilter] = useState(false);
+
+  const { products, loading, total, pages, filters } = useProducts();
 
   const breadcrumb = [breadcrumbRoutes.home, breadcrumbRoutes.productPage];
 
-  useEffect(() => {
-    dispatch(fetchAllProducts(filters));
-  }, [dispatch, filters]);
-
-  useEffect(() => {
-    const search = searchParams.get("search") || "";
-    const category = searchParams.get("category") || "";
-
-    if (search !== filters.search) {
-      dispatch(setSearch(search));
-    }
-
-    if (category !== filters.category) {
-      dispatch(setCategory(category));
-    }
-  }, [searchParams, dispatch]);
-
-  const handleCategory = (value) => {
-    dispatch(setCategory(value));
-  };
   const handleSort = (value) => {
     dispatch(setSort(value));
   };
 
-  const handlePageChange = (p) => {
-    dispatch(setPage(p));
+  const handlePageChange = (page) => {
+    dispatch(setPage(page));
   };
-
-  if (loading) return <p className="text-center py-10">Loading products...</p>;
-  if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
 
   return (
     <>
       <ToastContainer />
-      {/* routes section */}
+
+      {/*  ROUTES / BREADCRUMB  */}
       <RoutesSection breadcrumb={breadcrumb} />
 
-      {/* main section */}
-      <div className="flex gap-6 px-10 py-6">
-        {/* LEFT FILTERS */}
-        <FilterSidebar
-          onCategorySelect={handleCategory}
-          selected={filters.category}
-        />
+      {/*  MAIN SECTION  */}
+      <div className="flex gap-6 px-4 lg:px-10 py-6">
+        {/*  DESKTOP SIDEBAR  */}
+        <div className="hidden md:block">
+          <FilterSidebar
+            selectedSubCategory={filters.subCategory}
+            products={products}
+          />
+        </div>
 
+        {/*  RIGHT CONTENT  */}
         <div className="flex-1">
-          {/* TOP HEADER */}
-          <div className="flex flex-col md:flex-row justify-between items-center pb-4 ">
+          {/*  TOP BAR  */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center pb-4 gap-4">
             <div>
               <h2 className="text-lg lg:text-2xl font-semibold capitalize">
-                {filters.category
-                  ? `${filters.category.replace(/_/g, " ")} Collection`
+                {filters.subCategory
+                  ? `${filters.subCategory} Collection`
                   : "All Products"}
               </h2>
+
               <p className="text-sm text-gray-500 mt-1">
                 Showing {products.length} of {total || products.length} results
               </p>
             </div>
 
-            {/* Sort Dropdown */}
-            <div className="relative flex gap-4 items-center">
-              <h1>Sort By:</h1>
-              <select
-                className="bg-[#F5F4F4] px-3 py-2 rounded outline-0"
-                value={filters.sort}
-                onChange={(e) => handleSort(e.target.value)}
+            <div className="flex items-center gap-4">
+              {/* MOBILE FILTER BUTTON */}
+              <button
+                onClick={() => setOpenFilter(true)}
+                className="md:hidden border px-4 py-2 rounded text-sm"
               >
-                <option value="newest">Sort By Latest</option>
-                <option value="price_asc">Sort By Low to High Price</option>
-                <option value="price_desc">Sort By High to Low Price</option>
-              </select>
+                Filters
+              </button>
+
+              {/* SORT */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm">Sort By:</span>
+                <select
+                  className="bg-[#F5F4F4] px-3 py-2 rounded outline-0 text-sm"
+                  value={filters.sort}
+                  onChange={(e) => handleSort(e.target.value)}
+                >
+                  <option value="newest">Latest</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          {/* PRODUCTS GRID */}
-          <div className="grid grid-cols-2  lg:grid-cols-4 gap-6 mt-6 ">
-            {products?.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {/*  PRODUCTS  */}
+          {loading && <ProductGridLoader />}
+
+          {!loading && products.length === 0 && (
+            <EmptyState
+              title="No products found"
+              description="Try changing filters or explore other categories."
+            />
+          )}
+
+          {!loading && products.length > 0 && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      {/* Pagination section */}
-      <div className="flex items-center justify-center mb-20">
-        <Pagination
-          currentPage={page}
-          totalPages={pages || 1}
-          onPageChange={handlePageChange}
-        />
-      </div>
-      {/* FAQS */}
-      <div>
-        <FAQs />
-      </div>
+
+      {/*  PAGINATION  */}
+      {!loading && pages > 1 && (
+        <div className="flex items-center justify-center mb-20">
+          <Pagination
+            currentPage={filters.page}
+            totalPages={pages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
+
+      {/*  FAQS  */}
+      <FAQs />
+
+      {/*  MOBILE FILTER DRAWER  */}
+      <MobileFilterDrawer
+        open={openFilter}
+        onClose={() => setOpenFilter(false)}
+        selectedSubCategory={filters.subCategory}
+        products={products}
+      />
     </>
   );
 };

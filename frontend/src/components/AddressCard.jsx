@@ -1,11 +1,15 @@
 import { useDispatch } from "react-redux";
 import { selectAddress } from "../redux/addressSlice";
+import { removeAddress } from "../services/addressService";
 
 const AddressCard = ({ address }) => {
   const dispatch = useDispatch();
 
   const handleDeliverHere = () => {
     dispatch(selectAddress(address));
+  };
+  const handleAddressDelete = (id) => {
+    dispatch(removeAddress(id));
   };
 
   return (
@@ -26,7 +30,12 @@ const AddressCard = ({ address }) => {
 
       <div className="flex gap-3 mt-3">
         <button className="border px-3 py-1 text-sm rounded">Edit</button>
-        <button className="border px-3 py-1 text-sm rounded">Delete</button>
+        <button
+          className="border px-3 py-1 text-sm rounded"
+          onClick={() => handleAddressDelete(address.id)}
+        >
+          Delete
+        </button>
         <button
           className="bg-black text-white px-3 py-1 text-sm rounded"
           onClick={handleDeliverHere}

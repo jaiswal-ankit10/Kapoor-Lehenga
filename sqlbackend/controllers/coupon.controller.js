@@ -3,7 +3,7 @@ import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
 
-/* ================= VALIDATE COUPON ================= */
+/*  VALIDATE COUPON  */
 export const validateCoupon = async ({
   coupon,
   user,
@@ -51,7 +51,7 @@ export const validateCoupon = async ({
   return true;
 };
 
-/* ================= CALCULATE DISCOUNT ================= */
+/*  CALCULATE DISCOUNT  */
 export const calculateDiscount = (coupon, cartTotal) => {
   let discount = 0;
 
@@ -67,7 +67,7 @@ export const calculateDiscount = (coupon, cartTotal) => {
   return Math.round(discount);
 };
 
-/* ================= CREATE COUPON ================= */
+/*  CREATE COUPON  */
 export const createCoupon = asyncHandler(async (req, res) => {
   const {
     code,
@@ -138,7 +138,7 @@ export const createCoupon = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, coupon, "Coupon created successfully"));
 });
 
-/* ================= APPLY COUPON ================= */
+/*  APPLY COUPON  */
 export const applyCoupon = asyncHandler(async (req, res) => {
   const { code, cartItems, cartTotal } = req.body;
 
@@ -176,7 +176,7 @@ export const applyCoupon = asyncHandler(async (req, res) => {
   );
 });
 
-/* ================= FETCH COUPONS ================= */
+/*  FETCH COUPONS  */
 export const fetchCoupons = asyncHandler(async (req, res) => {
   const coupons = await prisma.coupon.findMany({
     orderBy: { createdAt: "desc" },
@@ -187,7 +187,7 @@ export const fetchCoupons = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, coupons, "Coupons fetched successfully"));
 });
 
-/* ================= UPDATE COUPON ================= */
+/*  UPDATE COUPON  */
 export const updateCoupon = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -263,7 +263,7 @@ export const updateCoupon = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, updatedCoupon, "Coupon updated successfully"));
 });
 
-/* ================= DELETE COUPON ================= */
+/*  DELETE COUPON  */
 export const deleteCoupon = asyncHandler(async (req, res) => {
   const { id } = req.params;
 

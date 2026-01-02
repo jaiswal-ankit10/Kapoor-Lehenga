@@ -3,7 +3,7 @@ import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
 
-/* ================= CREATE ADDRESS ================= */
+/*  CREATE ADDRESS  */
 export const createAddress = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
@@ -27,7 +27,7 @@ export const createAddress = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, address, "Address created successfully"));
 });
 
-/* ================= GET ALL ADDRESSES ================= */
+/*  GET ALL ADDRESSES  */
 export const getAllAddress = asyncHandler(async (req, res) => {
   const addresses = await prisma.address.findMany({
     where: { userId: req.user.id },
@@ -39,7 +39,7 @@ export const getAllAddress = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, addresses, "Address fetched successfully"));
 });
 
-/* ================= UPDATE ADDRESS ================= */
+/*  UPDATE ADDRESS  */
 export const updateAddress = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -71,7 +71,7 @@ export const updateAddress = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, updatedAddress, "Address updated successfully"));
 });
 
-/* ================= DELETE ADDRESS ================= */
+/*  DELETE ADDRESS  */
 export const deleteAddress = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -93,7 +93,7 @@ export const deleteAddress = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Address deleted successfully"));
 });
 
-/* ================= SET DEFAULT ADDRESS ================= */
+/*  SET DEFAULT ADDRESS  */
 export const setDefaultAddress = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const addressId = req.params.id;

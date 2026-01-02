@@ -1,7 +1,7 @@
 import prisma from "../config/prisma.js";
 import { uploadToCloudinary } from "../utils/uploadToCloudinary.js";
 
-/* ---------- Cloudinary retry ---------- */
+/*  Cloudinary retry  */
 const uploadWithRetry = async (buffer, retries = 1) => {
   try {
     return await uploadToCloudinary(buffer);
@@ -13,10 +13,10 @@ const uploadWithRetry = async (buffer, retries = 1) => {
   }
 };
 
-/* ================= CREATE PRODUCT ================= */
+/*  CREATE PRODUCT  */
 export const createProduct = async (req, res) => {
   try {
-    // 1. Validate images
+    /*  Validate images  */
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({
         success: false,
@@ -24,7 +24,7 @@ export const createProduct = async (req, res) => {
       });
     }
 
-    // 2. Upload binary buffers to Cloudinary
+    /*  Upload images  */
     const imageUrls = await Promise.all(
       req.files.map((file) => uploadWithRetry(file.buffer))
     );
@@ -36,49 +36,44 @@ export const createProduct = async (req, res) => {
       price,
       discount,
       stock,
-      category,
       brand,
       color,
+      subCategoryId,
       additionalDetails,
     } = req.body;
 
-    // 3. SAFE PARSING: Handle additionalDetails without double-parsing
+    if (!subCategoryId) {
+      return res.status(400).json({
+        success: false,
+        message: "SubCategory is required",
+      });
+    }
+
+    /*  Parse additional details  */
     let parsedDetails = [];
     if (typeof additionalDetails === "string") {
-      try {
-        parsedDetails = JSON.parse(additionalDetails);
-      } catch (err) {
-        parsedDetails = [];
-      }
-    } else if (Array.isArray(additionalDetails)) {
-      parsedDetails = additionalDetails;
+      parsedDetails = JSON.parse(additionalDetails || "[]");
     }
 
-    const cleanDetails = parsedDetails.filter((d) => d && d.title && d.value);
+    const cleanDetails = parsedDetails.filter((d) => d?.title && d?.value);
 
-    // 4. Numeric conversions
+    /*  Numbers  */
     const priceNum = Number(price);
-    if (isNaN(priceNum)) {
-      return res.status(400).json({ success: false, message: "Invalid price" });
-    }
-
     const discountNum = Number(discount) || 0;
+
     const discountedPrice =
-      discountNum > 0 ? priceNum - (priceNum * discountNum) / 100 : priceNum;
+      discountNum > 0
+        ? Math.round(priceNum - (priceNum * discountNum) / 100)
+        : priceNum;
 
-    // 5. Normalization
-    const normalizedCategory = category
-      ? category.toLowerCase().replace(/\s+/g, "_")
-      : "uncategorized";
-
-    // Handle color as it comes from the form
+    /*  Colors  */
     const parsedColor = Array.isArray(color)
       ? color
-      : typeof color === "string" && color.trim()
+      : typeof color === "string"
       ? color.split(",").map((c) => c.trim())
       : [];
 
-    // 6. Database creation via Prisma
+    /*  Create Product  */
     const product = await prisma.product.create({
       data: {
         title,
@@ -88,22 +83,29 @@ export const createProduct = async (req, res) => {
         discount: discountNum,
         discountedPrice,
         stock: Number(stock) || 0,
-        category: normalizedCategory,
         brand: brand || "Generic",
         color: parsedColor,
-        thumbnail: imageUrls[0], // Sets the first uploaded image as thumbnail
-        images: imageUrls, // Saves the array of Cloudinary URLs
+
+        thumbnail: imageUrls[0],
+        images: imageUrls,
+
+        subCategory: {
+          connect: { id: subCategoryId },
+        },
 
         additionalDetails: {
-          create: cleanDetails, // Creates related records in ProductAdditionalDetail
+          create: cleanDetails,
         },
       },
       include: {
         additionalDetails: true,
+        subCategory: {
+          include: { category: true },
+        },
       },
     });
 
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
       message: "Product created successfully",
       product,
@@ -112,21 +114,20 @@ export const createProduct = async (req, res) => {
     console.error("Product Creation Error:", error);
     res.status(500).json({
       success: false,
-      message: "Product creation failed",
-      error: error.message,
+      message: error.message,
     });
   }
 };
 
-/* ================= GET ALL PRODUCTS ================= */
+/*  GET ALL PRODUCTS  */
 export const getAllProducts = async (req, res) => {
   try {
     const {
       search,
-      category,
+      subCategory,
       sort,
       page = 1,
-      limit = 10,
+      limit = 20,
       color,
       maxPrice,
       discount,
@@ -136,43 +137,85 @@ export const getAllProducts = async (req, res) => {
       isDeleted: false,
     };
 
+    /*  SEARCH  */
     if (search) {
-      where.title = { contains: search, mode: "insensitive" };
+      where.OR = [
+        {
+          title: {
+            contains: search,
+          },
+        },
+        {
+          description: {
+            contains: search,
+          },
+        },
+        {
+          subCategory: {
+            name: {
+              contains: search,
+            },
+          },
+        },
+        {
+          subCategory: {
+            category: {
+              name: {
+                contains: search,
+              },
+            },
+          },
+        },
+      ];
     }
 
-    if (category) {
-      const dbCategory = category.toLowerCase().replace(/\s+/g, "_");
-      where.category = { contains: dbCategory };
+    /*  SUBCATEGORY FILTER   */
+    if (subCategory) {
+      where.subCategory = {
+        name: {
+          contains: subCategory, //  NOT equals
+        },
+      };
     }
 
+    /*  COLOR FILTER  */
     if (color) {
       const colors = Array.isArray(color) ? color : color.split(",");
       where.color = { hasSome: colors };
     }
 
+    /*  PRICE FILTER  */
     if (maxPrice) {
       where.price = { lte: Number(maxPrice) };
     }
 
+    /*  DISCOUNT FILTER  */
     if (discount) {
       where.discount = { gte: Number(discount) };
     }
 
-    let orderBy = {};
+    /*  SORT  */
+    let orderBy = { createdAt: "desc" };
     if (sort === "price_asc") orderBy = { price: "asc" };
     if (sort === "price_desc") orderBy = { price: "desc" };
-    if (sort === "newest") orderBy = { createdAt: "desc" };
 
-    const skip = (page - 1) * limit;
+    const skip = (Number(page) - 1) * Number(limit);
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({
         where,
+        include: {
+          subCategory: {
+            include: { category: true },
+          },
+        },
         orderBy,
         skip,
         take: Number(limit),
       }),
-      prisma.product.count({ where }),
+      prisma.product.count({
+        where, //  SAME WHERE, NOW VALID
+      }),
     ]);
 
     res.status(200).json({
@@ -183,16 +226,25 @@ export const getAllProducts = async (req, res) => {
       products,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("GET PRODUCTS ERROR:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
-/* ================= GET PRODUCT BY ID ================= */
+/*  GET PRODUCT BY ID  */
 export const getProductById = async (req, res) => {
   try {
     const product = await prisma.product.findUnique({
       where: { id: req.params.id },
-      include: { additionalDetails: true },
+      include: {
+        additionalDetails: true,
+        subCategory: {
+          include: { category: true },
+        },
+      },
     });
 
     if (!product || product.isDeleted) {
@@ -207,10 +259,42 @@ export const getProductById = async (req, res) => {
   }
 };
 
-/* ================= UPDATE PRODUCT ================= */
+/*  UPDATE PRODUCT  */
 export const updateProduct = async (req, res) => {
   try {
-    let updateData = { ...req.body };
+    let updateData = {};
+    const {
+      title,
+      description,
+      longDescription,
+      price,
+      discount,
+      stock,
+      brand,
+      color,
+      subCategoryId,
+      additionalDetails,
+    } = req.body;
+
+    if (title) updateData.title = title;
+    if (description) updateData.description = description;
+    if (longDescription) updateData.longDescription = longDescription;
+    if (price) updateData.price = Number(price);
+    if (discount) updateData.discount = Number(discount);
+    if (stock) updateData.stock = Number(stock);
+    if (brand) updateData.brand = brand;
+
+    if (color) {
+      updateData.color = Array.isArray(color)
+        ? color
+        : color.split(",").map((c) => c.trim());
+    }
+
+    if (subCategoryId) {
+      updateData.subCategory = {
+        connect: { id: subCategoryId },
+      };
+    }
 
     if (req.files && req.files.length > 0) {
       const imageUrls = await Promise.all(
@@ -221,22 +305,36 @@ export const updateProduct = async (req, res) => {
       updateData.thumbnail = imageUrls[0];
     }
 
+    if (additionalDetails) {
+      await prisma.productAdditionalDetail.deleteMany({
+        where: { productId: req.params.id },
+      });
+
+      updateData.additionalDetails = {
+        create: JSON.parse(additionalDetails),
+      };
+    }
+
     const product = await prisma.product.update({
       where: { id: req.params.id },
       data: updateData,
+      include: {
+        additionalDetails: true,
+        subCategory: { include: { category: true } },
+      },
     });
 
     res.status(200).json({
       success: true,
-      message: "Product updated",
+      message: "Product updated successfully",
       product,
     });
   } catch (error) {
-    res.status(404).json({ success: false, message: "Product not found" });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-/* ================= DELETE PRODUCT (SOFT) ================= */
+/*  DELETE PRODUCT (SOFT)  */
 export const deleteProduct = async (req, res) => {
   try {
     await prisma.product.update({
@@ -250,7 +348,7 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
-/* ================= NEW PRODUCTS ================= */
+/*  NEW PRODUCTS  */
 export const getNewProducts = async (req, res) => {
   const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
@@ -259,27 +357,30 @@ export const getNewProducts = async (req, res) => {
       createdAt: { gte: last24Hours },
       isDeleted: false,
     },
+    include: {
+      subCategory: { include: { category: true } },
+    },
     orderBy: { createdAt: "desc" },
   });
 
   res.json({ success: true, products });
 };
 
-/* ================= CATEGORIES ================= */
+/*  REAL CATEGORIES  */
 export const getProductCategories = async (req, res) => {
-  const categories = await prisma.product.findMany({
-    where: { isDeleted: false },
-    distinct: ["category"],
-    select: { category: true },
+  const categories = await prisma.category.findMany({
+    include: {
+      subCategories: true,
+    },
   });
 
   res.status(200).json({
     success: true,
-    categories: categories.map((c) => c.category),
+    categories,
   });
 };
 
-/* ================= COLORS ================= */
+/*  COLORS  */
 export const getProductColors = async (req, res) => {
   const products = await prisma.product.findMany({
     where: { isDeleted: false },
@@ -289,4 +390,52 @@ export const getProductColors = async (req, res) => {
   const colors = [...new Set(products.flatMap((p) => p.color || []))];
 
   res.status(200).json({ success: true, colors });
+};
+export const getSearchSuggestions = async (req, res) => {
+  try {
+    const { search } = req.query;
+
+    if (!search) {
+      return res.json({ success: true, suggestions: [] });
+    }
+
+    const suggestions = await prisma.product.findMany({
+      where: {
+        isDeleted: false,
+        OR: [
+          { title: { startsWith: search } },
+          {
+            subCategory: {
+              name: { startsWith: search },
+            },
+          },
+          {
+            subCategory: {
+              category: {
+                name: { startsWith: search },
+              },
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        title: true,
+        subCategory: {
+          select: {
+            name: true,
+            category: { select: { name: true } },
+          },
+        },
+      },
+      take: 8,
+    });
+
+    res.json({
+      success: true,
+      suggestions,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 };

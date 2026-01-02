@@ -2,7 +2,7 @@ import prisma from "../config/prisma.js";
 import { ApiError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
 
-/* ================= ADD TO WISHLIST ================= */
+/*  ADD TO WISHLIST  */
 export const addToWishlist = asyncHandler(async (req, res) => {
   const { productId } = req.body;
   const userId = req.user.id;
@@ -53,7 +53,7 @@ export const addToWishlist = asyncHandler(async (req, res) => {
   });
 });
 
-/* ================= REMOVE FROM WISHLIST ================= */
+/*  REMOVE FROM WISHLIST  */
 export const removeFromWishlist = asyncHandler(async (req, res) => {
   const { productId } = req.body;
   const userId = req.user.id;
@@ -96,7 +96,7 @@ export const removeFromWishlist = asyncHandler(async (req, res) => {
   });
 });
 
-/* ================= GET WISHLIST ================= */
+/*  GET WISHLIST  */
 export const getWishlist = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
@@ -117,7 +117,7 @@ export const getWishlist = asyncHandler(async (req, res) => {
   });
 });
 
-/* ================= CLEAR WISHLIST ================= */
+/*  CLEAR WISHLIST  */
 export const clearWishlist = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 

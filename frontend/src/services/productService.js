@@ -13,7 +13,7 @@ import {
 export const fetchAllProducts =
   ({
     search = "",
-    category = "",
+    subCategory = "",
     sort = "newest",
     color = [],
     maxPrice,
@@ -27,7 +27,7 @@ export const fetchAllProducts =
 
       const params = new URLSearchParams();
       if (search) params.append("search", search);
-      if (category) params.append("category", category);
+      if (subCategory) params.append("subCategory", subCategory);
       if (sort) params.append("sort", sort);
       if (color.length) params.append("color", color.join(","));
       if (maxPrice) params.append("maxPrice", maxPrice);
@@ -36,6 +36,7 @@ export const fetchAllProducts =
       params.append("limit", limit);
 
       const res = await axiosInstance.get(`/products?${params.toString()}`);
+
       dispatch(
         setProductsData({
           products: res.data.products,

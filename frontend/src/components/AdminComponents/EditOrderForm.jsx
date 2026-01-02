@@ -28,7 +28,7 @@ const EditOrderForm = ({ order, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(updateOrderStatus(order._id, formData.status));
+    dispatch(updateOrderStatus(order.id, formData.status));
     onClose();
   };
 

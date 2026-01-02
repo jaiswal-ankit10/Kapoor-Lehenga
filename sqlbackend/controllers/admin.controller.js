@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { ApiError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
 
-/* ================= USERS ================= */
+/*  USERS  */
 
 export const getAllUsers = asyncHandler(async (req, res) => {
   const users = await prisma.user.findMany({
@@ -114,7 +114,7 @@ export const updateUserRole = asyncHandler(async (req, res) => {
   res.json({ success: true, user });
 });
 
-/* ================= DASHBOARD ================= */
+/*  DASHBOARD  */
 
 export const getDashboardStats = asyncHandler(async (req, res) => {
   const now = new Date();

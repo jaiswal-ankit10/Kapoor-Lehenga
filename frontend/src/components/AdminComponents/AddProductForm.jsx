@@ -24,11 +24,20 @@ export default function AddProductForm() {
     price: "",
     discount: 0,
     stock: 0,
-    category: "",
+    categoryId: "",
+    subCategoryId: "",
     brand: "",
     color: "",
     additionalDetails: [{ title: "", value: "" }],
   });
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  useEffect(() => {
+    axiosInstance.get("/categories").then((res) => {
+      setCategories(res.data.categories || []);
+    });
+  }, []);
 
   const [existingImages, setExistingImages] = useState([]); // DB images
   const [selectedImages, setSelectedImages] = useState([]); // new files
@@ -48,13 +57,15 @@ export default function AddProductForm() {
       price: product.price || "",
       discount: product.discount || 0,
       stock: product.stock || 0,
-      category: product.category || "",
+      categoryId: product.subCategory?.category?.id || "",
+      subCategoryId: product.subCategory?.id || "",
       brand: product.brand || "",
       color: product.color || "",
       additionalDetails: product.additionalDetails || [
         { title: "", value: "" },
       ],
     });
+    setSelectedCategory(product.subCategory?.category || null);
 
     if (product.images?.length) {
       setExistingImages(product.images);
@@ -125,6 +136,13 @@ export default function AddProductForm() {
     setLoading(true);
     setError("");
 
+    // ✅ REQUIRED VALIDATIONS
+    if (!formData.subCategoryId) {
+      setError("Please select a category and subcategory");
+      setLoading(false);
+      return;
+    }
+
     if (existingImages.length === 0 && selectedImages.length === 0) {
       setError("At least one image is required");
       setLoading(false);
@@ -133,19 +151,29 @@ export default function AddProductForm() {
 
     const formDataToSend = new FormData();
 
-    Object.entries(formData).forEach(([key, value]) => {
-      if (key === "additionalDetails") return;
-      formDataToSend.append(key, value);
-    });
+    /* ---------------- APPEND BASIC FIELDS ---------------- */
+    formDataToSend.append("title", formData.title);
+    formDataToSend.append("description", formData.description);
+    formDataToSend.append("longDescription", formData.longDescription);
+    formDataToSend.append("price", formData.price);
+    formDataToSend.append("discount", formData.discount);
+    formDataToSend.append("stock", formData.stock);
+    formDataToSend.append("brand", formData.brand);
+    formDataToSend.append("color", formData.color);
+
+    /* 🔥 MOST IMPORTANT */
+    formDataToSend.append("subCategoryId", formData.subCategoryId);
+
+    /* ---------------- ADDITIONAL DETAILS ---------------- */
     formDataToSend.append(
       "additionalDetails",
       JSON.stringify(formData.additionalDetails)
     );
 
-    // keep remaining old images
+    /* ---------------- EXISTING IMAGES ---------------- */
     formDataToSend.append("existingImages", JSON.stringify(existingImages));
 
-    // new images
+    /* ---------------- NEW IMAGES ---------------- */
     selectedImages.forEach((img) => {
       formDataToSend.append("images", img);
     });
@@ -158,7 +186,9 @@ export default function AddProductForm() {
           )
         : await axiosInstance.post("/admin/products", formDataToSend);
 
-      if (res.data.success) navigate(-1);
+      if (res.data.success) {
+        navigate(-1);
+      }
     } catch (err) {
       setError(
         err.response?.data?.message || err.message || "Failed to save product"
@@ -187,7 +217,13 @@ export default function AddProductForm() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          <GeneralInfoSection data={formData} updateField={handleChange} />
+          <GeneralInfoSection
+            data={formData}
+            updateField={handleChange}
+            categories={categories}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+          />
           <DescriptionSection data={formData} updateField={handleChange} />
           <DetailsSection data={formData} updateField={handleChange} />
           <ImagesSection

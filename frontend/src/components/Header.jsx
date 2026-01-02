@@ -21,13 +21,18 @@ import { logout } from "../redux/userSlice";
 import CartSidebar from "./CartSidebar";
 import { loadCartFromBackend } from "../services/cartService";
 import { loadWishlistFromBackend } from "../services/wishlistService";
-import { setCategory, setSearch } from "../redux/filterSlice";
+import { setSearch } from "../redux/filterSlice";
 import { ToastContainer, toast } from "react-toastify";
+import axiosInstance from "../api/axiosInstance";
 
 const Header = () => {
   const [openMenu, setOpenMenu] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
   const [openCart, setOpenCart] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
 
   const { user } = useSelector((store) => store.user);
   const { cartItems } = useSelector((store) => store.cart);
@@ -35,38 +40,72 @@ const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const menuItems = [
-    "SALE",
-    "NEW ARRIVAL",
-    "HALF SAREE",
-    "FASHION SAREE",
-    "LEHENGA",
-    "GOWN",
-    "WEDDING",
-    "CELEBRITY OUTFITS",
-    "OCCASIONS",
-    "ENGAGEMENT",
-    "RECEPTION",
-    "OTHERS",
-  ];
+  // const menuItems = [
+  //   "SALE",
+  //   "NEW ARRIVAL",
+  //   "HALF SAREE",
+  //   "FASHION SAREE",
+  //   "LEHENGA",
+  //   "GOWN",
+  //   "WEDDING",
+  //   "CELEBRITY OUTFITS",
+  //   "OCCASIONS",
+  //   "ENGAGEMENT",
+  //   "RECEPTION",
+  //   "OTHERS",
+  // ];
+  const fetchCategories = async () => {
+    try {
+      const res = await axiosInstance.get("/categories");
+      setCategories(res.data.categories || []);
+    } catch {
+      toast.error("Failed to fetch categories");
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
   useEffect(() => {
     dispatch(loadCartFromBackend());
     dispatch(loadWishlistFromBackend());
   }, []);
 
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    dispatch(setSearch(value));
-    navigate(`/products?search=${encodeURIComponent(value)}`);
-  };
   const handleCategory = (category) => {
-    const normalizedCategory = category.toLowerCase().replace(/\s+/g, "_");
-    dispatch(setCategory(normalizedCategory));
-    navigate(`/products?category=${encodeURIComponent(normalizedCategory)}`);
+    navigate(`/products`);
   };
 
+  const handleSubCategory = (sc) => {
+    navigate(`/products?subcategory=${encodeURIComponent(sc.name)}`);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      dispatch(setSearch(searchText));
+      navigate(`/products?search=${encodeURIComponent(searchText)}`);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchText]);
+
+  useEffect(() => {
+    if (!searchText.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      const res = await axiosInstance.get(
+        `/products/suggestions?search=${searchText}`
+      );
+      setSuggestions(res.data.suggestions);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchText]);
+
   return (
-    <div className="bg-[#E9B159] w-full  px-6 md:px-10 py-3">
+    <div className="bg-[#E9B159] w-full  px-6 md:px-10 py-3 shadow-lg">
       <ToastContainer />
       {/* TOP ROW */}
       <div className="flex  justify-between items-center gap-4">
@@ -101,7 +140,7 @@ const Header = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="w-full hidden md:w-md lg:block lg:max-w-xl">
+        <div className="w-full hidden md:w-md lg:block lg:max-w-xl relative">
           <div className="flex items-center gap-3 bg-white/20 border border-white/50 rounded-lg px-4 py-2 text-white">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -121,9 +160,31 @@ const Header = () => {
               type="text"
               placeholder="Search for products..."
               className="bg-transparent outline-none text-white w-full"
-              onChange={handleSearchChange}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
             />
           </div>
+          {suggestions.length > 0 && (
+            <div className="absolute bg-white text-black w-full mt-1 rounded shadow-lg z-50">
+              {suggestions.map((item) => (
+                <div
+                  key={item.id}
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => {
+                    dispatch(setSearch(item.title));
+                    navigate(`/products?search=${item.title}`);
+                    setSuggestions([]);
+                    setSearchText(item.title);
+                  }}
+                >
+                  {item.title}
+                  <span className="text-xs text-gray-500 ml-2">
+                    {item.subCategory?.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* USER + WISHLIST + CART */}
@@ -285,21 +346,43 @@ const Header = () => {
             type="text"
             placeholder="Search for products..."
             className="bg-transparent outline-none text-white w-full"
-            onChange={handleSearchChange}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
           />
         </div>
       </div>
 
       {/* MENU BAR */}
-      <div className="mt-3 w-full">
-        <ul className="hidden lg:flex text-white  lg:justify-around  w-full  mx-auto text-base md:text-sm  lg:text-lg xl:text-xl  ">
-          {menuItems.map((item, index) => (
-            <li
-              onClick={() => handleCategory(item)}
-              key={index}
-              className="cursor-pointer hover:text-gray-200 whitespace-nowrap min-w-max"
-            >
-              {item}
+      <div className="mt-3 w-[80%] mx-auto">
+        <ul className="hidden lg:flex text-white lg:justify-around w-full relative">
+          {categories?.map((c) => (
+            <li key={c.id} className="relative whitespace-nowrap">
+              <div
+                className="cursor-pointer flex items-center gap-1"
+                onMouseEnter={() => setHoveredCategory(c.id)}
+                onMouseLeave={() => setHoveredCategory(null)}
+              >
+                <span
+                  onClick={() => handleCategory(c.name)}
+                  className="hover:text-gray-200 flex items-center gap-1"
+                >
+                  {c.name.toUpperCase()}
+                </span>
+
+                {hoveredCategory === c.id && c.subCategories?.length > 0 && (
+                  <div className="absolute top-full -left-12 mt-2 bg-white text-black rounded shadow-lg min-w-[200px] z-50">
+                    {c.subCategories.map((sc) => (
+                      <div
+                        key={sc.id}
+                        onClick={() => handleSubCategory(sc)}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm capitalize"
+                      >
+                        {sc.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </li>
           ))}
         </ul>

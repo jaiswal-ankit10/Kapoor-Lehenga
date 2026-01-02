@@ -54,81 +54,104 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
             <p className="text-center text-gray-500 mt-4">Your bag is empty.</p>
           )}
 
-          {cartItems?.map((item) => (
-            <div
-              key={item?._id}
-              className="border rounded-md border-gray-300 flex gap-4 relative pr-4"
-            >
-              <img
-                src={resolveImage(
-                  item.product?.images?.[0] || item.product?.thumbnail
-                )}
-                alt={item.product?.title}
-                className="w-[100px] h-[140px] object-cover rounded"
-              />
+          {cartItems?.map((item) => {
+            const stock = item.product?.stock ?? 0;
+            const isOutOfStock = item.quantity >= stock;
 
-              <div>
-                <h3 className=" text-md text-black ">{item.product?.title}</h3>
-                <h3 className=" text-sm text-black mb-2">
-                  <div
-                    className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{
-                      __html: item.product?.description,
-                    }}
-                  />
-                </h3>
-
-                <div className="flex items-center gap-2 mt-2 text-black">
-                  <button
-                    onClick={() => {
-                      if (item.quantity > 1) {
-                        dispatch(
-                          updateQtyBackend(item.product._id, item.quantity - 1)
-                        );
-                      }
-                    }}
-                    className="border px-2"
-                  >
-                    -
-                  </button>
-
-                  <span className="font-semibold">{item.quantity}</span>
-
-                  <button
-                    onClick={() =>
-                      dispatch(
-                        updateQtyBackend(item.product._id, item.quantity + 1)
-                      )
-                    }
-                    className="border px-2"
-                  >
-                    +
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <p className="text-green-700 font-semibold text-lg mt-1">
-                    ₹{item.product?.discountedPrice}
-                  </p>
-                  <p className="text-gray-400 line-through text-md">
-                    ₹{item.product?.price}
-                  </p>
-                  <p className="text-red-600 text-sm">
-                    ₹{item.product?.discount}% off
-                  </p>
-                </div>
-              </div>
-
-              <button
-                className="absolute top-2 right-2 text-[10px] bg-gray-200 px-2 py-1 rounded text-black"
-                onClick={() =>
-                  dispatch(removeBackendCartItem(item.product._id))
-                }
+            return (
+              <div
+                key={item?.id}
+                className="border rounded-md border-gray-300 flex gap-4 relative pr-4"
               >
-                x
-              </button>
-            </div>
-          ))}
+                <img
+                  src={resolveImage(
+                    item.product?.images?.[0] || item.product?.thumbnail
+                  )}
+                  alt={item.product?.title}
+                  className="w-[100px] h-[140px] object-cover rounded"
+                />
+
+                <div>
+                  <h3 className="text-md text-black">{item.product?.title}</h3>
+
+                  <h3 className="text-sm text-black mb-2">
+                    <div
+                      className="prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{
+                        __html: item.product?.description,
+                      }}
+                    />
+                  </h3>
+
+                  {/* Quantity Controls */}
+                  <div className="flex items-center gap-2 mt-2 text-black">
+                    <button
+                      onClick={() => {
+                        if (item.quantity === 1) {
+                          dispatch(removeBackendCartItem(item.product.id));
+                        } else {
+                          dispatch(
+                            updateQtyBackend(item.product.id, item.quantity - 1)
+                          );
+                        }
+                      }}
+                      className="border px-2"
+                    >
+                      -
+                    </button>
+
+                    <span className="font-semibold">{item.quantity}</span>
+
+                    <button
+                      onClick={() => {
+                        if (!isOutOfStock) {
+                          dispatch(
+                            updateQtyBackend(item.product.id, item.quantity + 1)
+                          );
+                        }
+                      }}
+                      disabled={isOutOfStock}
+                      className={`border px-2 ${
+                        isOutOfStock
+                          ? "opacity-40 cursor-not-allowed"
+                          : "hover:bg-gray-100"
+                      }`}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {/* Stock warning */}
+                  {isOutOfStock && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Maximum stock reached
+                    </p>
+                  )}
+
+                  <div className="flex items-center gap-4">
+                    <p className="text-green-700 font-semibold text-lg mt-1">
+                      ₹{item.product?.discountedPrice}
+                    </p>
+                    <p className="text-gray-400 line-through text-md">
+                      ₹{item.product?.price}
+                    </p>
+                    <p className="text-red-600 text-sm">
+                      ₹{item.product?.discount}% off
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  className="absolute top-2 right-2 text-[10px] bg-gray-200 px-2 py-1 rounded text-black"
+                  onClick={() =>
+                    dispatch(removeBackendCartItem(item.product.id))
+                  }
+                >
+                  x
+                </button>
+              </div>
+            );
+          })}
         </div>
 
         {/* Footer */}

@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   search: "",
   category: "",
+  subCategory: "",
   sort: "newest", // newest | price_asc | price_desc
   page: 1,
   limit: 20,
@@ -21,6 +22,10 @@ const filterSlice = createSlice({
     },
     setCategory(state, action) {
       state.category = action.payload;
+      state.page = 1;
+    },
+    setSubCategory: (state, action) => {
+      state.subCategory = action.payload;
       state.page = 1;
     },
     setSort(state, action) {
@@ -65,6 +70,7 @@ const filterSlice = createSlice({
 export const {
   setSearch,
   setCategory,
+  setSubCategory,
   setSort,
   setPage,
   setLimit,

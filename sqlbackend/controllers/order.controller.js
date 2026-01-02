@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import crypto from "crypto";
 
-/* ================= CREATE ORDER ================= */
+/*  CREATE ORDER  */
 export const createOrder = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const { items, shippingAddress, paymentMethod, paymentStatus } = req.body;
@@ -77,7 +77,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, order, "Order placed successfully"));
 });
 
-/* ================= MY ORDERS ================= */
+/*  MY ORDERS  */
 export const getMyOrders = asyncHandler(async (req, res) => {
   const orders = await prisma.order.findMany({
     where: { userId: req.user.id },
@@ -98,7 +98,7 @@ export const getMyOrders = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, orders, "Order fetched Successfully"));
 });
 
-/* ================= GET ORDER BY ID ================= */
+/*  GET ORDER BY ID  */
 export const getOrderById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -142,7 +142,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, order, "Order fetched successfully"));
 });
 
-/* ================= ADMIN: ALL ORDERS ================= */
+/*  ADMIN: ALL ORDERS  */
 export const getAllOrders = asyncHandler(async (req, res) => {
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: "desc" },
@@ -171,7 +171,7 @@ export const getAllOrders = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, orders, "Orders fetched successfully"));
 });
 
-/* ================= UPDATE ORDER STATUS (ADMIN) ================= */
+/*  UPDATE ORDER STATUS (ADMIN)  */
 export const updateOrderStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
   const { id } = req.params;
@@ -194,7 +194,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, updatedOrder, "Order status updated"));
 });
 
-/* ================= CANCEL ORDER ================= */
+/*  CANCEL ORDER  */
 export const cancelOrder = asyncHandler(async (req, res) => {
   const order = await prisma.order.findUnique({
     where: { id: req.params.id },
@@ -224,7 +224,7 @@ export const cancelOrder = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, updated, "Order cancelled successfully"));
 });
 
-/* ================= RETURN ORDER ================= */
+/*  RETURN ORDER  */
 export const returnOrder = asyncHandler(async (req, res) => {
   const order = await prisma.order.findUnique({
     where: { id: req.params.id },
@@ -249,7 +249,7 @@ export const returnOrder = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, updated, "Order returned successfully"));
 });
 
-/* ================= RETURNED ORDERS ================= */
+/*  RETURNED ORDERS  */
 export const getReturnedOrder = asyncHandler(async (req, res) => {
   const orders = await prisma.order.findMany({
     where: {
