@@ -4,6 +4,7 @@ import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
 import { Plus, Save, Search, SquarePen, Trash } from "lucide-react";
 import axiosInstance from "../../api/axiosInstance";
 import dayjs from "dayjs";
+import { toast, ToastContainer } from "react-toastify";
 
 const Banner = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -14,13 +15,16 @@ const Banner = () => {
 
   const initialState = {
     title: "",
-    isActive: "true",
+    isActive: true,
   };
   const [formData, setFormData] = useState(initialState);
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
+  const handleClick = () => {
+    setShowAddBannerForm((prev) => !prev);
+  };
   useEffect(() => {
     if (showAddBannerForm) {
       document.body.style.overflow = "hidden";
@@ -79,7 +83,7 @@ const Banner = () => {
 
     const formDataToSend = new FormData();
     formDataToSend.append("title", formData.title);
-    formDataToSend.append("isActive", formData.isActive);
+    formDataToSend.append("isActive", String(formData.isActive));
 
     if (image) {
       formDataToSend.append("image", image);
@@ -87,12 +91,18 @@ const Banner = () => {
 
     try {
       if (editBanner) {
-        await axiosInstance.put(
-          `/banners/update/${editBanner._id}`,
+        const res = await axiosInstance.put(
+          `/banners/update/${editBanner.id}`,
           formDataToSend
         );
+        if (res.data.success) {
+          toast.success("Banner updated successfully");
+        }
       } else {
-        await axiosInstance.post("/banners/create", formDataToSend);
+        const res = await axiosInstance.post("/banners/create", formDataToSend);
+        if (res.data.success) {
+          toast.success("Banner created successfully");
+        }
       }
 
       setShowAddBannerForm(false);
@@ -111,10 +121,6 @@ const Banner = () => {
   };
 
   const breadcrumb = [breadcrumbAdmin.home, breadcrumbAdmin.banner];
-
-  const handleClick = () => {
-    setShowAddBannerForm((prev) => !prev);
-  };
 
   const fetchAllBanner = async () => {
     try {
@@ -168,6 +174,7 @@ const Banner = () => {
 
   return (
     <div>
+      <ToastContainer />
       <PageHeader
         title={"Product List"}
         breadcrumbs={breadcrumb}
@@ -271,13 +278,16 @@ const Banner = () => {
         </div>
       </div>
       {showAddBannerForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setShowAddBannerForm(false)}
-          />
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          onClick={() => setShowAddBannerForm(false)}
+        >
+          <div className="absolute inset-0 bg-black/40" />
 
-          <div className="relative bg-white w-[95%] max-w-2xl rounded-xl shadow-lg z-10 max-h-[90vh] overflow-y-auto">
+          <div
+            className="relative bg-white w-[95%] max-w-2xl rounded-xl shadow-lg z-10 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="sticky top-0 bg-gray-100 flex justify-between items-center px-5 py-3 ">
               <h1 className="text-xl font-semibold">
                 {editBanner ? "Edit Banner" : "Add Banner"}
@@ -292,6 +302,11 @@ const Banner = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              {error && (
+                <div className="bg-red-100 text-red-700 px-3 py-2 rounded text-sm">
+                  {error}
+                </div>
+              )}
               <div>
                 <label className="block text-sm text-gray-600 mb-1">
                   Title
@@ -306,15 +321,13 @@ const Banner = () => {
               </div>
               <div>
                 <label className="block text-sm text-gray-600 mb-1">
-                  Active Status
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => handleChange("isActive", e.target.checked)}
+                  />
+                  <span className="text-sm text-gray-600">Active</span>
                 </label>
-                <input
-                  type="text"
-                  placeholder="true / false"
-                  value={formData.isActive || ""}
-                  onChange={(e) => handleChange("isActive", e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-md text-sm outline-none"
-                />
               </div>
               <div>
                 <label className="block text-sm text-gray-600 mb-1">
@@ -353,7 +366,7 @@ const Banner = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center gap-2 bg-[#E9B159] text-white px-4 py-2 rounded"
+                  className="flex items-center gap-2 bg-[#E9B159] text-white px-4 py-2 rounded cursor-pointer"
                 >
                   <Save size={18} />
                   {loading

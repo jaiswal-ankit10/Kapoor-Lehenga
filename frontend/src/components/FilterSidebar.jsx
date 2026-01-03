@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { FiChevronDown } from "react-icons/fi";
+import { FiChevronDown, FiMinus, FiPlus } from "react-icons/fi";
 import axiosInstance from "../api/axiosInstance";
 import { useDispatch, useSelector } from "react-redux";
 import { setColor, setDiscount, setMaxPrice } from "../redux/filterSlice";
@@ -25,7 +25,7 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
   const selectedColor = useSelector((s) => s.filters.color);
   const discount = useSelector((s) => s.filters.discount);
 
-  /* ---------- FETCH CATEGORIES + SUBCATEGORIES ---------- */
+  /*  FETCH CATEGORIES + SUBCATEGORIES  */
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -38,7 +38,7 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
     fetchCategories();
   }, []);
 
-  /* ---------- FETCH COLORS ---------- */
+  /*  FETCH COLORS  */
   useEffect(() => {
     const fetchColors = async () => {
       try {
@@ -51,7 +51,7 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
     fetchColors();
   }, []);
 
-  /* ================= FIND ACTIVE PARENT CATEGORY ================= */
+  /*  FIND ACTIVE PARENT CATEGORY  */
   const activeCategoryId = useMemo(() => {
     if (!selectedSubCategory || !products?.length) return null;
 
@@ -62,7 +62,7 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
     return product?.subCategory?.category?.id || null;
   }, [selectedSubCategory, products]);
 
-  /* ================= DECIDE WHICH CATEGORIES TO SHOW ================= */
+  /*  DECIDE WHICH CATEGORIES TO SHOW  */
   const visibleCategories = useMemo(() => {
     // Case 1: All products → show all categories
     if (!selectedSubCategory) return categories;
@@ -71,12 +71,12 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
     return categories.filter((cat) => cat.id === activeCategoryId);
   }, [categories, selectedSubCategory, activeCategoryId]);
 
-  /* ---------- SUBCATEGORY CLICK ---------- */
+  /*  SUBCATEGORY CLICK  */
   const handleSubCategoryClick = (sc) => {
     navigate(`/products?subcategory=${encodeURIComponent(sc.name)}`);
   };
 
-  /* ---------- COLOR ---------- */
+  /*  COLOR  */
   const toggleColor = (color) => {
     const updated = selectedColor.includes(color)
       ? selectedColor.filter((f) => f !== color)
@@ -85,7 +85,7 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
     dispatch(setColor(updated));
   };
 
-  /* ---------- DISCOUNT ---------- */
+  /*  DISCOUNT  */
   const handleDiscount = (value) => {
     dispatch(setDiscount(discount === value ? 0 : value));
   };
@@ -94,52 +94,61 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
     <div className="w-[250px] md:w-[250px]">
       <h3 className="text-lg font-semibold">Filter</h3>
 
-      {/* ================= CATEGORY / SUBCATEGORY ================= */}
-      <div className={`mt-4 ${open.category ? "bg-gray-100 p-2" : ""}`}>
-        <button
-          className="flex justify-between w-full"
+      {/*  CATEGORY / SUBCATEGORY  */}
+      {/* ================= CATEGORY ================= */}
+      <div className={`mt-4 ${open.category ? "bg-[#F6F6F6] p-2" : ""}`}>
+        {/* Header */}
+        <div
+          className="flex justify-between items-center px-2 py-3 cursor-pointer"
           onClick={() => toggle("category")}
         >
-          <span>Category</span>
-          <FiChevronDown className={`${open.category && "rotate-180"}`} />
-        </button>
+          <h3 className="text-md ">Category</h3>
+          {open.category ? <FiMinus size={18} /> : <FiPlus size={18} />}
+        </div>
 
+        <div className="border-t border-gray-200" />
+
+        {/* Category List */}
         {open.category && (
-          <div className="pl-2 mt-2 flex flex-col gap-3">
-            {visibleCategories.map((cat) => (
-              <div key={cat.id}>
-                <p className="text-sm font-medium uppercase mb-1">{cat.name}</p>
+          <div className="max-h-[260px] overflow-y-auto px-4 py-3 space-y-4">
+            {visibleCategories.flatMap((cat) =>
+              cat.subCategories.map((sc) => (
+                <label
+                  key={sc.id}
+                  className="flex items-center gap-3 text-[15px] cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedSubCategory === sc.name}
+                    onChange={() => handleSubCategoryClick(sc)}
+                    className="w-5 h-5 border-gray-400"
+                  />
 
-                <div className="flex flex-col gap-1 pl-2">
-                  {cat.subCategories.map((sc) => (
-                    <label
-                      key={sc.id}
-                      className="flex items-center gap-2 text-sm capitalize cursor-pointer"
-                    >
-                      <input
-                        type="radio"
-                        checked={selectedSubCategory === sc.name}
-                        onChange={() => handleSubCategoryClick(sc)}
-                      />
-                      {sc.name}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            ))}
+                  <span className="text-gray-900">
+                    {sc.name}
+                    <span className="text-gray-500">
+                      {" "}
+                      ({sc.productCount || 0})
+                    </span>
+                  </span>
+                </label>
+              ))
+            )}
           </div>
         )}
       </div>
 
-      {/* ================= PRICE ================= */}
-      <div className={`mt-4 ${open.price ? "bg-gray-100 p-2" : ""}`}>
-        <button
-          className="flex justify-between w-full"
+      {/*  PRICE  */}
+      <div className={`mt-4 ${open.price ? "bg-[#F6F6F6] p-2" : ""}`}>
+        <div
+          className="flex justify-between items-center px-2 py-3 cursor-pointer"
           onClick={() => toggle("price")}
         >
-          <span>Price</span>
-          <FiChevronDown className={`${open.price && "rotate-180"}`} />
-        </button>
+          <h3 className="text-md ">Price</h3>
+          {open.price ? <FiMinus size={18} /> : <FiPlus size={18} />}
+        </div>
+
+        <div className="border-t border-gray-200" />
 
         {open.price && (
           <div className="pl-2 mt-3">
@@ -162,15 +171,17 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
         )}
       </div>
 
-      {/* ================= COLOR ================= */}
-      <div className={`mt-4 ${open.color ? "bg-gray-100 p-2" : ""}`}>
-        <button
-          className="flex justify-between w-full"
+      {/*  COLOR  */}
+      <div className={`mt-4 ${open.color ? "bg-[#F6F6F6] p-2" : ""}`}>
+        <div
+          className="flex justify-between items-center px-2 py-3 cursor-pointer"
           onClick={() => toggle("color")}
         >
-          <span>Color</span>
-          <FiChevronDown className={`${open.color && "rotate-180"}`} />
-        </button>
+          <h3 className="text-md ">Color</h3>
+          {open.color ? <FiMinus size={18} /> : <FiPlus size={18} />}
+        </div>
+
+        <div className="border-t border-gray-200" />
 
         {open.color && (
           <div className="pl-2 mt-2 flex flex-col gap-1 text-sm">
@@ -188,15 +199,17 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
         )}
       </div>
 
-      {/* ================= DISCOUNT ================= */}
-      <div className={`mt-4 ${open.discount ? "bg-gray-100 p-2" : ""}`}>
-        <button
-          className="flex justify-between w-full"
+      {/*  DISCOUNT  */}
+      <div className={`mt-4 ${open.discount ? "bg-[#F6F6F6] p-2" : ""}`}>
+        <div
+          className="flex justify-between items-center px-2 py-3 cursor-pointer"
           onClick={() => toggle("discount")}
         >
-          <span>Discount</span>
-          <FiChevronDown className={`${open.discount && "rotate-180"}`} />
-        </button>
+          <h3 className="text-md ">Discount</h3>
+          {open.discount ? <FiMinus size={18} /> : <FiPlus size={18} />}
+        </div>
+
+        <div className="border-t border-gray-200" />
 
         {open.discount && (
           <div className="pl-2 mt-2 flex flex-col gap-1 text-sm">

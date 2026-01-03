@@ -29,18 +29,20 @@ export const useProducts = () => {
 
   /*  FETCH PRODUCTS  */
   useEffect(() => {
-    dispatch(
-      fetchAllProducts({
-        search: filters.search,
-        subCategory: filters.subCategory,
-        sort: filters.sort,
-        page: filters.page,
-        limit: filters.limit,
-        color: filters.color,
-        maxPrice: filters.maxPrice,
-        discount: filters.discount,
-      })
-    );
+    setTimeout(() => {
+      dispatch(
+        fetchAllProducts({
+          search: filters.search,
+          subCategory: filters.subCategory,
+          sort: filters.sort,
+          page: filters.page,
+          limit: filters.limit,
+          color: filters.color,
+          maxPrice: filters.maxPrice,
+          discount: filters.discount,
+        })
+      );
+    }, 400);
   }, [
     dispatch,
     filters.search,

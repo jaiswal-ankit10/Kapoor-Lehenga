@@ -33,12 +33,12 @@ export default function AdminProducts() {
 
   const visibleProducts = products.slice(startIndex, endIndex);
 
-  const handleDelete = (e, p) => {
+  const handleDelete = (e, id) => {
     e.preventDefault();
     if (!window.confirm("Are you sure you want to delete this product?"))
       return;
 
-    dispatch(deleteProductById(p._id));
+    dispatch(deleteProductById(id));
     fetchProducts();
   };
 
@@ -147,7 +147,7 @@ export default function AdminProducts() {
                     </div>
                     <div
                       className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center"
-                      onClick={handleDelete}
+                      onClick={(e) => handleDelete(e, p.id)}
                     >
                       <Trash size={16} className="text-red-700" />
                     </div>

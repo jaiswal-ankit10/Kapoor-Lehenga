@@ -24,6 +24,7 @@ import { loadWishlistFromBackend } from "../services/wishlistService";
 import { setSearch } from "../redux/filterSlice";
 import { ToastContainer, toast } from "react-toastify";
 import axiosInstance from "../api/axiosInstance";
+import { useRef } from "react";
 
 const Header = () => {
   const [openMenu, setOpenMenu] = useState(false);
@@ -40,20 +41,6 @@ const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // const menuItems = [
-  //   "SALE",
-  //   "NEW ARRIVAL",
-  //   "HALF SAREE",
-  //   "FASHION SAREE",
-  //   "LEHENGA",
-  //   "GOWN",
-  //   "WEDDING",
-  //   "CELEBRITY OUTFITS",
-  //   "OCCASIONS",
-  //   "ENGAGEMENT",
-  //   "RECEPTION",
-  //   "OTHERS",
-  // ];
   const fetchCategories = async () => {
     try {
       const res = await axiosInstance.get("/categories");
@@ -61,6 +48,18 @@ const Header = () => {
     } catch {
       toast.error("Failed to fetch categories");
     }
+  };
+  const timeoutRef = useRef(null);
+
+  const handleEnter = (id) => {
+    clearTimeout(timeoutRef.current);
+    setHoveredCategory(id);
+  };
+
+  const handleLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setHoveredCategory(null);
+    }, 200);
   };
 
   useEffect(() => {
@@ -78,15 +77,24 @@ const Header = () => {
   const handleSubCategory = (sc) => {
     navigate(`/products?subcategory=${encodeURIComponent(sc.name)}`);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && searchText.trim()) {
       dispatch(setSearch(searchText));
       navigate(`/products?search=${encodeURIComponent(searchText)}`);
-    }, 400);
+      setSuggestions([]);
+    }
+  };
 
-    return () => clearTimeout(timer);
-  }, [searchText]);
+  // useEffect(() => {
+  //   if (!searchText.trim()) return;
+
+  //   const timer = setTimeout(() => {
+  //     dispatch(setSearch(searchText));
+  //     navigate(`/products?search=${encodeURIComponent(searchText)}`);
+  //   }, 400);
+
+  //   return () => clearTimeout(timer);
+  // }, [searchText]);
 
   useEffect(() => {
     if (!searchText.trim()) {
@@ -161,6 +169,7 @@ const Header = () => {
               placeholder="Search for products..."
               className="bg-transparent outline-none text-white w-full"
               value={searchText}
+              onKeyDown={handleKeyDown}
               onChange={(e) => setSearchText(e.target.value)}
             />
           </div>
@@ -347,6 +356,7 @@ const Header = () => {
             placeholder="Search for products..."
             className="bg-transparent outline-none text-white w-full"
             value={searchText}
+            onKeyDown={handleKeyDown}
             onChange={(e) => setSearchText(e.target.value)}
           />
         </div>
@@ -356,33 +366,34 @@ const Header = () => {
       <div className="mt-3 w-[80%] mx-auto">
         <ul className="hidden lg:flex text-white lg:justify-around w-full relative">
           {categories?.map((c) => (
-            <li key={c.id} className="relative whitespace-nowrap">
-              <div
-                className="cursor-pointer flex items-center gap-1"
-                onMouseEnter={() => setHoveredCategory(c.id)}
-                onMouseLeave={() => setHoveredCategory(null)}
-              >
+            <li
+              key={c.id}
+              className="relative whitespace-nowrap"
+              onMouseEnter={() => handleEnter(c.id)}
+              onMouseLeave={handleLeave}
+            >
+              <div className="cursor-pointer flex items-center gap-1">
                 <span
                   onClick={() => handleCategory(c.name)}
                   className="hover:text-gray-200 flex items-center gap-1"
                 >
                   {c.name.toUpperCase()}
                 </span>
-
-                {hoveredCategory === c.id && c.subCategories?.length > 0 && (
-                  <div className="absolute top-full -left-12 mt-2 bg-white text-black rounded shadow-lg min-w-[200px] z-50">
-                    {c.subCategories.map((sc) => (
-                      <div
-                        key={sc.id}
-                        onClick={() => handleSubCategory(sc)}
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm capitalize"
-                      >
-                        {sc.name}
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
+
+              {hoveredCategory === c.id && c.subCategories?.length > 0 && (
+                <div className="absolute top-full -left-12 mt-2 bg-white text-black rounded shadow-lg min-w-[200px] z-50">
+                  {c.subCategories.map((sc) => (
+                    <div
+                      key={sc.id}
+                      onClick={() => handleSubCategory(sc)}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm capitalize"
+                    >
+                      {sc.name}
+                    </div>
+                  ))}
+                </div>
+              )}
             </li>
           ))}
         </ul>

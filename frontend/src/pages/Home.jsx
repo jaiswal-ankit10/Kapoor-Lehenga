@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import bannerImage from "../assets/images/banner.png";
-import mobileImage from "../assets/images/mobile-banner.png";
 import CategorySlider from "../components/CategorySlider";
 import luxeImg from "../assets/images/luxe.png";
 import newlyLaunchedBanner from "../assets/images/newly-launched.png";
@@ -18,11 +16,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Login from "./Login";
 import Signup from "./Signup";
 import axiosInstance from "../api/axiosInstance";
+import BannerSlider from "../components/BannerSlider";
 
 const Home = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const [bannerImg, setBannerImg] = useState(null);
+  const [bannerImg, setBannerImg] = useState([]);
 
   const isLogin = pathname === "/login";
   const isSignup = pathname === "/signup";
@@ -33,7 +32,7 @@ const Home = () => {
         const res = await axiosInstance.get("/banners/active");
 
         if (res.data.success && res.data.data.length > 0) {
-          setBannerImg(res.data.data[0]);
+          setBannerImg(res.data.data);
         }
       } catch (err) {
         console.error(err);
@@ -45,14 +44,7 @@ const Home = () => {
   return (
     <div>
       {/* Banner section */}
-      <section className="">
-        <img
-          src={bannerImg?.image?.url || bannerImage}
-          alt="banner image"
-          className="hidden md:block"
-        />
-        <img src={mobileImage} alt="" className="block md:hidden w-full" />
-      </section>
+      <BannerSlider banners={bannerImg} />
       <CategorySlider />
       {/* Luxe Section */}
       <section className="bg-[#310914] w-full min-h-[40%] md:min-h-screen flex  md:flex-row md:justify-between px-4 md:px-8 lg:px-16 ">
@@ -65,7 +57,7 @@ const Home = () => {
       </section>
 
       {/* newly launched banner */}
-      <section className="max-w-[85vw] mx-auto my-10">
+      <section className="max-w-[95vw] mx-auto my-10">
         <img
           src={newlyLaunchedBanner}
           alt="newlyLaunchedBanner"

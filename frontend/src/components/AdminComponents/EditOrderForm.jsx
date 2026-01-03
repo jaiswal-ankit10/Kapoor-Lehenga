@@ -6,14 +6,14 @@ const EditOrderForm = ({ order, onClose }) => {
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
-    status: "Pending",
+    status: "PENDING",
   });
 
   // Pre-filled data
   useEffect(() => {
     if (order) {
       setFormData({
-        status: order.status || "Pending",
+        status: order.status || "PENDING",
       });
     }
   }, [order]);
@@ -44,13 +44,13 @@ const EditOrderForm = ({ order, onClose }) => {
             onChange={handleChange}
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#E9B159]"
           >
-            <option value="Pending">Pending</option>
-            <option value="Confirmed">Confirmed</option>
-            <option value="Processing">Processing</option>
-            <option value="Shipped">Shipped</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
-            <option value="Returned">Returned</option>
+            <option value="PENDING">Pending</option>
+            <option value="CONFIRMED">Confirmed</option>
+            <option value="PROCESSING">Processing</option>
+            <option value="SHIPPED">Shipped</option>
+            <option value="DELIVERED">Delivered</option>
+            <option value="CANCELLED">Cancelled</option>
+            <option value="RETURNED">Returned</option>
           </select>
           <div className="flex justify-end gap-3 pt-4">
             <button type="button" onClick={onClose} className="btn btn-ghost">

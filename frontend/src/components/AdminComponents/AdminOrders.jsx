@@ -221,7 +221,7 @@ export default function AdminOrders() {
                   <td className="py-2 px-5 text-center">
                     <span
                       className={`${
-                        order.paymentStatus === "complete"
+                        order.paymentStatus === "COMPLETE"
                           ? "bg-green-400 text-white"
                           : "bg-red-400 text-white"
                       } px-2 py-1 rounded`}

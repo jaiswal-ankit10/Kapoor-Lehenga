@@ -10,6 +10,7 @@ import {
   removeFromWishlistBackend,
 } from "../services/wishlistService";
 import { toast } from "react-toastify";
+import { setSearch } from "../redux/filterSlice";
 
 const ProductCard = ({ product }) => {
   if (!product) return null;
@@ -48,13 +49,22 @@ const ProductCard = ({ product }) => {
       navigate("/login");
       return;
     }
-    dispatch(addItemToBackendCart(actualProduct));
-    toast.success("Item added to cart");
+    try {
+      dispatch(addItemToBackendCart(actualProduct));
+      toast.success("Item added to cart");
+    } catch (error) {
+      toast.error("Failed to add item to cart");
+    }
+  };
+
+  const handleClick = () => {
+    dispatch(setSearch(""));
+    navigate(`/products/${productId}`);
   };
 
   return (
     <div
-      onClick={() => navigate(`/products/${productId}`)}
+      onClick={handleClick}
       className="group w-full lg:w-[260px] shrink-0 overflow-hidden hover:shadow-xl duration-300 cursor-pointer relative bg-white"
     >
       {/* Wishlist Icon */}
@@ -74,7 +84,7 @@ const ProductCard = ({ product }) => {
         <Swiper
           navigation={true}
           modules={[Navigation]}
-          className="w-full h-full"
+          className="w-full h-full product-swiper"
         >
           {(actualProduct?.images || [actualProduct?.thumbnail])
             ?.filter(Boolean)

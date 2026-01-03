@@ -25,6 +25,7 @@ const CategorySlider = () => {
         watchOverflow={true}
         centeredSlides={sarees.length === 1}
         spaceBetween={10}
+        className="category-swiper cursor-pointer"
         breakpoints={{
           0: { slidesPerView: 1 },
           640: { slidesPerView: 2 },
@@ -39,7 +40,7 @@ const CategorySlider = () => {
               <img
                 src={item.images?.[0]}
                 alt={item.title}
-                className="h-[260px] w-full max-w-[220px] object-cover cursor-pointer rounded"
+                className="h-[260px] w-full max-w-[220px] object-fit cursor-pointer rounded"
                 onClick={() =>
                   navigate(`/products?subcategory=${item.subCategory.name}`)
                 }

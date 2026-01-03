@@ -27,6 +27,7 @@ export const createBanner = asyncHandler(async (req, res) => {
   const banner = await prisma.banner.create({
     data: {
       title: req.body.title,
+      isActive: req.body.isActive === "true",
       imageUrl: upload.secure_url,
       publicId: upload.public_id,
     },
@@ -46,7 +47,10 @@ export const updateBanner = asyncHandler(async (req, res) => {
 
   let updateData = {
     title: req.body.title ?? banner.title,
-    isActive: req.body.isActive ?? banner.isActive,
+    isActive:
+      req.body.isActive !== undefined
+        ? req.body.isActive === "true"
+        : banner.isActive,
   };
 
   if (req.file) {
