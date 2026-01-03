@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import RoutesSection from "../components/RoutesSection";
 import { breadcrumbRoutes } from "../utils/breadcrumbRoutes";
 import { useNavigate } from "react-router-dom";
@@ -40,10 +40,13 @@ const MyOrder = () => {
     Returned: "bg-gray-100 text-gray-500",
   };
 
+  const [showAll, setShowAll] = useState(false);
   const breadcrumb = [breadcrumbRoutes.home, breadcrumbRoutes.myOrder];
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { orders, loading } = useSelector((state) => state.order);
+
+  const visibleOrders = showAll ? orders : orders.slice(0, 4);
 
   useEffect(() => {
     dispatch(fetchMyOrders());
@@ -54,16 +57,16 @@ const MyOrder = () => {
       <div>
         <RoutesSection breadcrumb={breadcrumb} />
       </div>
-      <div className="w-full max-w-3xl mx-auto my-10">
+      <div className="w-full max-w-3xl mx-auto my-10 p-2">
         {loading && <p>Loading orders...</p>}
 
         {!loading && orders.length === 0 && (
           <p className="text-gray-500">No order found</p>
         )}
-        {orders.map((order, i) => (
+        {visibleOrders.map((order) => (
           <div
-            key={i}
-            className="flex justify-between items-center border border-gray-100 rounded p-4 my-3 shadow-sm bg-white"
+            key={order.id}
+            className="flex justify-between items-center border border-gray-100 rounded p-4 my-3 shadow-sm bg-white cursor-pointer"
             onClick={() => navigate(`/orders/${order.id}`)}
           >
             <div>
@@ -96,10 +99,13 @@ const MyOrder = () => {
         ))}
 
         {/* See More */}
-        {orders.length > 0 && (
+        {orders.length > 4 && (
           <div className="text-right mt-4">
-            <button className="text-md font-medium text-gray-600 hover:underline">
-              See More
+            <button
+              onClick={() => setShowAll((prev) => !prev)}
+              className="text-md font-medium text-gray-600 hover:underline"
+            >
+              {showAll ? "Show Less" : "See More"}
             </button>
           </div>
         )}

@@ -16,7 +16,7 @@ export default function OrderDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const { order, loading } = useSelector((state) => state.order);
+  const { order, loading, error } = useSelector((state) => state.order);
   useEffect(() => {
     dispatch(fetchSingleOrder(id));
   }, [dispatch, id]);
@@ -152,21 +152,26 @@ export default function OrderDetail() {
             </div>
           </div>
         ))}
+        {error && (
+          <div className="bg-red-100 text-red-600 px-4 py-2 rounded mb-4">
+            {error}
+          </div>
+        )}
 
         <div className="flex justify-center items-center">
-          {order.status !== "Cancelled" &&
-            order.status !== "Delivered" &&
-            order.status !== "Returned" && (
+          {order.status !== "CANCELLED" &&
+            order.status !== "DELIVERED" &&
+            order.status !== "RETURNED" && (
               <button
-                className="bg-[#E9B159] px-12 py-3 font-medium text-white text-lg"
+                className="bg-[#E9B159] px-12 py-3 font-medium text-white text-lg cursor-pointer"
                 onClick={handleOrderCancel}
               >
                 Order Cancel
               </button>
             )}
-          {order.status === "Delivered" && (
+          {order.status === "DELIVERED" && (
             <button
-              className="bg-[#E9B159] px-12 py-3 font-medium text-white text-lg"
+              className="bg-[#E9B159] px-12 py-3 font-medium text-white text-lg cursor-pointer"
               onClick={handleReturnOrder}
             >
               Return Order
