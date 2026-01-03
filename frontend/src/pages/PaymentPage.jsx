@@ -29,12 +29,11 @@ const PaymentPage = () => {
     const items = cartItems
       .filter((item) => item.product && item.product.id)
       .map((item) => ({
-        productId: item.product.id, // Changed from 'product' to 'productId'
+        productId: item.product.id,
         quantity: item.quantity,
         price: item.product.discountedPrice || item.product.price,
       }));
 
-    // Ensure status is uppercase to match Prisma Enums if necessary
     const paymentStatus = selected === "cod" ? "PENDING" : "COMPLETE";
 
     return {
@@ -58,7 +57,7 @@ const PaymentPage = () => {
     try {
       const orderData = buildOrderData();
 
-      await dispatch(createOrder(orderData)).unwrap();
+      await dispatch(createOrder(orderData));
 
       dispatch(clearBackendCart());
       setOpenSuccess(true);

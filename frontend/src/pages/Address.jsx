@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import AddressCard from "../components/AddressCard";
-import CartSummary from "../components/CartSummary";
-import CouponBox from "../components/CouponBox";
-import PriceDetails from "../components/PriceDetails";
+const CartSummary = lazy(() => import("../components/CartSummary"));
+const CouponBox = lazy(() => import("../components/CouponBox"));
+const PriceDetails = lazy(() => import("../components/PriceDetails"));
+const NewAddressSideBar = lazy(() => import("../components/NewAddressSideBar"));
 import logo from "../assets/images/full-logo.png";
 import paymentBar from "../assets/icons/address-pay.png";
 import map from "../assets/icons/map.png";
 import { Link, useNavigate } from "react-router-dom";
-import NewAddressSideBar from "../components/NewAddressSideBar";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAddresses } from "../services/addressService";
 
@@ -19,17 +19,8 @@ const Address = () => {
     (state) => state.address
   );
 
-  const dummyAddress = [
-    {
-      id: 1,
-      name: "Piyush Kalsariya",
-      address: "146, Laxmi Nagar, Surat",
-      default: true,
-    },
-    { id: 2, name: "Rohit Kumar", address: "Dindoli Road, Surat" },
-    { id: 3, name: "Mehul Desai", address: "146, Laxmi Nagar, Surat" },
-  ];
   const handleContinue = () => {
+    if (!selectedAddress) return;
     navigate("/payment");
   };
   useEffect(() => {
@@ -90,10 +81,12 @@ const Address = () => {
               <div className="text-3xl font-bold">+</div>
               <p className="mt-2 font-medium">Add New Address</p>
 
-              <NewAddressSideBar
-                openNewAddress={openNewAddress}
-                setOpenNewAddress={setOpenNewAddress}
-              />
+              <Suspense fallback={<div>Loading...</div>}>
+                <NewAddressSideBar
+                  openNewAddress={openNewAddress}
+                  setOpenNewAddress={setOpenNewAddress}
+                />
+              </Suspense>
             </div>
           </div>
         </div>
@@ -103,9 +96,15 @@ const Address = () => {
           className="w-full hidden md:block md:w-[760px] lg:w-[420px] 
                         border border-gray-200 bg-[#F6F6F6] rounded-md p-4"
         >
-          <CartSummary />
-          <CouponBox />
-          <PriceDetails />
+          <Suspense fallback={<div>Loading...</div>}>
+            <CartSummary />
+          </Suspense>
+          <Suspense fallback={<div>Loading...</div>}>
+            <CouponBox />
+          </Suspense>
+          <Suspense fallback={<div>Loading...</div>}>
+            <PriceDetails />
+          </Suspense>
 
           <button
             onClick={handleContinue}

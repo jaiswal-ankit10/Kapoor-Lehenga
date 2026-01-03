@@ -27,7 +27,7 @@ const NewArrival = () => {
           }}
         >
           {products.map((product) => (
-            <SwiperSlide key={product._id}>
+            <SwiperSlide key={product.id}>
               <ProductCard product={product} />
             </SwiperSlide>
           ))}
@@ -42,7 +42,7 @@ const NewArrival = () => {
         "
       >
         {products.map((product) => (
-          <ProductCard key={product._id} product={product} />
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </>

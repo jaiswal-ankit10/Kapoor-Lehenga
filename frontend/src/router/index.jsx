@@ -1,33 +1,51 @@
 import { createBrowserRouter } from "react-router-dom";
-import Home from "../pages/Home";
-import Signup from "../pages/Signup";
-import Login from "../pages/Login";
-import Layout from "../components/Layout";
-import Products from "../pages/Products";
-import ProductDetail from "../pages/ProductDetail";
-import Wishlist from "../pages/Wishlist";
-import NotFound from "../pages/NotFound";
-import PaymentPage from "../pages/PaymentPage";
-import Address from "../pages/Address";
-import MyOrder from "../pages/MyOrder";
-import OrderDetail from "../pages/OrderDetail";
-import ReturnProduct from "../pages/ReturnProduct";
-import AdminPanel from "../pages/AdminPanel";
-import AdminRoute from "../components/ProtectedRoute/AdminRoute";
-import UserRoute from "../components/ProtectedRoute/UserRoute";
-import AdminDashboard from "../components/AdminComponents/AdminDashboard";
-import Users from "../components/AdminComponents/Users";
-import AdminProducts from "../components/AdminComponents/AdminProducts";
-import AdminOrders from "../components/AdminComponents/AdminOrders";
-import Categories from "../components/AdminComponents/Categories";
-import PaymentHistory from "../components/AdminComponents/PaymentHistory";
-import CouponList from "../components/AdminComponents/CouponList";
-import AddProductForm from "../components/AdminComponents/AddProductForm";
-import ProductReview from "../components/AdminComponents/ProductReview";
-import Inquiry from "../components/AdminComponents/Inquiry";
-import Clients from "../components/AdminComponents/Clients";
-import Banner from "../components/AdminComponents/Banner";
-import CategoryManager from "../components/AdminComponents/CategoryManager";
+import { lazy } from "react";
+const Home = lazy(() => import("../pages/Home"));
+const Signup = lazy(() => import("../pages/Signup"));
+const Login = lazy(() => import("../pages/Login"));
+const Layout = lazy(() => import("../components/Layout"));
+const Products = lazy(() => import("../pages/Products"));
+const ProductDetail = lazy(() => import("../pages/ProductDetail"));
+const NotFound = lazy(() => import("../pages/NotFound"));
+const Wishlist = lazy(() => import("../pages/Wishlist"));
+const PaymentPage = lazy(() => import("../pages/PaymentPage"));
+const Address = lazy(() => import("../pages/Address"));
+const MyOrder = lazy(() => import("../pages/MyOrder"));
+const OrderDetail = lazy(() => import("../pages/OrderDetail"));
+const ReturnProduct = lazy(() => import("../pages/ReturnProduct"));
+const AdminPanel = lazy(() => import("../pages/AdminPanel"));
+const AdminRoute = lazy(() =>
+  import("../components/ProtectedRoute/AdminRoute")
+);
+const UserRoute = lazy(() => import("../components/ProtectedRoute/UserRoute"));
+const AdminDashboard = lazy(() =>
+  import("../components/AdminComponents/AdminDashboard")
+);
+const Users = lazy(() => import("../components/AdminComponents/Users"));
+const AdminProducts = lazy(() =>
+  import("../components/AdminComponents/AdminProducts")
+);
+const AdminOrders = lazy(() =>
+  import("../components/AdminComponents/AdminOrders")
+);
+const PaymentHistory = lazy(() =>
+  import("../components/AdminComponents/PaymentHistory")
+);
+const CouponList = lazy(() =>
+  import("../components/AdminComponents/CouponList")
+);
+const AddProductForm = lazy(() =>
+  import("../components/AdminComponents/AddProductForm")
+);
+const ProductReview = lazy(() =>
+  import("../components/AdminComponents/ProductReview")
+);
+const Inquiry = lazy(() => import("../components/AdminComponents/Inquiry"));
+const Clients = lazy(() => import("../components/AdminComponents/Clients"));
+const Banner = lazy(() => import("../components/AdminComponents/Banner"));
+const CategoryManager = lazy(() =>
+  import("../components/AdminComponents/CategoryManager")
+);
 
 export const router = createBrowserRouter([
   {

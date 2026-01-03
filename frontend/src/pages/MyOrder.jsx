@@ -96,11 +96,13 @@ const MyOrder = () => {
         ))}
 
         {/* See More */}
-        <div className="text-right mt-4">
-          <button className="text-md font-medium text-gray-600 hover:underline">
-            See More
-          </button>
-        </div>
+        {orders.length > 0 && (
+          <div className="text-right mt-4">
+            <button className="text-md font-medium text-gray-600 hover:underline">
+              See More
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

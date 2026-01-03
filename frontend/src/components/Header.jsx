@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, lazy, Suspense } from "react";
+
+const CartSidebar = lazy(() => import("./CartSidebar"));
+
 import {
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowUp,
@@ -6,7 +9,6 @@ import {
 import { FaRegUser } from "react-icons/fa";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { IoCubeOutline } from "react-icons/io5";
-
 import { IoExitOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/images/logo.png";
@@ -18,13 +20,11 @@ import userIcon from "../assets/icons/user.png";
 import returnIcon from "../assets/icons/return.png";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/userSlice";
-import CartSidebar from "./CartSidebar";
 import { loadCartFromBackend } from "../services/cartService";
 import { loadWishlistFromBackend } from "../services/wishlistService";
 import { setSearch } from "../redux/filterSlice";
 import { ToastContainer, toast } from "react-toastify";
 import axiosInstance from "../api/axiosInstance";
-import { useRef } from "react";
 
 const Header = () => {
   const [openMenu, setOpenMenu] = useState(false);
@@ -331,7 +331,9 @@ const Header = () => {
             </div>
             <h2 className="hidden md:block">Cart</h2>
           </div>
-          <CartSidebar openCart={openCart} setOpenCart={setOpenCart} />
+          <Suspense fallback={<div>Loading cart....</div>}>
+            <CartSidebar openCart={openCart} setOpenCart={setOpenCart} />
+          </Suspense>
         </div>
       </div>
       {/* mobile searchbar */}

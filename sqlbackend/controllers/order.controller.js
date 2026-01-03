@@ -12,6 +12,13 @@ export const createOrder = asyncHandler(async (req, res) => {
   if (!items || items.length === 0) {
     throw new ApiError(400, "Order Items are required");
   }
+  if (!shippingAddress) {
+    throw new ApiError(400, "Shipping address is required");
+  }
+
+  if (!paymentMethod) {
+    throw new ApiError(400, "Payment method is required");
+  }
 
   const productIds = items
     .map((i) => i.productId)
@@ -73,8 +80,8 @@ export const createOrder = asyncHandler(async (req, res) => {
   });
 
   return res
-    .status(200)
-    .json(new ApiResponse(200, order, "Order placed successfully"));
+    .status(201)
+    .json(new ApiResponse(201, order, "Order placed successfully"));
 });
 
 /*  MY ORDERS  */

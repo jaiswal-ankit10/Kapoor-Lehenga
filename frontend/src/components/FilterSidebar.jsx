@@ -124,13 +124,7 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
                     className="w-5 h-5 border-gray-400"
                   />
 
-                  <span className="text-gray-900">
-                    {sc.name}
-                    <span className="text-gray-500">
-                      {" "}
-                      ({sc.productCount || 0})
-                    </span>
-                  </span>
+                  <span className="text-gray-900">{sc.name}</span>
                 </label>
               ))
             )}

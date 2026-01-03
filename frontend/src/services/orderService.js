@@ -7,13 +7,21 @@ import {
   updateOrder,
   setError,
 } from "../redux/orderSlice";
+
 export const createOrder = (orderData) => async (dispatch) => {
   try {
     dispatch(setLoading());
+
     const res = await axiosInstance.post("/orders", orderData);
+
     dispatch(addOrder(res.data.data));
+
+    return res.data.data;
   } catch (error) {
-    dispatch(setError("Failed to place order"));
+    const message = error.response?.data?.message || "Failed to place order";
+
+    dispatch(setError(message));
+    throw new Error(message);
   }
 };
 

@@ -1,22 +1,25 @@
-import React, { useEffect, useState } from "react";
-import CategorySlider from "../components/CategorySlider";
+import React, { useEffect, useState, lazy, Suspense } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+const CategorySlider = lazy(() => import("../components/CategorySlider"));
+const BannerSlider = lazy(() => import("../components/BannerSlider"));
+const NewArrival = lazy(() => import("../components/NewArrival"));
+const TestimonialsSection = lazy(() =>
+  import("../components/TestimonialSections")
+);
+const ServicesSection = lazy(() => import("../components/ServicesSection"));
+
 import luxeImg from "../assets/images/luxe.png";
 import newlyLaunchedBanner from "../assets/images/newly-launched.png";
 import sareeBanner from "../assets/images/saree-banner.png";
-import NewArrival from "../components/NewArrival";
 import Subscribe from "../assets/images/subscribe.png";
 import leftBanner from "../assets/images/festival-special/img1.png";
 import rightTop from "../assets/images/festival-special/img2.png";
 import bottomBanner1 from "../assets/images/festival-special/img3.png";
 import bottomBanner2 from "../assets/images/festival-special/img4.png";
-import TestimonialsSection from "../components/TestimonialSections";
-import ServicesSection from "../components/ServicesSection";
 import mapImage from "../assets/images/cropped_map.png";
-import { useLocation, useNavigate } from "react-router-dom";
 import Login from "./Login";
 import Signup from "./Signup";
 import axiosInstance from "../api/axiosInstance";
-import BannerSlider from "../components/BannerSlider";
 
 const Home = () => {
   const { pathname } = useLocation();
@@ -44,8 +47,13 @@ const Home = () => {
   return (
     <div>
       {/* Banner section */}
-      <BannerSlider banners={bannerImg} />
-      <CategorySlider />
+
+      <Suspense fallback={<div>Loading Banner...</div>}>
+        <BannerSlider banners={bannerImg} />
+      </Suspense>
+      <Suspense fallback={<div>Loading categories...</div>}>
+        <CategorySlider />
+      </Suspense>
       {/* Luxe Section */}
       <section className="bg-[#310914] w-full min-h-[40%] md:min-h-screen flex  md:flex-row md:justify-between px-4 md:px-8 lg:px-16 ">
         <img
@@ -71,7 +79,9 @@ const Home = () => {
         <p className="mb-5">
           "Embrace the festival magic, let joy fill every moment."
         </p>
-        <NewArrival />
+        <Suspense fallback={<div>Loading new arrival...</div>}>
+          <NewArrival />
+        </Suspense>
       </section>
 
       {/* Subscription */}
@@ -147,10 +157,14 @@ const Home = () => {
       </section>
 
       {/* Customer Service */}
-      <TestimonialsSection />
+      <Suspense fallback={<div>Loading Testimonial...</div>}>
+        <TestimonialsSection />
+      </Suspense>
 
       {/* services section */}
-      <ServicesSection />
+      <Suspense fallback={<div>Loading services...</div>}>
+        <ServicesSection />
+      </Suspense>
 
       {/* map section */}
       <section className="w-full h-[50vh] md:h-full bg-[#E3FCFF] flex items-center justify-center">

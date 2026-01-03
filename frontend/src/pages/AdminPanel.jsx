@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { logout } from "../redux/userSlice";
 
 import {
   Home,
@@ -14,7 +12,6 @@ import {
   Tag,
   MessageCircle,
   ChevronDown,
-  Circle,
   CircleSmall,
   CircleStop,
 } from "lucide-react";
