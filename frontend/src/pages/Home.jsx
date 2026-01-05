@@ -143,7 +143,7 @@ const Home = () => {
       </section>
 
       {/* sarees  */}
-      <section className="max-w-[85vw] mx-auto my-10 relative">
+      <section className="max-w-[95vw] mx-auto my-10 relative">
         <img
           src={sareeBanner}
           alt="sareeBanner"

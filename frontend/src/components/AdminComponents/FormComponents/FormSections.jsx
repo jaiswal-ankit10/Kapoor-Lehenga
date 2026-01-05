@@ -1,7 +1,6 @@
 import { Package, Plus } from "lucide-react";
 import CustomSelect from "./CustomSelect";
 import { RichTextEditor } from "./RichTextEditor";
-import { useState } from "react";
 
 export function GeneralInfoSection({
   data,

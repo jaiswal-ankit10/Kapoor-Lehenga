@@ -42,6 +42,11 @@ export default function AdminOrders() {
     Processing: "bg-blue-100 text-blue-500",
     Returned: "bg-gray-100 text-gray-500",
   };
+  const paymentStatusStyle = {
+    COMPLETE: "bg-green-400",
+    REFUNDED: "bg-blue-400",
+    PENDING: "bg-red-400",
+  };
   const [stats, setStats] = useState({
     todaysOrders: 0,
     completedOrders: 0,
@@ -221,10 +226,8 @@ export default function AdminOrders() {
                   <td className="py-2 px-5 text-center">
                     <span
                       className={`${
-                        order.paymentStatus === "COMPLETE"
-                          ? "bg-green-400 text-white"
-                          : "bg-red-400 text-white"
-                      } px-2 py-1 rounded`}
+                        paymentStatusStyle[order.paymentStatus]
+                      } text-white px-2 py-1 rounded`}
                     >
                       {order.paymentStatus}
                     </span>

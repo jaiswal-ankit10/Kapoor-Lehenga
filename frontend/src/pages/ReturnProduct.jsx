@@ -52,7 +52,7 @@ const ReturnProduct = () => {
                 <img
                   src={item.product.images?.[0]}
                   alt={item.product.title}
-                  className="w-28 h-28 rounded-md object-cover"
+                  className="w-28 h-28 rounded-md object-fit"
                 />
 
                 <div className="flex-1">
