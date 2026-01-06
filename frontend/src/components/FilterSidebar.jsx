@@ -2,7 +2,12 @@ import React, { useEffect, useState, useMemo } from "react";
 import { FiChevronDown, FiMinus, FiPlus } from "react-icons/fi";
 import axiosInstance from "../api/axiosInstance";
 import { useDispatch, useSelector } from "react-redux";
-import { setColor, setDiscount, setMaxPrice } from "../redux/filterSlice";
+import {
+  setColor,
+  setDiscount,
+  setMaxPrice,
+  setSubCategory,
+} from "../redux/filterSlice";
 import { useNavigate } from "react-router-dom";
 
 const FilterSidebar = ({ selectedSubCategory, products }) => {
@@ -21,9 +26,12 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
 
   const toggle = (key) => setOpen({ ...open, [key]: !open[key] });
 
+  const minPrice = useSelector((s) => s.filters.minPrice);
   const maxPrice = useSelector((s) => s.filters.maxPrice);
   const selectedColor = useSelector((s) => s.filters.color);
   const discount = useSelector((s) => s.filters.discount);
+  const selectedSubCategories = useSelector((s) => s.filters.subCategory);
+  const activeCategory = useSelector((s) => s.filters.category);
 
   /*  FETCH CATEGORIES + SUBCATEGORIES  */
   useEffect(() => {
@@ -51,29 +59,16 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
     fetchColors();
   }, []);
 
-  /*  FIND ACTIVE PARENT CATEGORY  */
-  const activeCategoryId = useMemo(() => {
-    if (!selectedSubCategory || !products?.length) return null;
-
-    const product = products.find(
-      (p) => p.subCategory?.name === selectedSubCategory
-    );
-
-    return product?.subCategory?.category?.id || null;
-  }, [selectedSubCategory, products]);
-
   /*  DECIDE WHICH CATEGORIES TO SHOW  */
   const visibleCategories = useMemo(() => {
-    // Case 1: All products → show all categories
-    if (!selectedSubCategory) return categories;
+    if (!activeCategory) return categories;
 
-    // Case 2: Filtered → show only parent category
-    return categories.filter((cat) => cat.id === activeCategoryId);
-  }, [categories, selectedSubCategory, activeCategoryId]);
+    return categories.filter((cat) => cat.name === activeCategory);
+  }, [categories, activeCategory]);
 
   /*  SUBCATEGORY CLICK  */
-  const handleSubCategoryClick = (sc) => {
-    navigate(`/products?subcategory=${encodeURIComponent(sc.name)}`);
+  const toggleSubCategory = (name) => {
+    dispatch(setSubCategory(name));
   };
 
   /*  COLOR  */
@@ -95,14 +90,13 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
       <h3 className="text-lg font-semibold">Filter</h3>
 
       {/*  CATEGORY / SUBCATEGORY  */}
-      {/* ================= CATEGORY ================= */}
       <div className={`mt-4 ${open.category ? "bg-[#F6F6F6] p-2" : ""}`}>
         {/* Header */}
         <div
           className="flex justify-between items-center px-2 py-3 cursor-pointer"
           onClick={() => toggle("category")}
         >
-          <h3 className="text-md ">Category</h3>
+          <h3 className="text-md ">Sub Category</h3>
           {open.category ? <FiMinus size={18} /> : <FiPlus size={18} />}
         </div>
 
@@ -119,12 +113,12 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
                 >
                   <input
                     type="checkbox"
-                    checked={selectedSubCategory === sc.name}
-                    onChange={() => handleSubCategoryClick(sc)}
+                    checked={selectedSubCategories.includes(sc.name)}
+                    onChange={() => dispatch(setSubCategory(sc.name))}
                     className="w-5 h-5 border-gray-400"
                   />
 
-                  <span className="text-gray-900">{sc.name}</span>
+                  <span className="text-gray-900 capitalize">{sc.name}</span>
                 </label>
               ))
             )}
@@ -147,7 +141,7 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
         {open.price && (
           <div className="pl-2 mt-3">
             <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>₹0</span>
+              <span>₹{minPrice}</span>
               <span>₹{maxPrice}</span>
               <span>₹20,000</span>
             </div>
@@ -185,6 +179,7 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
                   type="checkbox"
                   checked={selectedColor.includes(color)}
                   onChange={() => toggleColor(color)}
+                  className="w-5 h-5"
                 />
                 {color}
               </label>

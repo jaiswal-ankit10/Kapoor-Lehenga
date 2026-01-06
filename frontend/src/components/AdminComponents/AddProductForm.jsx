@@ -32,6 +32,10 @@ export default function AddProductForm() {
   });
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [editProduct, setEditProduct] = useState(null);
+
+  // Add a flag to track if we've loaded the data
+  const [hasLoadedProduct, setHasLoadedProduct] = useState(false);
 
   useEffect(() => {
     axiosInstance.get("/categories").then((res) => {
@@ -39,45 +43,139 @@ export default function AddProductForm() {
     });
   }, []);
 
-  const [existingImages, setExistingImages] = useState([]); // DB images
-  const [selectedImages, setSelectedImages] = useState([]); // new files
-  const [imagePreviews, setImagePreviews] = useState([]); // urls
+  useEffect(() => {
+    if (!product?.id) {
+      setHasLoadedProduct(true);
+      return;
+    }
+
+    axiosInstance
+      .get(`/admin/products/${product.id}`)
+      .then((res) => {
+        // console.log("API Response for edit product:", res.data);
+        // console.log(
+        //   "Additional details from API:",
+        //   res.data.product?.additionalDetails
+        // );
+        setEditProduct(res.data.product);
+        setHasLoadedProduct(true);
+      })
+      .catch((err) => {
+        console.error("Error fetching product:", err);
+        setEditProduct(null);
+        setHasLoadedProduct(true);
+      });
+  }, [product?.id]);
+
+  const [existingImages, setExistingImages] = useState([]);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
 
   // PREFILL DATA ON EDIT
+  const currentProduct = editProduct || product;
+
   useEffect(() => {
-    if (!product) return;
+    if (!currentProduct || !hasLoadedProduct) return;
+
+    // console.log("========= LOADING PRODUCT DATA =========");
+    // console.log("Current product:", currentProduct);
+    // console.log(
+    //   "Additional details from currentProduct:",
+    //   currentProduct.additionalDetails
+    // );
+    // console.log(
+    //   "Type of additionalDetails:",
+    //   typeof currentProduct.additionalDetails
+    // );
+    // console.log("Is array?", Array.isArray(currentProduct.additionalDetails));
+
+    // Process additional details correctly
+    let processedAdditionalDetails = [{ title: "", value: "" }];
+
+    if (currentProduct.additionalDetails) {
+      if (Array.isArray(currentProduct.additionalDetails)) {
+        if (currentProduct.additionalDetails.length > 0) {
+          // Log each item to verify structure
+          // currentProduct.additionalDetails.forEach((item, index) => {
+          //   console.log(`Item ${index}:`, item);
+          //   console.log(`Item ${index} has title?`, item.title);
+          //   console.log(`Item ${index} has value?`, item.value);
+          // });
+
+          processedAdditionalDetails = currentProduct.additionalDetails
+            .filter((item) => item && (item.title || item.value)) // Filter out empty items
+            .map((item) => ({
+              title: item.title || "",
+              value: item.value || "",
+            }));
+        }
+      } else if (
+        typeof currentProduct.additionalDetails === "object" &&
+        currentProduct.additionalDetails !== null
+      ) {
+        // If it's an object but not an array, convert to array
+        processedAdditionalDetails = Object.entries(
+          currentProduct.additionalDetails
+        ).map(([key, value]) => ({
+          title: key || "",
+          value: String(value) || "",
+        }));
+      }
+    }
+    //
+    console.log("Processed additional details:", processedAdditionalDetails);
+
+    // If no valid additional details, use default
+    if (processedAdditionalDetails.length === 0) {
+      processedAdditionalDetails = [{ title: "", value: "" }];
+    }
 
     setFormData({
-      title: product.title || "",
-      description: product.description || "",
-      longDescription: product.longDescription || "",
-      price: product.price || "",
-      discount: product.discount || 0,
-      stock: product.stock || 0,
-      categoryId: product.subCategory?.category?.id || "",
-      subCategoryId: product.subCategory?.id || "",
-      brand: product.brand || "",
-      color: product.color || "",
-      additionalDetails: product.additionalDetails || [
-        { title: "", value: "" },
-      ],
+      title: currentProduct.title || "",
+      description: currentProduct.description || "",
+      longDescription: currentProduct.longDescription || "",
+      price: currentProduct.price || "",
+      discount: currentProduct.discount || 0,
+      stock: currentProduct.stock || 0,
+      categoryId: currentProduct.subCategory?.category?.id || "",
+      subCategoryId: currentProduct.subCategory?.id || "",
+      brand: currentProduct.brand || "",
+      color:
+        typeof currentProduct.color === "string"
+          ? currentProduct.color
+          : Array.isArray(currentProduct.color)
+          ? currentProduct.color.join(", ")
+          : "",
+      additionalDetails: processedAdditionalDetails,
     });
-    setSelectedCategory(product.subCategory?.category || null);
 
-    if (product.images?.length) {
-      setExistingImages(product.images);
-      setImagePreviews(product.images.map((img) => img));
+    // Log the formData that will be set
+    console.log(
+      "Setting formData with additionalDetails:",
+      processedAdditionalDetails
+    );
+
+    setSelectedCategory(currentProduct.subCategory?.category || null);
+
+    if (currentProduct.images?.length) {
+      setExistingImages(currentProduct.images);
+      setImagePreviews(currentProduct.images);
     }
-  }, [product?.id]);
+  }, [currentProduct, hasLoadedProduct]);
+
+  // Add this useEffect to debug formData changes
+  useEffect(() => {
+    console.log("formData updated:", formData);
+    console.log("formData.additionalDetails:", formData.additionalDetails);
+  }, [formData]);
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ADD NEW IMAGES
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
@@ -111,7 +209,6 @@ export default function AddProductForm() {
     setError("");
   };
 
-  // REMOVE IMAGE (existing OR new)
   const removeImage = (index) => {
     if (index < existingImages.length) {
       setExistingImages((prev) => prev.filter((_, i) => i !== index));
@@ -124,7 +221,6 @@ export default function AddProductForm() {
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // CLEANUP PREVIEWS
   useEffect(() => {
     return () => {
       imagePreviews.forEach((url) => URL.revokeObjectURL(url));
@@ -136,7 +232,6 @@ export default function AddProductForm() {
     setLoading(true);
     setError("");
 
-    // ✅ REQUIRED VALIDATIONS
     if (!formData.subCategoryId) {
       setError("Please select a category and subcategory");
       setLoading(false);
@@ -151,7 +246,6 @@ export default function AddProductForm() {
 
     const formDataToSend = new FormData();
 
-    /* ---------------- APPEND BASIC FIELDS ---------------- */
     formDataToSend.append("title", formData.title);
     formDataToSend.append("description", formData.description);
     formDataToSend.append("longDescription", formData.longDescription);
@@ -160,20 +254,13 @@ export default function AddProductForm() {
     formDataToSend.append("stock", formData.stock);
     formDataToSend.append("brand", formData.brand);
     formDataToSend.append("color", formData.color);
-
-    /* 🔥 MOST IMPORTANT */
     formDataToSend.append("subCategoryId", formData.subCategoryId);
-
-    /* ---------------- ADDITIONAL DETAILS ---------------- */
     formDataToSend.append(
       "additionalDetails",
       JSON.stringify(formData.additionalDetails)
     );
-
-    /* ---------------- EXISTING IMAGES ---------------- */
     formDataToSend.append("existingImages", JSON.stringify(existingImages));
 
-    /* ---------------- NEW IMAGES ---------------- */
     selectedImages.forEach((img) => {
       formDataToSend.append("images", img);
     });
@@ -197,6 +284,15 @@ export default function AddProductForm() {
       setLoading(false);
     }
   };
+
+  // console.log("========= RENDER LOGS =========");
+  // console.log("Current Product:", currentProduct);
+  // console.log(
+  //   "Current Product Additional Details:",
+  //   currentProduct?.additionalDetails
+  // );
+  // console.log("Form Data Additional Details:", formData.additionalDetails);
+  // console.log("Has loaded product?", hasLoadedProduct);
 
   return (
     <div>
@@ -225,14 +321,24 @@ export default function AddProductForm() {
             setSelectedCategory={setSelectedCategory}
           />
           <DescriptionSection data={formData} updateField={handleChange} />
-          <DetailsSection data={formData} updateField={handleChange} />
+
+          {/* Add conditional rendering while data loads */}
+          {hasLoadedProduct && (
+            <DetailsSection
+              key={`details-${currentProduct?.id}-${JSON.stringify(
+                formData.additionalDetails
+              )}`}
+              data={formData}
+              updateField={handleChange}
+            />
+          )}
+
           <ImagesSection
             handleImageChange={handleImageChange}
             fileInputRef={fileInputRef}
             imagePreviews={imagePreviews}
             removeImage={removeImage}
           />
-
           <PricingSection data={formData} updateField={handleChange} />
 
           <div className="bg-white rounded-xl shadow-sm p-6 flex justify-end gap-5">

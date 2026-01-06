@@ -7,16 +7,18 @@ const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
   const dispatch = useDispatch();
   const { cartItems, totalAmount } = useSelector((state) => state.cart);
   const { coupons, error, loading } = useSelector((state) => state.coupon);
-  const handleApply = (coupon) => {
-    dispatch(
-      applyCoupon({
-        code: coupon.code,
-        cartItems,
-        cartTotal: totalAmount,
-      })
-    );
+  const handleApply = async (coupon) => {
+    try {
+      await dispatch(
+        applyCoupon({
+          code: coupon.code,
+          cartItems,
+          cartTotal: totalAmount,
+        })
+      ).unwrap();
 
-    setCoupon(false);
+      setCoupon(false);
+    } catch (error) {}
   };
   useEffect(() => {
     dispatch(fetchCoupons());
@@ -26,7 +28,9 @@ const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
       {openCoupon && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-          onClick={() => setCoupon(false)}
+          onClick={() => {
+            if (!loading) setCoupon(false);
+          }}
         />
       )}
 
@@ -60,7 +64,7 @@ const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
               </div>
 
               <button
-                className="bg-black text-white px-3 py-1 rounded text-sm"
+                className="bg-black text-white px-3 py-1 rounded text-sm cursor-pointer"
                 onClick={() => handleApply(coupon)}
               >
                 {loading ? "Applying..." : "Apply"}

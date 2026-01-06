@@ -1,6 +1,7 @@
 import { Package, Plus } from "lucide-react";
 import CustomSelect from "./CustomSelect";
 import { RichTextEditor } from "./RichTextEditor";
+import React from "react";
 
 export function GeneralInfoSection({
   data,
@@ -151,6 +152,15 @@ export function DescriptionSection({ data, updateField }) {
   );
 }
 export function DetailsSection({ data, updateField }) {
+  console.log("::", data);
+
+  const safeDetails = React.useMemo(() => {
+    return Array.isArray(data.additionalDetails) &&
+      data.additionalDetails.length
+      ? data.additionalDetails
+      : [{ title: "", value: "" }];
+  }, [data.additionalDetails]);
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-10">
       <div className="grid grid-cols-12 gap-6 items-start">
@@ -170,8 +180,9 @@ export function DetailsSection({ data, updateField }) {
           <h3 className="text-sm font-medium text-gray-700 mb-4">
             Product Additional Details
           </h3>
+
           <ProductAdditionalDetails
-            details={data.additionalDetails}
+            details={safeDetails}
             setDetails={(val) => updateField("additionalDetails", val)}
           />
         </div>
@@ -328,7 +339,8 @@ function ProductAdditionalDetails({ details, setDetails }) {
   };
 
   const removeRow = (index) => {
-    setDetails(details.filter((_, i) => i !== index));
+    const updated = details.filter((_, i) => i !== index);
+    setDetails(updated.length ? updated : [{ title: "", value: "" }]);
   };
 
   return (

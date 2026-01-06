@@ -3,11 +3,12 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   search: "",
   category: "",
-  subCategory: "",
-  sort: "newest", // newest | price_asc | price_desc
+  subCategory: [],
+  sort: "newest",
   page: 1,
   limit: 20,
   color: [],
+  minPrice: 0,
   maxPrice: 20000,
   discount: 0,
 };
@@ -22,12 +23,25 @@ const filterSlice = createSlice({
     },
     setCategory(state, action) {
       state.category = action.payload;
+      state.subCategory = [];
       state.page = 1;
     },
-    setSubCategory: (state, action) => {
+    setSubCategory(state, action) {
+      const value = action.payload;
+
+      if (state.subCategory.includes(value)) {
+        state.subCategory = state.subCategory.filter((v) => v !== value);
+      } else {
+        state.subCategory.push(value);
+      }
+
+      state.page = 1;
+    },
+    setSubCategories(state, action) {
       state.subCategory = action.payload;
       state.page = 1;
     },
+
     setSort(state, action) {
       state.sort = action.payload;
       state.page = 1;
@@ -45,6 +59,10 @@ const filterSlice = createSlice({
       state.page = 1;
     },
 
+    setMinPrice(state, action) {
+      state.minPrice = action.payload;
+      state.page = 1;
+    },
     setMaxPrice(state, action) {
       state.maxPrice = action.payload;
       state.page = 1;
@@ -71,10 +89,12 @@ export const {
   setSearch,
   setCategory,
   setSubCategory,
+  setSubCategories,
   setSort,
   setPage,
   setLimit,
   setColor,
+  setMinPrice,
   setMaxPrice,
   setDiscount,
   resetFilters,

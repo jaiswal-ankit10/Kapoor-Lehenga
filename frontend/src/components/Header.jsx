@@ -22,7 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/userSlice";
 import { loadCartFromBackend } from "../services/cartService";
 import { loadWishlistFromBackend } from "../services/wishlistService";
-import { setSearch } from "../redux/filterSlice";
+import { setCategory, setSearch, setSubCategory } from "../redux/filterSlice";
 import { ToastContainer, toast } from "react-toastify";
 import axiosInstance from "../api/axiosInstance";
 
@@ -71,12 +71,21 @@ const Header = () => {
   }, []);
 
   const handleCategory = (category) => {
-    navigate(`/products`);
+    dispatch(setCategory(category));
+    navigate(`/products?category=${encodeURIComponent(category)}`);
   };
 
-  const handleSubCategory = (sc) => {
-    navigate(`/products?subcategory=${encodeURIComponent(sc.name)}`);
+  const handleSubCategory = (categoryName, sc) => {
+    dispatch(setCategory(categoryName));
+    dispatch(setSubCategory(sc.name));
+
+    navigate(
+      `/products?category=${encodeURIComponent(
+        categoryName
+      )}&subcategory=${encodeURIComponent(sc.name)}`
+    );
   };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && searchText.trim()) {
       dispatch(setSearch(searchText));
@@ -128,7 +137,7 @@ const Header = () => {
         </div>
         {/* Logo */}
         <div
-          className="flex items-center gap-0 lg:gap-2"
+          className="flex items-center gap-0 lg:gap-2 cursor-pointer"
           onClick={() => navigate("/")}
         >
           <img
@@ -172,6 +181,14 @@ const Header = () => {
               onKeyDown={handleKeyDown}
               onChange={(e) => setSearchText(e.target.value)}
             />
+            {searchText && (
+              <p
+                className="text-xs cursor-pointer select-none"
+                onClick={() => setSearchText("")}
+              >
+                X
+              </p>
+            )}
           </div>
           {suggestions.length > 0 && (
             <div className="absolute bg-white text-black w-full mt-1 rounded shadow-lg z-50">
@@ -361,6 +378,14 @@ const Header = () => {
             onKeyDown={handleKeyDown}
             onChange={(e) => setSearchText(e.target.value)}
           />
+          {searchText && (
+            <p
+              className="text-xs cursor-pointer select-none"
+              onClick={() => setSearchText("")}
+            >
+              X
+            </p>
+          )}
         </div>
       </div>
 
@@ -388,7 +413,7 @@ const Header = () => {
                   {c.subCategories.map((sc) => (
                     <div
                       key={sc.id}
-                      onClick={() => handleSubCategory(sc)}
+                      onClick={() => handleSubCategory(c.name, sc)}
                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm capitalize"
                     >
                       {sc.name}

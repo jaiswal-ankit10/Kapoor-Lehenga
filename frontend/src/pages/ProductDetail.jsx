@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { breadcrumbRoutes } from "../utils/breadcrumbRoutes";
 import RoutesSection from "../components/RoutesSection";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchProductById } from "../services/productService";
+import { fetchAllProducts, fetchProductById } from "../services/productService";
 import { FaStar } from "react-icons/fa";
 import cart from "../assets/icons/cart.png";
 import ServicesSection from "../components/ServicesSection";
@@ -13,7 +13,11 @@ import SimilarProductsSlider from "../components/SimilarProductsSlider";
 import MoreProducts from "../components/MoreProducts";
 import ReviewSection from "../components/ReviewSection";
 import { useDispatch, useSelector } from "react-redux";
-import { addItemToBackendCart } from "../services/cartService";
+import {
+  addItemToBackendCart,
+  updateQtyBackend,
+  removeBackendCartItem,
+} from "../services/cartService";
 import {
   addItemToWishlist,
   removeFromWishlistBackend,
@@ -34,44 +38,79 @@ const ProductDetail = () => {
   const [selectedThumb, setSelectedThumb] = useState(null);
   const [qty, setQty] = useState(1);
 
-  const isWishlisted = wishlistItems.some((item) => item.product?._id === id);
   const imageBaseUrl = import.meta.env.VITE_BACKEND_URL;
-  const resolveImage = (url) => {
-    if (!url) return "";
-    return url.startsWith("http") ? url : `${imageBaseUrl}${url}`;
-  };
+  const resolveImage = (url) =>
+    url?.startsWith("http") ? url : `${imageBaseUrl}${url}`;
 
   useEffect(() => {
     dispatch(fetchProductById(id));
   }, [dispatch, id]);
+
   useEffect(() => {
     dispatch(fetchCoupons());
   }, [dispatch]);
+  useEffect(() => {
+    if (!products || products.length === 0) {
+      dispatch(fetchAllProducts());
+    }
+  }, [dispatch, products?.length]);
 
   useEffect(() => {
-    if (product?.images?.length > 0) {
+    if (product?.images?.length) {
       setSelectedThumb(product.images[0]);
     } else if (product?.thumbnail) {
       setSelectedThumb(product.thumbnail);
     }
   }, [product]);
+  useEffect(() => {
+    if (product && cartItems) {
+      const item = cartItems.find((i) => i.product?.id === product.id);
+      if (item?.quantity) {
+        setQty(item.quantity);
+      }
+    }
+  }, [product?.id, cartItems]);
 
+  /*  EARLY RETURNS (CRITICAL)  */
   if (loading) return <p>Loading product...</p>;
   if (!product) return <p>Product not found</p>;
 
-  const isInCart = cartItems?.some((item) => item.product?._id === product._id);
+  /*  SAFE PRODUCT LOGIC  */
+  const cartItem = cartItems?.find((item) => item.product?.id === product.id);
 
-  const addItemToCart = () => {
-    if (isInCart) return;
-    dispatch(addItemToBackendCart(product));
-    toast("Item added to cart");
+  const isInCart = Boolean(cartItem);
+  const stock = product.stock ?? 0;
+  const isOutOfStock = stock === 0;
+  const isMaxQtyReached = qty >= stock;
+
+  /*  ACTIONS  */
+  const addItemToCart = async () => {
+    if (isOutOfStock || isMaxQtyReached || isInCart) return;
+
+    try {
+      await dispatch(
+        addItemToBackendCart({
+          id: product.id,
+          discountedPrice: product.discountedPrice,
+          quantity: qty,
+        })
+      ).unwrap();
+
+      toast.success("Item added to cart");
+    } catch (error) {
+      toast.error("Failed to add item to cart");
+    }
   };
 
   const toggleWishlist = () => {
+    const isWishlisted = wishlistItems.some(
+      (item) => item.product?.id === product.id
+    );
+
     if (isWishlisted) {
-      dispatch(removeFromWishlistBackend(product._id));
+      dispatch(removeFromWishlistBackend(product.id));
     } else {
-      dispatch(addItemToWishlist(product._id));
+      dispatch(addItemToWishlist(product.id));
       toast("Added to wishlist");
     }
   };
@@ -92,37 +131,36 @@ const ProductDetail = () => {
       <RoutesSection breadcrumb={breadcrumb} />
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-10 flex gap-10 flex-col md:flex-row">
         <ToastContainer />
-        {/* Thumbnails */}
-        <div
-          className="flex flex-row md:flex-col gap-3
-    overflow-auto
-    max-h-[420px] md:max-h-[620px] "
-        >
-          {(product?.images || [product?.thumbnail])
-            .filter(Boolean)
-            .map((thumb, i) => (
-              <img
-                key={i}
-                src={resolveImage(thumb)}
-                onClick={() => setSelectedThumb(thumb)}
-                className={`w-[70px] h-[100px] md:w-[100px] md:h-[140px] object-cover rounded cursor-pointer border ${
-                  selectedThumb === thumb ? "border-black" : "border-gray-300"
-                }`}
-              />
-            ))}
+
+        {/* LEFT PANEL */}
+        <div className="md:sticky md:top-5 self-start flex gap-6 flex-col md:flex-row">
+          <div className="flex gap-6 flex-row md:flex-col overflow-auto max-h-[420px] md:max-h-[620px]">
+            {(product.images || [product.thumbnail])
+              .filter(Boolean)
+              .map((thumb, i) => (
+                <img
+                  key={i}
+                  src={resolveImage(thumb)}
+                  onClick={() => setSelectedThumb(thumb)}
+                  className={`w-[70px] h-[100px] md:w-[120px] md:h-40 object-cover rounded cursor-pointer border ${
+                    selectedThumb === thumb ? "border-black" : "border-gray-300"
+                  }`}
+                />
+              ))}
+          </div>
+
+          {selectedThumb && (
+            <img
+              src={resolveImage(selectedThumb)}
+              className="w-[320px] h-[420px] md:w-[450px] md:h-[650px] object-cover rounded"
+            />
+          )}
         </div>
 
-        {/* Main Image */}
-        {selectedThumb && (
-          <img
-            src={resolveImage(selectedThumb)}
-            className="w-[320px] h-[420px] md:w-[450px] md:h-[550px] object-fill rounded"
-          />
-        )}
-
-        {/* Right Panel */}
+        {/* RIGHT PANEL */}
         <div className="flex-1">
           <h2 className="text-3xl font-bold">{product.title}</h2>
+
           <div
             className="prose prose-sm max-w-none text-gray-500 text-sm mt-4"
             dangerouslySetInnerHTML={{ __html: product.description }}
@@ -137,7 +175,7 @@ const ProductDetail = () => {
             </p>
           </div>
 
-          {/* Price */}
+          {/* PRICE */}
           <div className="mt-4">
             <div className="flex gap-4 items-center">
               <p className="text-xl font-bold line-through text-gray-500">
@@ -150,7 +188,6 @@ const ProductDetail = () => {
             </div>
             <p className="text-gray-400 text-sm">Inclusive of all taxes</p>
           </div>
-
           <hr className="my-4 text-gray-300" />
           {/* Color Options */}
           <p className="text-sm font-semibold mt-6">Select Color</p>
@@ -177,13 +214,12 @@ const ProductDetail = () => {
                 </div>
               ))}
           </div>
-
           {/* Available Offers */}
           <h3 className="font-semibold mt-6">Available Offers</h3>
           <div className="mt-3 space-y-3">
             {coupons.map((offer) => (
               <div
-                key={offer._id}
+                key={offer.id}
                 className="border rounded-lg flex justify-between p-3 items-center"
               >
                 <div>
@@ -201,31 +237,71 @@ const ProductDetail = () => {
               </div>
             ))}
           </div>
-
-          {/* Quantity */}
+          {/* QUANTITY (LOGIC FIXED, UI SAME) */}
           <div className="mt-6">
             <p className="font-semibold mb-2">Quantity:</p>
             <div className="flex items-center">
               <button
-                className="border border-gray-300 px-4 py-1 text-lg"
-                onClick={() => setQty((prev) => (prev > 1 ? prev - 1 : 1))}
+                className="border border-gray-300 px-4 py-1 text-lg cursor-pointer"
+                onClick={() => {
+                  if (qty === 1) {
+                    if (isInCart) {
+                      dispatch(removeBackendCartItem(product.id));
+                    }
+                    setQty(1);
+                  } else {
+                    const newQty = qty - 1;
+                    setQty(newQty);
+                    if (isInCart) {
+                      dispatch(
+                        updateQtyBackend({
+                          productId: item.product.id,
+                          quantity: newQty,
+                        })
+                      );
+                    }
+                  }
+                }}
               >
                 -
               </button>
+
               <span className="border border-gray-300 px-4 py-1 text-lg">
                 {qty}
               </span>
+
               <button
-                className="border border-gray-300 px-4 py-1 text-lg"
-                onClick={() => setQty((prev) => prev + 1)}
+                className="border border-gray-300 px-4 py-1 text-lg cursor-pointer"
+                onClick={() => {
+                  if (qty < stock) {
+                    const newQty = qty + 1;
+                    setQty(newQty);
+                    if (isInCart) {
+                      dispatch(
+                        updateQtyBackend({
+                          productId: item.product.id,
+                          quantity: newQty,
+                        })
+                      );
+                    }
+                  }
+                }}
+                disabled={qty >= stock}
               >
                 +
               </button>
             </div>
+
+            {qty >= stock && stock > 0 && (
+              <p className="text-xs text-red-500 mt-1">Maximum stock reached</p>
+            )}
+            {isOutOfStock && (
+              <p className="text-xs text-red-500 mt-1">Out of stock</p>
+            )}
           </div>
 
-          {/* Buttons */}
-          <div className="flex flex-col md:flex-row gap-4 mt-6 ">
+          {/* BUTTONS */}
+          <div className="flex flex-col md:flex-row gap-4 mt-6">
             <button
               onClick={toggleWishlist}
               className="bg-[#EDEDED] px-4 py-3 rounded-lg cursor-pointer"
@@ -241,15 +317,21 @@ const ProductDetail = () => {
 
             <button
               onClick={addItemToCart}
-              disabled={isInCart}
-              className={`bg-[#E9B159] w-full py-4 text-xl text-white flex items-center justify-center gap-4 cursor-pointer ${
+              disabled={isInCart || isOutOfStock || isMaxQtyReached}
+              className={`bg-[#E9B159] w-full py-4 text-xl text-white flex items-center justify-center gap-4 ${
                 isInCart
                   ? "bg-gray-600 cursor-not-allowed opacity-70"
-                  : "bg-[#E9B159] cursor-pointer hover:bg-[#d89f3f]"
-              }`}
+                  : "hover:bg-[#d89f3f]"
+              } cursor-pointer`}
             >
               <img src={cart} className="w-10" />
-              <h2>{isInCart ? "Added to Bag" : "Add to Bag"}</h2>
+              <h2>
+                {isOutOfStock
+                  ? "Out of Stock"
+                  : isInCart
+                  ? "Added to Bag"
+                  : "Add to Bag"}
+              </h2>
             </button>
 
             <button
@@ -260,8 +342,7 @@ const ProductDetail = () => {
             </button>
           </div>
 
-          <hr className="my-10 text-gray-400" />
-          <div className="bg-[#EDEDED] rounded-lg">
+          <div className="bg-[#EDEDED] rounded-lg mt-10">
             <ServicesSection />
           </div>
 

@@ -58,15 +58,15 @@ export const registerUser = asyncHandler(async (req, res) => {
 
 /*  LOGIN  */
 export const login = asyncHandler(async (req, res) => {
-  const { email, mobile, password } = req.body;
+  const { email, password } = req.body;
 
-  if ((!email && !mobile) || !password) {
+  if (!email || !password) {
     throw new ApiError(400, "All the fields are required");
   }
 
   const user = await prisma.user.findFirst({
     where: {
-      OR: [{ email }, { mobile }],
+      OR: [{ email }],
     },
   });
 
@@ -100,7 +100,6 @@ export const login = asyncHandler(async (req, res) => {
         id: user.id,
         fullName: user.fullName,
         email: user.email,
-        mobile: user.mobile,
         role: user.role,
       },
     });

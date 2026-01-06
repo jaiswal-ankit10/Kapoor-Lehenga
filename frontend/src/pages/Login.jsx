@@ -15,7 +15,7 @@ const Login = () => {
 
   const [input, setInput] = useState({
     email: "",
-    mobile: "",
+    // mobile: "",
     password: "",
   });
   const [errors, setErrors] = useState({});
@@ -37,12 +37,12 @@ const Login = () => {
       newErrors.email = "Invalid email format";
     }
 
-    const mobileRegex = /^[0-9]{10}$/;
-    if (!input.mobile) {
-      newErrors.mobile = "Mobile number is required";
-    } else if (!mobileRegex.test(input.mobile)) {
-      newErrors.mobile = "Enter a valid 10-digit number";
-    }
+    // const mobileRegex = /^[0-9]{10}$/;
+    // if (!input.mobile) {
+    //   newErrors.mobile = "Mobile number is required";
+    // } else if (!mobileRegex.test(input.mobile)) {
+    //   newErrors.mobile = "Enter a valid 10-digit number";
+    // }
 
     if (!input.password) {
       newErrors.password = "Password is required";
@@ -125,7 +125,7 @@ const Login = () => {
             )}
           </div>
 
-          <div className="flex flex-col">
+          {/* <div className="flex flex-col">
             <input
               type="text"
               name="mobile"
@@ -141,7 +141,7 @@ const Login = () => {
                 {errors.mobile}
               </span>
             )}
-          </div>
+          </div> */}
 
           <div className="flex flex-col">
             <input
@@ -161,7 +161,7 @@ const Login = () => {
             )}
           </div>
 
-          <button className="bg-[#F3A93C] text-white text-xl w-full py-3 rounded mt-3">
+          <button className="bg-[#F3A93C] text-white text-xl w-full py-3 rounded mt-3 cursor-pointer">
             CONTINUE
           </button>
         </form>

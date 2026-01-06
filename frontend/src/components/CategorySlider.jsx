@@ -40,15 +40,15 @@ const CategorySlider = () => {
               <img
                 src={item.images?.[0]}
                 alt={item.title}
-                className="h-[260px] w-full max-w-[220px] object-fit cursor-pointer rounded"
+                className="h-[386px] w-full max-w-[276px] object-cover cursor-pointer rounded"
                 onClick={() =>
                   navigate(`/products?subcategory=${item.subCategory.name}`)
                 }
               />
 
               <h3
-                className="absolute bottom-3 text-white drop-shadow-md text-lg"
-                style={{ fontFamily: "Kaushan Script, cursive" }}
+                className="absolute bottom-3 text-white drop-shadow-md text-lg capitalize"
+                // style={{ fontFamily: "Kaushan Script, cursive" }}
               >
                 {item.subCategory.name}
               </h3>

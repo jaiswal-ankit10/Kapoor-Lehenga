@@ -13,6 +13,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  getProductById,
 } from "../controllers/products.controller.js";
 import { verifyJWT, verifyRoles } from "../middlewares/auth.middleware.js";
 
@@ -40,8 +41,15 @@ router.post(
   uploadMultipleImages,
   createProduct
 );
-router.put("/products/:id", verifyJWT, verifyRoles("ADMIN"), updateProduct);
+router.put(
+  "/products/:id",
+  verifyJWT,
+  verifyRoles("ADMIN"),
+  uploadMultipleImages,
+  updateProduct
+);
 router.delete("/products/:id", verifyJWT, verifyRoles("ADMIN"), deleteProduct);
+router.get("/products/:id", verifyJWT, verifyRoles("ADMIN"), getProductById);
 
 // Dashboard
 router.get("/dashboard", verifyJWT, verifyRoles("ADMIN"), getDashboardStats);

@@ -91,11 +91,14 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
                           dispatch(removeBackendCartItem(item.product.id));
                         } else {
                           dispatch(
-                            updateQtyBackend(item.product.id, item.quantity - 1)
+                            updateQtyBackend({
+                              productId: item.product.id,
+                              quantity: item.quantity - 1,
+                            })
                           );
                         }
                       }}
-                      className="border px-2"
+                      className="border px-2 cursor-pointer"
                     >
                       -
                     </button>
@@ -106,7 +109,10 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
                       onClick={() => {
                         if (!isOutOfStock) {
                           dispatch(
-                            updateQtyBackend(item.product.id, item.quantity + 1)
+                            updateQtyBackend({
+                              productId: item.product.id,
+                              quantity: item.quantity + 1,
+                            })
                           );
                         }
                       }}
@@ -115,7 +121,7 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
                         isOutOfStock
                           ? "opacity-40 cursor-not-allowed"
                           : "hover:bg-gray-100"
-                      }`}
+                      } cursor-pointer`}
                     >
                       +
                     </button>
@@ -142,7 +148,7 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
                 </div>
 
                 <button
-                  className="absolute top-2 right-2 text-[10px] bg-gray-200 px-2 py-1 rounded text-black"
+                  className="absolute top-2 right-2 text-[10px] bg-gray-200 px-2 py-1 rounded text-black cursor-pointer"
                   onClick={() =>
                     dispatch(removeBackendCartItem(item.product.id))
                   }

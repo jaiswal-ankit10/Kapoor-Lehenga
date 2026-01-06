@@ -1,40 +1,76 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../api/axiosInstance";
-import { clearCartReducer, setCart } from "../redux/cartSlice";
 
-export const loadCartFromBackend = () => async (dispatch) => {
-  const res = await axiosInstance.get("/cart");
-  dispatch(setCart(res.data.cart));
-};
+/*  LOAD CART  */
+export const loadCartFromBackend = createAsyncThunk(
+  "cart/load",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get("/cart");
+      return res.data.cart;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
 
-export const addItemToBackendCart = (item) => async (dispatch) => {
-  const price = item.discountedPrice;
-  const productId = item.id;
+/*  ADD ITEM  */
+export const addItemToBackendCart = createAsyncThunk(
+  "cart/addItem",
+  async ({ id, discountedPrice, quantity = 1 }, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.post("/cart/add", {
+        productId: id,
+        price: discountedPrice,
+        quantity,
+      });
+      return res.data.cart;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
 
-  const res = await axiosInstance.post("/cart/add", {
-    productId,
-    price: price,
-    quantity: 1,
-  });
+/*  UPDATE QTY  */
+export const updateQtyBackend = createAsyncThunk(
+  "cart/updateQty",
+  async ({ productId, quantity }, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.put("/cart/update", {
+        productId,
+        quantity,
+      });
+      return res.data.cart;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
 
-  dispatch(setCart(res.data.cart));
-};
+/*  REMOVE ITEM  */
+export const removeBackendCartItem = createAsyncThunk(
+  "cart/removeItem",
+  async (productId, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.delete("/cart/remove", {
+        data: { productId },
+      });
+      return res.data.cart;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
 
-export const updateQtyBackend = (itemId, qty) => async (dispatch) => {
-  const res = await axiosInstance.put("/cart/update", {
-    productId: itemId,
-    quantity: qty,
-  });
-  dispatch(setCart(res.data.cart));
-};
-
-export const removeBackendCartItem = (itemId) => async (dispatch) => {
-  const res = await axiosInstance.delete("/cart/remove", {
-    data: { productId: itemId },
-  });
-  dispatch(setCart(res.data.cart));
-};
-
-export const clearBackendCart = () => async (dispatch) => {
-  await axiosInstance.delete("/cart/clear");
-  dispatch(clearCartReducer());
-};
+/*  CLEAR CART  */
+export const clearBackendCart = createAsyncThunk(
+  "cart/clear",
+  async (_, { rejectWithValue }) => {
+    try {
+      await axiosInstance.delete("/cart/clear");
+      return true;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);

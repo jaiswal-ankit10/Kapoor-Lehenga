@@ -6,20 +6,29 @@ import ProductCard from "../components/ProductCard";
 import Pagination from "../components/pagination";
 import FAQs from "../components/Faqs";
 import FilterSidebar from "../components/FilterSidebar";
-import ProductGridLoader from "../components/ProductGridLoader";
 import MobileFilterDrawer from "../components/MobileFilterDrawer";
 import EmptyState from "../components/EmptyState";
 
 import { useProducts } from "../hooks/useProducts";
 import { useDispatch } from "react-redux";
-import { setSort, setPage } from "../redux/filterSlice";
+import { useNavigate } from "react-router-dom";
+
+import {
+  setSort,
+  setPage,
+  setSubCategories,
+  setSubCategory,
+  setCategory,
+} from "../redux/filterSlice";
 import { ToastContainer } from "react-toastify";
 
 const Products = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [openFilter, setOpenFilter] = useState(false);
 
-  const { products, loading, total, pages, filters } = useProducts();
+  const { products, loading, pages, filters } = useProducts();
 
   const breadcrumb = [breadcrumbRoutes.home, breadcrumbRoutes.productPage];
 
@@ -41,7 +50,7 @@ const Products = () => {
       {/*  MAIN SECTION  */}
       <div className="flex gap-6 px-4 lg:px-10 py-6">
         {/*  DESKTOP SIDEBAR  */}
-        <div className="hidden md:block">
+        <div className="hidden md:flex sticky top-5 self-start">
           <FilterSidebar
             selectedSubCategory={filters.subCategory}
             products={products}
@@ -51,29 +60,13 @@ const Products = () => {
         {/*  RIGHT CONTENT  */}
         <div className="flex-1">
           {/*  TOP BAR  */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center pb-4 gap-4">
-            <div>
+          <div className="">
+            <div className="flex justify-between items-center w-full">
               <h2 className="text-lg lg:text-2xl font-semibold capitalize">
-                {filters.subCategory
-                  ? `${filters.subCategory} Collection`
+                {filters.category
+                  ? `${filters.category} Collection`
                   : "All Products"}
               </h2>
-
-              <p className="text-sm text-gray-500 mt-1">
-                Showing {products.length} of {total || products.length} results
-              </p>
-            </div>
-
-            <div className="flex items-center gap-4">
-              {/* MOBILE FILTER BUTTON */}
-              <button
-                onClick={() => setOpenFilter(true)}
-                className="md:hidden border px-4 py-2 rounded text-sm"
-              >
-                Filters
-              </button>
-
-              {/* SORT */}
               <div className="flex items-center gap-2">
                 <span className="text-sm">Sort By:</span>
                 <select
@@ -87,10 +80,52 @@ const Products = () => {
                 </select>
               </div>
             </div>
+
+            <div className="flex items-center gap-4">
+              {/* MOBILE FILTER BUTTON */}
+              <button
+                onClick={() => setOpenFilter(true)}
+                className="md:hidden border px-4 py-2 rounded text-sm"
+              >
+                Filters
+              </button>
+            </div>
+            {filters.subCategory.length > 0 && (
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                {/* Clear All */}
+                <button
+                  onClick={() => {
+                    dispatch(setSubCategories([]));
+                    dispatch(setCategory(""));
+                    navigate("/products", { replace: true });
+                  }}
+                  className="px-4 py-1.5 text-sm border border-gray-300 rounded-full bg-gray-100 cursor-pointer"
+                >
+                  Clear All
+                </button>
+
+                {/* Product Type Chips */}
+                {filters.subCategory.map((sub) => (
+                  <div
+                    key={sub}
+                    className="flex items-center gap-2 px-3 py-1.5 border border-dashed border-gray-400 rounded-full text-sm text-gray-700"
+                  >
+                    <span>
+                      Product Type: <strong>{sub}</strong>
+                    </span>
+                    <button
+                      onClick={() => dispatch(setSubCategory(sub))}
+                      className="text-gray-500 hover:text-black cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/*  PRODUCTS  */}
-          {loading && <ProductGridLoader />}
 
           {!loading && products.length === 0 && (
             <EmptyState
@@ -100,7 +135,14 @@ const Products = () => {
           )}
 
           {!loading && products.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+            <div
+              className="grid gap-8 mt-6
+  grid-cols-2
+  sm:grid-cols-2
+  md:grid-cols-[repeat(auto-fill,260px)]
+  justify-start
+"
+            >
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

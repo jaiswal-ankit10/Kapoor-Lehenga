@@ -43,7 +43,11 @@ const CouponBox = () => {
           <h3 className="font-semibold text-lg">Coupon Code</h3>
         </div>
 
-        <IoIosArrowForward size={24} onClick={() => setCoupon(!openCoupon)} />
+        <IoIosArrowForward
+          size={24}
+          onClick={() => setCoupon(!openCoupon)}
+          className="cursor-pointer"
+        />
         <CouponCodeSlider openCoupon={openCoupon} setCoupon={setCoupon} />
       </div>
 

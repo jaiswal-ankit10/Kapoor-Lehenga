@@ -124,11 +124,13 @@ export const getAllProducts = async (req, res) => {
   try {
     const {
       search,
+      category,
       subCategory,
       sort,
       page = 1,
       limit = 20,
       color,
+      minPrice,
       maxPrice,
       discount,
     } = req.query;
@@ -169,11 +171,22 @@ export const getAllProducts = async (req, res) => {
       ];
     }
 
+    if (category && category !== "undefined") {
+      where.subCategory = {
+        category: {
+          name: category,
+        },
+      };
+    }
     /*  SUBCATEGORY FILTER   */
     if (subCategory) {
+      const subCategories = Array.isArray(subCategory)
+        ? subCategory
+        : subCategory.split(",");
+
       where.subCategory = {
         name: {
-          contains: subCategory, //  NOT equals
+          in: subCategories,
         },
       };
     }
@@ -185,6 +198,9 @@ export const getAllProducts = async (req, res) => {
     }
 
     /*  PRICE FILTER  */
+    if (minPrice) {
+      where.price = { gte: Number(minPrice) };
+    }
     if (maxPrice) {
       where.price = { lte: Number(maxPrice) };
     }
@@ -196,8 +212,8 @@ export const getAllProducts = async (req, res) => {
 
     /*  SORT  */
     let orderBy = { createdAt: "desc" };
-    if (sort === "price_asc") orderBy = { price: "asc" };
-    if (sort === "price_desc") orderBy = { price: "desc" };
+    if (sort === "price_asc") orderBy = { discountedPrice: "asc" };
+    if (sort === "price_desc") orderBy = { discountedPrice: "desc" };
 
     const skip = (Number(page) - 1) * Number(limit);
 
@@ -305,14 +321,21 @@ export const updateProduct = async (req, res) => {
       updateData.thumbnail = imageUrls[0];
     }
 
-    if (additionalDetails) {
+    if (additionalDetails !== undefined) {
+      const parsedDetails = JSON.parse(additionalDetails);
+
       await prisma.productAdditionalDetail.deleteMany({
         where: { productId: req.params.id },
       });
 
-      updateData.additionalDetails = {
-        create: JSON.parse(additionalDetails),
-      };
+      if (Array.isArray(parsedDetails) && parsedDetails.length > 0) {
+        updateData.additionalDetails = {
+          create: parsedDetails.map((d) => ({
+            title: d.title,
+            value: d.value,
+          })),
+        };
+      }
     }
 
     const product = await prisma.product.update({

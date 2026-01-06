@@ -136,7 +136,7 @@ export default function AdminProducts() {
                 <tr key={p.id} className="border-t border-gray-300">
                   <td className="px-5 py-4 flex items-center gap-2">
                     <div
-                      className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center"
+                      className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center cursor-pointer"
                       onClick={() =>
                         navigate("/admin/productform", {
                           state: { product: p },
@@ -146,7 +146,7 @@ export default function AdminProducts() {
                       <Edit size={16} className="text-green-950" />
                     </div>
                     <div
-                      className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center"
+                      className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center cursor-pointer"
                       onClick={(e) => handleDelete(e, p.id)}
                     >
                       <Trash size={16} className="text-red-700" />

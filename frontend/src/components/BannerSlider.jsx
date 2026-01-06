@@ -10,7 +10,7 @@ import "swiper/css/navigation";
 
 const BannerSlider = ({ banners = [] }) => {
   return (
-    <section className="w-full">
+    <section className="max-w-100vh">
       {/* Desktop Slider */}
       <div className="hidden md:block">
         <Swiper

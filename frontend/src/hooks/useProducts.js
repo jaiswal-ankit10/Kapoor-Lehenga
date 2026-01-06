@@ -2,7 +2,12 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 
-import { setSearch, setSubCategory, setCategory } from "../redux/filterSlice";
+import {
+  setSearch,
+  setSubCategory,
+  setCategory,
+  setSubCategories,
+} from "../redux/filterSlice";
 import { fetchAllProducts } from "../services/productService";
 
 export const useProducts = () => {
@@ -15,45 +20,40 @@ export const useProducts = () => {
   /*  URL → FILTER SYNC  */
   useEffect(() => {
     const search = searchParams.get("search") || "";
-    const subCategory = searchParams.get("subcategory") || "";
+    const category = searchParams.get("category") || "";
+    const subParam = searchParams.get("subcategory");
+    const subCategories = subParam ? subParam.split(",") : [];
 
-    if (search !== filters.search) {
-      dispatch(setSearch(search));
+    if (search !== filters.search) dispatch(setSearch(search));
+    if (category && category !== "undefined" && category !== filters.category) {
+      dispatch(setCategory(category));
     }
 
-    if (subCategory !== filters.subCategory) {
-      dispatch(setSubCategory(subCategory));
-      dispatch(setCategory(""));
+    if (subParam && subCategories.length) {
+      if (
+        JSON.stringify(subCategories) !== JSON.stringify(filters.subCategory)
+      ) {
+        dispatch(setSubCategories(subCategories));
+      }
     }
-  }, [searchParams, dispatch]);
+  }, [searchParams]);
 
   /*  FETCH PRODUCTS  */
   useEffect(() => {
-    setTimeout(() => {
-      dispatch(
-        fetchAllProducts({
-          search: filters.search,
-          subCategory: filters.subCategory,
-          sort: filters.sort,
-          page: filters.page,
-          limit: filters.limit,
-          color: filters.color,
-          maxPrice: filters.maxPrice,
-          discount: filters.discount,
-        })
-      );
-    }, 400);
-  }, [
-    dispatch,
-    filters.search,
-    filters.subCategory,
-    filters.sort,
-    filters.page,
-    filters.limit,
-    filters.color,
-    filters.maxPrice,
-    filters.discount,
-  ]);
+    dispatch(
+      fetchAllProducts({
+        search: filters.search,
+        category: filters.category,
+        subCategory: filters.subCategory,
+        sort: filters.sort,
+        page: filters.page,
+        limit: filters.limit,
+        color: filters.color,
+        maxPrice: filters.maxPrice,
+        discount: filters.discount,
+      })
+    );
+  }, [filters]);
 
   return {
     products: productState.products,

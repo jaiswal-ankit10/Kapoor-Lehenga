@@ -19,6 +19,7 @@ import {
   Code,
   RotateCcw,
 } from "lucide-react";
+import { useEffect } from "react";
 
 export function RichTextEditor({ value, onChange, placeholder }) {
   const editor = useEditor({
@@ -39,6 +40,11 @@ export function RichTextEditor({ value, onChange, placeholder }) {
       onChange(editor.getHTML());
     },
   });
+  useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      editor.commands.setContent(value || "");
+    }
+  }, [value, editor]);
 
   if (!editor) return null;
 
