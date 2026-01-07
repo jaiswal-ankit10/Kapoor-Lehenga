@@ -192,17 +192,31 @@ export const getAllProducts = async (req, res) => {
     }
 
     /*  COLOR FILTER  */
+    /* COLOR FILTER (Json field) */
     if (color) {
       const colors = Array.isArray(color) ? color : color.split(",");
-      where.color = { hasSome: colors };
+
+      where.OR = [
+        ...(where.OR || []),
+        ...colors.map((c) => ({
+          color: {
+            array_contains: c,
+          },
+        })),
+      ];
     }
 
-    /*  PRICE FILTER  */
-    if (minPrice) {
-      where.price = { gte: Number(minPrice) };
-    }
-    if (maxPrice) {
-      where.price = { lte: Number(maxPrice) };
+    /* PRICE FILTER */
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      where.discountedPrice = {};
+
+      if (minPrice !== undefined) {
+        where.discountedPrice.gte = Number(minPrice);
+      }
+
+      if (maxPrice !== undefined) {
+        where.discountedPrice.lte = Number(maxPrice);
+      }
     }
 
     /*  DISCOUNT FILTER  */

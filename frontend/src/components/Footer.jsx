@@ -11,11 +11,11 @@ const Footer = () => {
       {/* Top Dark Bar */}
       <div className="bg-[#333333] w-full text-white px-10 py-5 flex flex-wrap justify-around items-center">
         {/* Left - App Download */}
-        <div className="flex flex-col">
-          <h3 className="uppercase text-sm">Download our app</h3>
+        <div className="flex flex-col items-center">
+          <h3 className="uppercase text-md.">Download our app</h3>
           <div className="flex gap-3 mt-2">
-            <img src={playStore} alt="Google Play" className="h-5" />
-            <img src={appStore} alt="App Store" className="h-5" />
+            <img src={playStore} alt="Google Play" className="h-8" />
+            <img src={appStore} alt="App Store" className="h-8" />
           </div>
         </div>
 

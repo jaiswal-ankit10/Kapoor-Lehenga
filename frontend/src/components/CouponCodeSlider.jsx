@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { applyCoupon, fetchCoupons } from "../redux/couponSlice";
+import ellipse from "../assets/images/Ellipse1.png";
 
 const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
   const dispatch = useDispatch();
@@ -53,14 +54,24 @@ const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
           {coupons.map((coupon) => (
             <div
               key={coupon.id}
-              className="border bg-gray-100 rounded-lg flex justify-between p-3 items-center"
+              className="border border-gray-300 bg-gray-100  flex justify-between items-center  pr-3"
             >
-              <div className="">
-                <p className="font-semibold">{coupon.title}</p>
-                <p className="text-gray-500 text-sm">Use Code: {coupon.code}</p>
-                <p className="text-gray-500 text-sm">
-                  Minimum Purchase Amount: {coupon.minPurchaseAmount}
-                </p>
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <img src={ellipse} alt="coupon" className="w-32 h-20 " />
+                  <p className="absolute top-3 left-4 z-40 text-[#FF3F4C] text-xl font-semibold">
+                    Get {coupon.title}
+                  </p>
+                </div>
+                <div className="">
+                  <p className="font-semibold">{coupon.title}</p>
+                  <p className="text-gray-500 text-sm">
+                    Use Code: {coupon.code}
+                  </p>
+                  {/* <p className="text-gray-500 text-sm">
+                    Minimum Purchase Amount: {coupon.minPurchaseAmount}
+                  </p> */}
+                </div>
               </div>
 
               <button

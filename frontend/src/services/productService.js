@@ -16,6 +16,7 @@ export const fetchAllProducts =
     subCategory = "",
     sort = "newest",
     color = [],
+    minPrice,
     maxPrice,
     discount,
     page = 1,
@@ -30,6 +31,7 @@ export const fetchAllProducts =
       if (subCategory) params.append("subCategory", subCategory);
       if (sort) params.append("sort", sort);
       if (color.length) params.append("color", color.join(","));
+      if (minPrice) params.append("minPrice", minPrice);
       if (maxPrice) params.append("maxPrice", maxPrice);
       if (discount) params.append("discount", discount);
       params.append("page", page);

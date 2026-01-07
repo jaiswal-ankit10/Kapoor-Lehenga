@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { fetchAllProducts, fetchProductById } from "../services/productService";
 import { FaStar } from "react-icons/fa";
 import cart from "../assets/icons/cart.png";
+import ellipse from "../assets/images/Ellipse1.png";
 import ServicesSection from "../components/ServicesSection";
 import { FiHeart } from "react-icons/fi";
 import { GoPlus } from "react-icons/go";
@@ -158,20 +159,20 @@ const ProductDetail = () => {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="flex-1">
-          <h2 className="text-3xl font-bold">{product.title}</h2>
+        <div className="flex-1 mt-2">
+          <h2 className="text-3xl font-semibold">{product.title}</h2>
 
           <div
-            className="prose prose-sm max-w-none text-gray-500 text-sm mt-4"
+            className="prose prose-sm max-w-none text-gray-500 text-sm mt-2"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
 
-          <div className="flex items-center gap-2 mt-2">
-            <span className="bg-green-600 text-white px-2 rounded text-sm flex items-center gap-1">
-              {product.rating} <FaStar className="text-xs" />
+          <div className="flex items-center gap-2 mt-3">
+            <span className="border border-gray-500 text-black px-2 rounded text-sm flex items-center gap-1">
+              {product.rating || 2.5} <FaStar className="text-xs" />
             </span>
             <p className="text-gray-500 text-sm">
-              Based on {product.totalReviews} reviews
+              Based on {product.totalReviews} ratings
             </p>
           </div>
 
@@ -214,22 +215,32 @@ const ProductDetail = () => {
                 </div>
               ))}
           </div>
+          <hr className="my-4 text-gray-300" />
           {/* Available Offers */}
-          <h3 className="font-semibold mt-6">Available Offers</h3>
+          <h3 className="font-semibold mt-4">Available Offers</h3>
           <div className="mt-3 space-y-3">
             {coupons.map((offer) => (
               <div
                 key={offer.id}
-                className="border rounded-lg flex justify-between p-3 items-center"
+                className="border border-gray-200  flex justify-between pr-4 items-center "
               >
-                <div>
-                  <p className="font-semibold">{offer.title}</p>
-                  <p className="text-gray-500 text-sm">
-                    Use Code: {offer.code}
-                  </p>
+                <div className="flex items-center gap-4 ">
+                  <div className="relative">
+                    <img src={ellipse} alt="coupon" className="w-40 h-22 " />
+                    <p className="absolute top-4 left-8 z-40 text-[#FF3F4C] text-xl font-semibold">
+                      Get {offer.title}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-semibold">{offer.title}</p>
+                    <p className="text-gray-500 text-sm">
+                      Use Code: {offer.code}
+                    </p>
+                  </div>
                 </div>
+
                 <button
-                  className="border px-3 py-1 rounded text-sm cursor-pointer"
+                  className="border px-3 py-1 rounded text-sm cursor-pointer bg-black text-white"
                   onClick={() => handleCopy(offer.code)}
                 >
                   COPY

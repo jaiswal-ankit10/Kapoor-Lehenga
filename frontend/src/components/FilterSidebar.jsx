@@ -6,6 +6,7 @@ import {
   setColor,
   setDiscount,
   setMaxPrice,
+  setMinPrice,
   setSubCategory,
 } from "../redux/filterSlice";
 import { useNavigate } from "react-router-dom";
@@ -139,23 +140,68 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
         <div className="border-t border-gray-200" />
 
         {open.price && (
-          <div className="pl-2 mt-3">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>₹{minPrice}</span>
-              <span>₹{maxPrice}</span>
-              <span>₹20,000</span>
-            </div>
+          <>
+            <div className="relative w-full h-6">
+              {/* Track */}
+              <div className="absolute w-full h-1 bg-gray-300 rounded top-1/2 -translate-y-1/2" />
 
-            <input
-              type="range"
-              min="0"
-              max="20000"
-              step="500"
-              value={maxPrice}
-              onChange={(e) => dispatch(setMaxPrice(Number(e.target.value)))}
-              className="w-full accent-black cursor-pointer"
-            />
-          </div>
+              {/* Active Range */}
+              <div
+                className="absolute h-1 bg-[#E9B159] rounded top-1/2 -translate-y-1/2"
+                style={{
+                  left: `${(minPrice / 20000) * 100}%`,
+                  right: `${100 - (maxPrice / 20000) * 100}%`,
+                }}
+              />
+
+              {/* Min Range */}
+              <input
+                type="range"
+                min="0"
+                max="20000"
+                step="500"
+                value={minPrice}
+                onChange={(e) =>
+                  dispatch(
+                    setMinPrice(Math.min(+e.target.value, maxPrice - 500))
+                  )
+                }
+                className="absolute w-full h-6 pointer-events-none appearance-none bg-transparent z-20
+                [&::-webkit-slider-thumb]:pointer-events-auto
+                 [&::-webkit-slider-thumb]:appearance-none
+                 [&::-webkit-slider-thumb]:w-4
+                 [&::-webkit-slider-thumb]:h-4
+                 [&::-webkit-slider-thumb]:rounded-full
+                 [&::-webkit-slider-thumb]:bg-[#E9B159]
+                 [&::-webkit-slider-thumb]:cursor-pointer"
+              />
+
+              {/* Max Range */}
+              <input
+                type="range"
+                min="0"
+                max="20000"
+                step="500"
+                value={maxPrice}
+                onChange={(e) =>
+                  dispatch(
+                    setMaxPrice(Math.max(+e.target.value, minPrice + 500))
+                  )
+                }
+                className="absolute w-full h-6 appearance-none bg-transparent pointer-events-none z-30
+                [&::-webkit-slider-thumb]:pointer-events-auto
+                 [&::-webkit-slider-thumb]:appearance-none
+                 [&::-webkit-slider-thumb]:w-4
+                 [&::-webkit-slider-thumb]:h-4
+                 [&::-webkit-slider-thumb]:rounded-full
+                 [&::-webkit-slider-thumb]:bg-[#E9B159]
+                 [&::-webkit-slider-thumb]:cursor-pointer"
+              />
+            </div>
+            <p className="text-sm mt-3 font-medium">
+              ₹{minPrice.toLocaleString()} - ₹{maxPrice.toLocaleString()}+
+            </p>
+          </>
         )}
       </div>
 
