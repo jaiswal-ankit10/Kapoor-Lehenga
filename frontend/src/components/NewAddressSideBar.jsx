@@ -57,7 +57,7 @@ const NewAddressSideBar = ({ openNewAddress, setOpenNewAddress }) => {
       {/* New Address Drawer */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white z-50 shadow-xl p-3 transform duration-300 ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-105 bg-white z-50 shadow-xl p-3 transform duration-300 overflow-auto scrollbar-hide ${
           openNewAddress ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -154,7 +154,7 @@ const NewAddressSideBar = ({ openNewAddress, setOpenNewAddress }) => {
               slotProps={{ input: { "aria-label": "controlled" } }}
             />
           </div>
-          <div className="absolute bottom-1 left-0 w-full p-4 flex items-center justify-center bg-white">
+          <div className="bottom-1 left-0 w-full p-4 flex items-center justify-center bg-white">
             <button
               type="submit"
               className="bg-[#E9B159] text-white px-6 py-2 text-xl w-full"

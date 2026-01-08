@@ -19,7 +19,7 @@ const PriceDetails = () => {
   const totalToPay = baseAmount + gstAmount;
 
   return (
-    <div className="bg-white rounded-md p-3">
+    <div className="bg-white rounded-md p-1">
       <div className="flex justify-between">
         <div className="flex items-center gap-2">
           <LiaRupeeSignSolid size={24} className="border rounded-2xl p-1" />
@@ -31,10 +31,10 @@ const PriceDetails = () => {
       </div>
 
       {isOpen && (
-        <div className="mt-2 text-md text-[#555555] bg-[#F8F8F8] p-4">
+        <div className="mt-2 text-md text-[#555555] bg-[#F8F8F8] p-1 border border-gray-200">
           <div className="flex justify-between mb-1">
             <span>Bag Total</span>
-            <span>₹{totalAmount}</span>
+            <span>₹{totalAmount.toFixed(2)}</span>
           </div>
 
           <div className="flex justify-between mb-1">
@@ -51,7 +51,7 @@ const PriceDetails = () => {
 
           <div className="flex justify-between mb-1">
             <span>GST 18%</span>
-            <span>₹{gstAmount.toFixed(0)}</span>
+            <span>₹{gstAmount.toFixed(2)}</span>
           </div>
 
           <div className="flex justify-between font-semibold text-green-600 mt-2">

@@ -6,7 +6,10 @@ import { fetchAllProducts, fetchProductById } from "../services/productService";
 import { FaStar } from "react-icons/fa";
 import cart from "../assets/icons/cart.png";
 import ellipse from "../assets/images/Ellipse1.png";
-import ServicesSection from "../components/ServicesSection";
+import ellipse2 from "../assets/icons/Ellipse2.png";
+import shoppingBag from "../assets/icons/shopping-bags1.png";
+import carts from "../assets/icons/carts.png";
+import onlineShopping from "../assets/icons/online-shopping.png";
 import { FiHeart } from "react-icons/fi";
 import { GoPlus } from "react-icons/go";
 import ProductInfo from "../components/ProductInfo";
@@ -18,6 +21,7 @@ import {
   addItemToBackendCart,
   updateQtyBackend,
   removeBackendCartItem,
+  loadCartFromBackend,
 } from "../services/cartService";
 import {
   addItemToWishlist,
@@ -25,6 +29,8 @@ import {
 } from "../services/wishlistService";
 import { toast, ToastContainer } from "react-toastify";
 import { fetchCoupons } from "../redux/couponSlice";
+import ServicesSectionProduct from "../components/ServicesSectionProduct";
+import ProductDetailImages from "../components/MediumDeviceComponents/ProductDetailImages";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -102,6 +108,29 @@ const ProductDetail = () => {
       toast.error("Failed to add item to cart");
     }
   };
+  const handleBuyNow = async () => {
+    try {
+      // 1. Only add to cart if it's NOT already there
+      if (!isInCart) {
+        await dispatch(
+          addItemToBackendCart({
+            id: product.id,
+            discountedPrice: product.discountedPrice,
+            quantity: qty,
+          })
+        ).unwrap();
+      }
+
+      // 2. Ensure Redux state is fully updated before moving
+      await dispatch(loadCartFromBackend()).unwrap();
+
+      // 3. Navigate to address
+      navigate("/address");
+    } catch (error) {
+      console.error("Buy Now Error:", error);
+      toast.error("Failed to proceed to checkout");
+    }
+  };
 
   const toggleWishlist = () => {
     const isWishlisted = wishlistItems.some(
@@ -130,12 +159,12 @@ const ProductDetail = () => {
   return (
     <>
       <RoutesSection breadcrumb={breadcrumb} />
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-10 flex gap-10 flex-col md:flex-row">
+      <div className="max-w-xl lg:max-w-7xl mx-auto px-1 lg:px-10 py-10 flex gap-10 flex-col lg:flex-row">
         <ToastContainer />
 
-        {/* LEFT PANEL */}
-        <div className="md:sticky md:top-5 self-start flex gap-6 flex-col md:flex-row">
-          <div className="flex gap-6 flex-row md:flex-col overflow-auto max-h-[420px] md:max-h-[620px]">
+        {/* LEFT PANEL for big screen  */}
+        <div className="hidden  lg:sticky md:top-5 self-start lg:flex gap-6 flex-col lg:flex-row">
+          <div className="flex gap-6 flex-row md:flex-col overflow-auto max-h-105 lg:max-h-155">
             {(product.images || [product.thumbnail])
               .filter(Boolean)
               .map((thumb, i) => (
@@ -143,7 +172,7 @@ const ProductDetail = () => {
                   key={i}
                   src={resolveImage(thumb)}
                   onClick={() => setSelectedThumb(thumb)}
-                  className={`w-[70px] h-[100px] md:w-[120px] md:h-40 object-cover rounded cursor-pointer border ${
+                  className={`w-17.5 h-25 md:w-30 md:h-40 object-cover rounded cursor-pointer border ${
                     selectedThumb === thumb ? "border-black" : "border-gray-300"
                   }`}
                 />
@@ -153,14 +182,19 @@ const ProductDetail = () => {
           {selectedThumb && (
             <img
               src={resolveImage(selectedThumb)}
-              className="w-[320px] h-[420px] md:w-[450px] md:h-[650px] object-cover rounded"
+              className="w-[320px] h-105 lg:w-112.5 lg:h-162.5 object-cover rounded"
             />
           )}
         </div>
-
+        {/* Top PANEL for big screen  */}
+        <div className="block lg:hidden w-full">
+          <ProductDetailImages product={product} />
+        </div>
         {/* RIGHT PANEL */}
         <div className="flex-1 mt-2">
-          <h2 className="text-3xl font-semibold">{product.title}</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold">
+            {product.title}
+          </h2>
 
           <div
             className="prose prose-sm max-w-none text-gray-500 text-sm mt-2"
@@ -201,7 +235,7 @@ const ProductDetail = () => {
                   <img
                     src={resolveImage(color)}
                     onClick={() => setSelectedThumb(color)}
-                    className={`w-[60px] h-20 object-cover rounded cursor-pointer border ${
+                    className={`w-15 h-20 object-cover rounded cursor-pointer border ${
                       selectedThumb === color
                         ? "border-black"
                         : "border-gray-300"
@@ -222,14 +256,34 @@ const ProductDetail = () => {
             {coupons.map((offer) => (
               <div
                 key={offer.id}
-                className="border border-gray-200  flex justify-between pr-4 items-center "
+                className="border border-gray-200  flex  justify-between pr-4 items-center "
               >
                 <div className="flex items-center gap-4 ">
                   <div className="relative">
                     <img src={ellipse} alt="coupon" className="w-40 h-22 " />
-                    <p className="absolute top-4 left-8 z-40 text-[#FF3F4C] text-xl font-semibold">
+                    <p className="absolute top-4 left-8 z-10 text-[#FF3F4C] text-md sm:text-xl font-semibold">
                       Get {offer.title}
                     </p>
+                    <img
+                      src={shoppingBag}
+                      alt=""
+                      className="absolute top-0 left-2"
+                    />
+                    <img
+                      src={carts}
+                      alt=""
+                      className="absolute top-0 right-3 w-5"
+                    />
+                    <img
+                      src={onlineShopping}
+                      alt=""
+                      className="absolute bottom-0 left-0 w-7"
+                    />
+                    <img
+                      src={ellipse2}
+                      alt=""
+                      className="absolute bottom-3 right-8"
+                    />
                   </div>
                   <div>
                     <p className="font-semibold">{offer.title}</p>
@@ -248,7 +302,7 @@ const ProductDetail = () => {
               </div>
             ))}
           </div>
-          {/* QUANTITY (LOGIC FIXED, UI SAME) */}
+          {/* QUANTITY  */}
           <div className="mt-6">
             <p className="font-semibold mb-2">Quantity:</p>
             <div className="flex items-center">
@@ -312,7 +366,7 @@ const ProductDetail = () => {
           </div>
 
           {/* BUTTONS */}
-          <div className="flex flex-col md:flex-row gap-4 mt-6">
+          <div className="flex flex-col lg:flex-row gap-4 mt-6">
             <button
               onClick={toggleWishlist}
               className="bg-[#EDEDED] px-4 py-3 rounded-lg cursor-pointer"
@@ -346,7 +400,7 @@ const ProductDetail = () => {
             </button>
 
             <button
-              onClick={() => navigate("/address")}
+              onClick={handleBuyNow}
               className="bg-[#03A685] w-full py-4 text-xl text-white cursor-pointer"
             >
               Buy Now
@@ -354,7 +408,7 @@ const ProductDetail = () => {
           </div>
 
           <div className="bg-[#EDEDED] rounded-lg mt-10">
-            <ServicesSection />
+            <ServicesSectionProduct />
           </div>
 
           <ProductInfo product={product} />

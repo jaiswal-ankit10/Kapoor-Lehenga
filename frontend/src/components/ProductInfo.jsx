@@ -21,7 +21,7 @@ const ProductInfo = ({ product }) => {
           onClick={() => setOpenDetails(!openDetails)}
         >
           <div className="flex gap-3 items-center">
-            <PiPackageDuotone size={24} />
+            <PiPackageDuotone size={32} />
             <div>
               <p className="font-semibold">Product Details</p>
               <p className="text-md text-gray-500">
@@ -33,13 +33,13 @@ const ProductInfo = ({ product }) => {
         </div>
 
         {openDetails && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 mt-3 pl-10 text-md">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 mt-3 pl-15 text-md">
             {product.additionalDetails &&
             product.additionalDetails.length > 0 ? (
               product.additionalDetails.map((detail, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <p className="font-medium">{detail.title}:</p>
-                  <p className="text-sm">{detail.value}</p>
+                <div key={index} className="">
+                  <p className="font-medium">{detail.title}</p>
+                  <p className="text-sm text-gray-500">{detail.value}</p>
                 </div>
               ))
             ) : (

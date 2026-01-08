@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { lazy } from "react";
+import CheckoutGuard from "../components/ProtectedRoute/CheckoutGuard";
 const Home = lazy(() => import("../pages/Home"));
 const Signup = lazy(() => import("../pages/Signup"));
 const Login = lazy(() => import("../pages/Login"));
@@ -100,7 +101,9 @@ export const router = createBrowserRouter([
     path: "/address",
     element: (
       <UserRoute>
-        <Address />
+        <CheckoutGuard requiredStep="address">
+          <Address />
+        </CheckoutGuard>
       </UserRoute>
     ),
   },
@@ -108,7 +111,9 @@ export const router = createBrowserRouter([
     path: "/payment",
     element: (
       <UserRoute>
-        <PaymentPage />
+        <CheckoutGuard requiredStep="payment">
+          <PaymentPage />
+        </CheckoutGuard>
       </UserRoute>
     ),
   },

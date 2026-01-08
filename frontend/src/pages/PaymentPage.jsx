@@ -90,20 +90,22 @@ const PaymentPage = () => {
         </div>
         <img src={map} alt="map" className="w-50 mr-10 hidden  md:block" />
       </div>
-      <div className="container mx-auto flex  items-center justify-center  mt-4">
+
+      {/* Main Section */}
+      <div className="container mx-auto flex flex-col lg:flex-row items-start justify-center gap-8 px-4 pb-10">
         {/* LEFT - Price Detals */}
-        <div className="w-[480px] hidden lg:block border border-gray-200 rounded-md p-3">
+        <div className="flex-1 w-full lg:max-w-md border border-gray-200 rounded-md p-4 bg-white ">
           <PriceDetails />
         </div>
         {/* Right - Payment Method */}
-        <div className="w-full max-w-md mx-auto border border-gray-200 bg-[#F6F6F6] rounded-xl shadow-sm p-4 ">
-          <div className="flex items-center gap-2 mb-4">
+        <div className="w-full lg:max-w-md  border border-gray-200 bg-[#F6F6F6] rounded-xl shadow-sm p-4 md:p-6">
+          <div className="flex items-center gap-2 mb-6">
             <IoCardOutline size={24} />
             <h2 className="font-semibold text-lg">Payment Method</h2>
           </div>
 
           {/* Options */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div
               onClick={() => setSelected("razorpay")}
               className="flex items-center justify-between p-4 cursor-pointer bg-white 
@@ -150,7 +152,7 @@ const PaymentPage = () => {
 
           <button
             onClick={placeOrder}
-            className="w-full mt-5 bg-[#E9B159] text-white text-xl font-semibold py-3"
+            className="w-full mt-5 bg-[#E9B159] text-white text-xl font-semibold py-3 cursor-pointer"
           >
             Payment
           </button>

@@ -47,7 +47,7 @@ const CartSummary = () => {
                 <span className="font-semibold">{item.quantity}</span>
               </div>
 
-              <div className="flex items-center gap-4 mt-10">
+              <div className="flex items-center gap-4 mt-3">
                 <p className="text-green-700 font-semibold text-lg mt-1">
                   ₹{item.product?.discountedPrice}
                 </p>

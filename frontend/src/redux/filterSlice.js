@@ -76,9 +76,12 @@ const filterSlice = createSlice({
     resetFilters(state) {
       state.search = "";
       state.category = "";
+      state.subCategory = [];
       state.sort = "newest";
       state.page = 1;
       state.limit = 20;
+      state.minPrice = 0;
+      state.maxPrice = 20000;
       state.color = [];
       state.discount = 0;
     },

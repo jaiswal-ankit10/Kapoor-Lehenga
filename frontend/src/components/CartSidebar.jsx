@@ -36,7 +36,7 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
 
       {/* Cart Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[520px] bg-white z-50 shadow-xl p-3 transform duration-300 ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-130 bg-white z-50 shadow-xl p-3 transform duration-300 ${
           openCart ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -68,15 +68,17 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
                     item.product?.images?.[0] || item.product?.thumbnail
                   )}
                   alt={item.product?.title}
-                  className="w-[100px] h-[140px] object-cover rounded"
+                  className="w-25 h-35 object-cover rounded"
                 />
 
                 <div>
-                  <h3 className="text-md text-black">{item.product?.title}</h3>
+                  <h3 className="text-md text-black line-clamp-1 overflow-hidden">
+                    {item.product?.title}
+                  </h3>
 
                   <h3 className="text-sm text-black mb-2">
                     <div
-                      className="prose prose-sm max-w-none"
+                      className="prose prose-sm max-w-none line-clamp-1 overflow-hidden"
                       dangerouslySetInnerHTML={{
                         __html: item.product?.description,
                       }}
@@ -134,8 +136,8 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
                     </p>
                   )}
 
-                  <div className="flex items-center gap-4">
-                    <p className="text-green-700 font-semibold text-lg mt-1">
+                  <div className="flex items-center gap-4 mt-1">
+                    <p className="text-green-700 font-semibold text-lg ">
                       ₹{item.product?.discountedPrice}
                     </p>
                     <p className="text-gray-400 line-through text-md">
@@ -168,7 +170,7 @@ const CartSidebar = ({ openCart, setOpenCart }) => {
             </p>
 
             <button
-              className="bg-[#E9B159] text-white px-6 py-2 text-xl"
+              className="bg-[#E9B159] text-white px-6 py-2 text-xl cursor-pointer"
               onClick={() => navigate("/address")}
             >
               Proceed to Buy

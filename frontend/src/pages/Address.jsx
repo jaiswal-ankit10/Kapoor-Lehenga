@@ -56,27 +56,32 @@ const Address = () => {
       </div>
 
       {/* MAIN SECTION */}
-      <div className="container mx-auto flex flex-col lg:flex-row gap-2 md:gap-20">
-        {loading && <p>Loading addresses...</p>}
-
+      <div className="container mx-auto flex flex-col lg:flex-row gap-8 px-4 pb-10">
         {!loading && addresses.length === 0 && (
           <p className="text-gray-500">No addresses found</p>
         )}
 
         {/* LEFT – ADDRESS LIST */}
-        <div className="md:flex-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-20 ">
-            {addresses
-              ?.filter((address) => address && address.id)
-              .map((address) => (
-                <AddressCard key={address.id} address={address} />
-              ))}
+        <div className="flex-1">
+          {loading && <p>Loading addresses...</p>}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {!loading &&
+              addresses
+                ?.filter((address) => address && address.id)
+                .map((address) => (
+                  <AddressCard
+                    key={address.id}
+                    address={address}
+                    isSelected={selectedAddress?.id === address.id}
+                  />
+                ))}
 
             {/* ADD NEW ADDRESS CARD */}
             <div
               onClick={() => setOpenNewAddress(!openNewAddress)}
-              className="rounded-md p-4 bg-[#F6F6F6] hover:shadow-md duration-300 
-                         flex flex-col items-center justify-center cursor-pointer w-full md:w-[320px] lg:w-[420px]"
+              className="rounded-md p-6 bg-[#F6F6F6] border border-dashed border-gray-300 
+                   hover:border-[#E9B159] hover:shadow-md duration-300 
+                   flex flex-col items-center justify-center cursor-pointer min-h-40"
             >
               <div className="text-3xl font-bold">+</div>
               <p className="mt-2 font-medium">Add New Address</p>
@@ -93,7 +98,7 @@ const Address = () => {
 
         {/* RIGHT – CART SUMMARY */}
         <div
-          className="w-full hidden md:block md:w-[760px] lg:w-[420px] 
+          className="w-full lg:w-100 h-fit sticky top-4
                         border border-gray-200 bg-[#F6F6F6] rounded-md p-4"
         >
           <Suspense fallback={<div>Loading...</div>}>
@@ -108,9 +113,15 @@ const Address = () => {
 
           <button
             onClick={handleContinue}
-            className="bg-[#E9B159] text-white w-full py-3 rounded-md mt-4 text-lg font-medium"
+            disabled={!selectedAddress}
+            className={`w-full py-3 rounded-md mt-4 text-lg font-medium transition-colors
+        ${
+          selectedAddress
+            ? "bg-[#E9B159] text-white cursor-pointer hover:bg-[#d8a148]"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+        }`}
           >
-            Continue
+            {selectedAddress ? "Continue" : "Select an Address"}
           </button>
         </div>
       </div>

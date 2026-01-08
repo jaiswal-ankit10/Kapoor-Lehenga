@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { lazy, useState } from "react";
 import RoutesSection from "../components/RoutesSection";
 import { breadcrumbRoutes } from "../utils/breadcrumbRoutes";
-
-import ProductCard from "../components/ProductCard";
+const ProductCard = lazy(() => import("../components/ProductCard"));
 import Pagination from "../components/pagination";
 import FAQs from "../components/Faqs";
 import FilterSidebar from "../components/FilterSidebar";
@@ -16,11 +15,11 @@ import { useNavigate } from "react-router-dom";
 import {
   setSort,
   setPage,
-  setSubCategories,
   setSubCategory,
-  setCategory,
+  resetFilters,
 } from "../redux/filterSlice";
 import { ToastContainer } from "react-toastify";
+import CircularUnderLoad from "../ui/CircularProgress";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -95,8 +94,7 @@ const Products = () => {
                 {/* Clear All */}
                 <button
                   onClick={() => {
-                    dispatch(setSubCategories([]));
-                    dispatch(setCategory(""));
+                    dispatch(resetFilters());
                     navigate("/products", { replace: true });
                   }}
                   className="px-4 py-1.5 text-sm border border-gray-300 rounded-full bg-gray-100 cursor-pointer"
@@ -126,28 +124,36 @@ const Products = () => {
           </div>
 
           {/*  PRODUCTS  */}
+          <div
+            className={`relative mt-6 ${
+              loading ? "opacity-50 pointer-events-none" : ""
+            }`}
+          >
+            {loading && (
+              <div className="absolute inset-0 z-10 flex justify-center items-start pt-20 bg-white/30">
+                <CircularUnderLoad />
+              </div>
+            )}
 
-          {!loading && products.length === 0 && (
-            <EmptyState
-              title="No products found"
-              description="Try changing filters or explore other categories."
-            />
-          )}
+            {!loading && products.length === 0 && (
+              <EmptyState
+                title="No products found"
+                description="Try changing filters or explore other categories."
+              />
+            )}
 
-          {!loading && products.length > 0 && (
-            <div
-              className="grid gap-8 mt-6
-  grid-cols-2
-  sm:grid-cols-2
-  md:grid-cols-[repeat(auto-fill,260px)]
-  justify-start
-"
-            >
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          )}
+            {!loading && products.length > 0 && (
+              <div
+                className="grid gap-8 mt-6
+                         grid-cols-[repeat(auto-fill,minmax(240px,1fr))]
+                         justify-start"
+              >
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

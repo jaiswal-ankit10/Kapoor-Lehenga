@@ -3,6 +3,10 @@ import { IoClose } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { applyCoupon, fetchCoupons } from "../redux/couponSlice";
 import ellipse from "../assets/images/Ellipse1.png";
+import ellipse2 from "../assets/icons/Ellipse2.png";
+import shoppingBag from "../assets/icons/shopping-bags1.png";
+import carts from "../assets/icons/carts.png";
+import onlineShopping from "../assets/icons/online-shopping.png";
 
 const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
   const dispatch = useDispatch();
@@ -36,7 +40,7 @@ const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white z-50 shadow-xl p-3 duration-300 ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-105 bg-white z-50 shadow-xl p-3 duration-300 ${
           openCoupon ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -58,10 +62,30 @@ const CouponCodeSlider = ({ openCoupon, setCoupon }) => {
             >
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  <img src={ellipse} alt="coupon" className="w-32 h-20 " />
-                  <p className="absolute top-3 left-4 z-40 text-[#FF3F4C] text-xl font-semibold">
+                  <img src={ellipse} alt="coupon" className="w-32 h-22 " />
+                  <p className="absolute top-4 left-4 z-40 text-[#FF3F4C] text-xl font-semibold">
                     Get {coupon.title}
                   </p>
+                  <img
+                    src={shoppingBag}
+                    alt=""
+                    className="absolute top-0 left-2"
+                  />
+                  <img
+                    src={carts}
+                    alt=""
+                    className="absolute top-0 right-3 w-5"
+                  />
+                  <img
+                    src={onlineShopping}
+                    alt=""
+                    className="absolute bottom-0 left-0 w-6"
+                  />
+                  <img
+                    src={ellipse2}
+                    alt=""
+                    className="absolute bottom-3 right-6"
+                  />
                 </div>
                 <div className="">
                   <p className="font-semibold">{coupon.title}</p>

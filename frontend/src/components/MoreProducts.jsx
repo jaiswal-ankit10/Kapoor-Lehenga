@@ -20,7 +20,7 @@ const MoreProducts = ({ products }) => {
       {/* Left Arrow */}
       <button
         onClick={slideLeft}
-        className="absolute -left-3 top-1/2 transform -translate-y-1/2 bg-white shadow-md p-2 rounded-full z-50"
+        className="hidden lg:block absolute -left-3 top-1/2 transform -translate-y-1/2 bg-white shadow-md p-2 rounded-full z-50"
       >
         <FaChevronLeft />
       </button>
@@ -28,7 +28,7 @@ const MoreProducts = ({ products }) => {
       {/* Slider */}
       <div
         ref={sliderRef}
-        className="flex gap-6 overflow-x-hidden scroll-smooth"
+        className="flex gap-6 overflow-x-auto md:overflow-x-hidden scroll-smooth scrollbar-hide px-4 md:px-0"
       >
         {products?.map((product) => (
           <ProductCard key={product.id} product={product} />
@@ -38,7 +38,7 @@ const MoreProducts = ({ products }) => {
       {/* Right Arrow */}
       <button
         onClick={slideRight}
-        className="absolute -right-3 top-1/2 transform -translate-y-1/2 bg-white shadow-md p-2 rounded-full z-50"
+        className="hidden lg:block absolute -right-3 top-1/2 transform -translate-y-1/2 bg-white shadow-md p-2 rounded-full z-50"
       >
         <FaChevronRight />
       </button>

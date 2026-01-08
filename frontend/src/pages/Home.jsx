@@ -20,6 +20,7 @@ import mapImage from "../assets/images/cropped_map.png";
 import Login from "./Login";
 import Signup from "./Signup";
 import axiosInstance from "../api/axiosInstance";
+import CircularUnderLoad from "../ui/CircularProgress";
 
 const Home = () => {
   const { pathname } = useLocation();
@@ -48,10 +49,22 @@ const Home = () => {
     <div>
       {/* Banner section */}
 
-      <Suspense fallback={<div>Loading Banner...</div>}>
+      <Suspense
+        fallback={
+          <div>
+            <CircularUnderLoad />
+          </div>
+        }
+      >
         <BannerSlider banners={bannerImg} />
       </Suspense>
-      <Suspense fallback={<div>Loading categories...</div>}>
+      <Suspense
+        fallback={
+          <div>
+            <CircularUnderLoad />
+          </div>
+        }
+      >
         <CategorySlider />
       </Suspense>
       {/* Luxe Section */}
@@ -74,12 +87,18 @@ const Home = () => {
       </section>
 
       {/* newly arrival section */}
-      <section className="container mx-auto text-center mb-10">
-        <div className="text-2xl">New Arrival</div>
+      <section className="container mx-auto px-4 md:px-8 lg:px-12 text-center mb-10">
+        <div className="text-2xl font-semibold">New Arrival</div>
         <p className="mb-5">
           "Embrace the festival magic, let joy fill every moment."
         </p>
-        <Suspense fallback={<div>Loading new arrival...</div>}>
+        <Suspense
+          fallback={
+            <div>
+              <CircularUnderLoad />
+            </div>
+          }
+        >
           <NewArrival />
         </Suspense>
       </section>
@@ -101,7 +120,7 @@ const Home = () => {
 
         <div className="flex flex-col md:flex-row gap-6">
           {/* LEFT BIG IMAGE */}
-          <div className="flex-1 md:col-span-1 h-auto md:h-[800px]">
+          <div className="flex-1 md:col-span-1 h-auto md:h-200">
             <img
               src={leftBanner}
               alt="Luxury Fabrics"
@@ -147,7 +166,7 @@ const Home = () => {
         <img
           src={sareeBanner}
           alt="sareeBanner"
-          className="h-[200px]  w-full object-cover"
+          className="h-50 w-full object-cover"
         />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
@@ -157,12 +176,24 @@ const Home = () => {
       </section>
 
       {/* Customer Service */}
-      <Suspense fallback={<div>Loading Testimonial...</div>}>
+      <Suspense
+        fallback={
+          <div>
+            <CircularUnderLoad />
+          </div>
+        }
+      >
         <TestimonialsSection />
       </Suspense>
 
       {/* services section */}
-      <Suspense fallback={<div>Loading services...</div>}>
+      <Suspense
+        fallback={
+          <div>
+            <CircularUnderLoad />
+          </div>
+        }
+      >
         <ServicesSection />
       </Suspense>
 

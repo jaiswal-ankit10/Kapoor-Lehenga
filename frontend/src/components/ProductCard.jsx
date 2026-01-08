@@ -76,9 +76,15 @@ const ProductCard = ({ product }) => {
   return (
     <div
       onClick={handleClick}
-      className="group w-[260px] shrink-0 overflow-hidden hover:shadow-xl duration-300 cursor-pointer relative bg-white"
+      className="group w-65 shrink-0 overflow-hidden hover:shadow-xl duration-300 cursor-pointer relative bg-white"
     >
-      {/* <ToastContainer /> */}
+      <div className="absolute top-0 right-0 z-10 group-hover:hidden transition-opacity duration-300">
+        <div className="bg-[#E41E26] text-white text-[10px] font-bold px-2 py-1 flex flex-col items-center leading-none">
+          <span>{actualProduct.discount}%</span>
+          <span>OFF</span>
+        </div>
+        <div className="w-0 h-0 border-l-15 border-l-transparent border-r-15 border-r-transparent border-t-8 border-t-[#E41E26]"></div>
+      </div>
       {/* Wishlist Icon */}
       <button
         onClick={toggleWishlist}
@@ -92,7 +98,7 @@ const ProductCard = ({ product }) => {
       </button>
 
       {/* Slider */}
-      <div className="relative h-[340px]" onClick={(e) => e.stopPropagation()}>
+      <div className="relative h-85" onClick={(e) => e.stopPropagation()}>
         <Swiper
           navigation={true}
           modules={[Navigation]}
@@ -114,7 +120,7 @@ const ProductCard = ({ product }) => {
         {/* Add to Cart button */}
         <button
           onClick={addItemToCart}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[80%] max-w-[200px] bg-white py-2 font-semibold text-sm opacity-0 group-hover:opacity-100 duration-300 z-20 cursor-pointer"
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[80%] max-w-50 bg-white py-2 font-semibold text-sm opacity-0 group-hover:opacity-100 duration-300 z-20 cursor-pointer"
         >
           {isWishlisted ? "Move to Bag" : "Add to Cart"}
         </button>

@@ -87,7 +87,7 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
   };
 
   return (
-    <div className="w-[250px] md:w-[250px]">
+    <div className="w-62.5">
       <h3 className="text-lg font-semibold">Filter</h3>
 
       {/*  CATEGORY / SUBCATEGORY  */}
@@ -105,7 +105,7 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
 
         {/* Category List */}
         {open.category && (
-          <div className="max-h-[260px] overflow-y-auto px-4 py-3 space-y-4">
+          <div className="max-h-65 overflow-y-auto px-4 py-3 space-y-4">
             {visibleCategories.flatMap((cat) =>
               cat.subCategories.map((sc) => (
                 <label
@@ -220,12 +220,15 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
         {open.color && (
           <div className="pl-2 mt-2 flex flex-col gap-1 text-sm">
             {colors.map((color) => (
-              <label key={color} className="flex items-center gap-2 capitalize">
+              <label
+                key={color}
+                className="flex items-center gap-2 capitalize cursor-pointer"
+              >
                 <input
                   type="checkbox"
                   checked={selectedColor.includes(color)}
                   onChange={() => toggleColor(color)}
-                  className="w-5 h-5"
+                  className="w-5 h-5 cursor-pointer"
                 />
                 {color}
               </label>
@@ -249,11 +252,15 @@ const FilterSidebar = ({ selectedSubCategory, products }) => {
         {open.discount && (
           <div className="pl-2 mt-2 flex flex-col gap-1 text-sm">
             {[10, 20, 30, 40, 50, 60, 70, 80].map((value) => (
-              <label key={value} className="flex items-center gap-2">
+              <label
+                key={value}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <input
                   type="checkbox"
                   checked={discount === value}
                   onChange={() => handleDiscount(value)}
+                  className="w-5 h-5 cursor-pointer"
                 />
                 {value}% and above
               </label>
