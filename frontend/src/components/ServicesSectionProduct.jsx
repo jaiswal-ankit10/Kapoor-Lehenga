@@ -24,13 +24,13 @@ const services = [
 
 const ServicesSectionProduct = () => {
   return (
-    <section className="py-12">
-      <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+    <section className="py-8">
+      <div className="container mx-auto grid grid-cols-2  lg:grid-cols-4 gap-8 md:gap-4 lg-gap-8 text-center">
         {services.map((item, index) => (
           <div key={index} className="flex flex-col items-center gap-2 ">
             <img src={item.icon} alt={item.title} className="w-10 h-10" />
 
-            <h3 className="font-medium text-sm tracking-wide">{item.title}</h3>
+            <h3 className="font-medium text-xs tracking-wide">{item.title}</h3>
           </div>
         ))}
       </div>

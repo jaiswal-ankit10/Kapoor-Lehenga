@@ -131,8 +131,8 @@ const Header = () => {
           className="lg:hidden cursor-pointer mt-1"
           onClick={() => setOpenMenu(!openMenu)}
         >
-          <div className="w-6 h-0.5 bg-white mb-[5px]"></div>
-          <div className="w-6 h-0.5 bg-white mb-[5px]"></div>
+          <div className="w-6 h-0.5 bg-white mb-1.25"></div>
+          <div className="w-6 h-0.5 bg-white mb-1.25"></div>
           <div className="w-6 h-0.5 bg-white"></div>
         </div>
         {/* Logo */}
@@ -142,12 +142,9 @@ const Header = () => {
         >
           <img
             src={logo}
-            className="hidden  md:block md:w-16 lg:w-[84px] lg:h-[81px]"
+            className="hidden  md:block md:w-16 lg:w-21 lg:h-20.25"
           />
-          <img
-            src={kapoor}
-            className="hidden md:block  lg:w-[180px] lg:h-[69px]"
-          />
+          <img src={kapoor} className="hidden md:block  lg:w-45 lg:h-17.25" />
           {/* mobile logo */}
           <img
             src={mobileLogo}
@@ -409,7 +406,7 @@ const Header = () => {
               </div>
 
               {hoveredCategory === c.id && c.subCategories?.length > 0 && (
-                <div className="absolute top-full -left-12 mt-2 bg-white text-black rounded shadow-lg min-w-[200px] z-50">
+                <div className="absolute top-full -left-12 mt-2 bg-white text-black rounded shadow-lg min-w-50 z-50">
                   {c.subCategories.map((sc) => (
                     <div
                       key={sc.id}

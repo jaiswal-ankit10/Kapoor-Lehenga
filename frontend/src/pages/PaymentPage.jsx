@@ -70,14 +70,14 @@ const PaymentPage = () => {
   return (
     <div className="w-full min-h-screen bg-white">
       <ToastContainer />
-      <div className="bg-[#E9B159] p-5 flex justify-center text-white text-xl font-semibold">
+      <div className="bg-[#E9B159] p-4 flex justify-center">
         <Link to={"/"}>
-          <img src={logo} alt="logo" />
+          <img src={logo} alt="logo" className="w-32 sm:w-40" />
         </Link>
       </div>
 
       {/* Steps */}
-      <div className="flex justify-center items-center py-10 ">
+      <div className="flex justify-center items-center py-6 ">
         <img src={paymentBar} alt="" className="w-[80%] sm:w-[60%]" />
       </div>
 

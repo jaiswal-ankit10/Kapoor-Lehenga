@@ -159,11 +159,11 @@ const ProductDetail = () => {
   return (
     <>
       <RoutesSection breadcrumb={breadcrumb} />
-      <div className="max-w-xl lg:max-w-7xl mx-auto px-1 lg:px-10 py-10 flex gap-10 flex-col lg:flex-row">
+      <div className="max-w-xl lg:max-w-7xl mx-auto px-1 lg:px-2 py-10 flex gap-6 flex-col lg:flex-row">
         <ToastContainer />
 
         {/* LEFT PANEL for big screen  */}
-        <div className="hidden  lg:sticky md:top-5 self-start lg:flex gap-6 flex-col lg:flex-row">
+        <div className="hidden  lg:sticky md:top-5 self-start lg:flex gap-4 flex-col lg:flex-row">
           <div className="flex gap-6 flex-row md:flex-col overflow-auto max-h-105 lg:max-h-155">
             {(product.images || [product.thumbnail])
               .filter(Boolean)
