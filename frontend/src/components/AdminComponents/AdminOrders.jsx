@@ -201,12 +201,12 @@ export default function AdminOrders() {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-gray-600">
               {orders?.map((order) => (
-                <tr key={order.id} className="border-t">
+                <tr key={order.id} className="border-t border-gray-300">
                   <td className="px-5 py-4">
                     <div
-                      className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center"
+                      className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center cursor-pointer"
                       onClick={() => openEditModal(order)}
                     >
                       <SquarePen size={16} />

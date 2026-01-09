@@ -13,7 +13,7 @@ const CategoryManager = () => {
   const [parentCategoryId, setParentCategoryId] = useState("");
   const breadcrumb = [breadcrumbAdmin.home, breadcrumbAdmin.categories];
 
-  /* ---------------- FETCH ---------------- */
+  /*  FETCH  */
   const fetchCategories = async () => {
     try {
       const res = await axiosInstance.get("/categories");
@@ -27,7 +27,7 @@ const CategoryManager = () => {
     fetchCategories();
   }, []);
 
-  /* ---------------- SUBMIT ---------------- */
+  /*  SUBMIT  */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -72,7 +72,7 @@ const CategoryManager = () => {
       />
       <ToastContainer />
 
-      {/* ---------------- TABLE ---------------- */}
+      {/*  TABLE  */}
       <div className="bg-white rounded shadow overflow-x-auto p-2">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-gray-500">
@@ -81,7 +81,7 @@ const CategoryManager = () => {
               <th className="px-5 py-3 text-left">SubCategories</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="text-gray-600">
             {categories.map((c) => (
               <tr key={c.id} className="border-b border-gray-200">
                 <td className="px-5 py-3 capitalize font-medium">{c.name}</td>
@@ -109,7 +109,7 @@ const CategoryManager = () => {
         </table>
       </div>
 
-      {/* ================= MODAL ================= */}
+      {/*  MODAL  */}
       {openModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white w-full max-w-md rounded shadow-lg">

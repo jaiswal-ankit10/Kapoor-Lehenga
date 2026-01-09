@@ -1,22 +1,65 @@
 import React, { useState } from "react";
 import { FaStar } from "react-icons/fa";
-import { reviewsData } from "../utils/reviewsData";
+// import { reviewsData } from "../utils/reviewsData";
 import {
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowUp,
 } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchReviews } from "../services/reviewService";
 
-const ReviewSection = () => {
-  const { average, totalReviews, distribution, topReviews } = reviewsData;
-  const [openDropdown, setOpenDropdown] = useState(false);
+const ReviewSection = ({ productId }) => {
+  // const { average, totalReviews, distribution, topReviews } = reviewsData;
+  const dispatch = useDispatch();
+  const { reviews, loading, error } = useSelector((state) => state.review);
+  const [showAllReview, setShowAllReview] = useState(false);
+  const visibleReviews = showAllReview ? reviews : reviews.slice(0, 3);
+
+  const imageBaseUrl = import.meta.env.VITE_BACKEND_URL;
+  const resolveImage = (url) =>
+    url?.startsWith("http") ? url : `${imageBaseUrl}${url}`;
+
+  // console.log(reviews);
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        await dispatch(fetchReviews(productId)).unwrap();
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (productId) {
+      loadReviews();
+    }
+  }, [dispatch, productId]);
+
+  const totalReviews = reviews.length;
+  const average =
+    totalReviews === 0
+      ? 0
+      : (reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(
+          1
+        );
+  const distribution = [1, 2, 3, 4, 5].reduce((acc, star) => {
+    acc[star] =
+      totalReviews === 0
+        ? 0
+        : Math.round(
+            (reviews.filter((r) => r.rating === star).length / totalReviews) *
+              100
+          );
+    return acc;
+  }, {});
 
   return (
-    <div className="max-w-6xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 gap-10">
+    <div className="max-w-6xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 gap-20 p-6 border-t border-gray-200">
       {/* LEFT — Rating Summary */}
-      <div className=" p-6 ">
+      <div>
         <h2 className="text-xl font-semibold mb-4">Customer reviews</h2>
 
-        <div className="flex gap-8 items-center shadow-sm rounded-lg py-2 px-4">
+        <div className="flex gap-8 items-center shadow-lg rounded-lg py-2 px-4">
           <div className="flex flex-col items-center">
             <h1 className="text-5xl font-bold">{average}</h1>
             <div className="flex text-yellow-500">
@@ -31,7 +74,9 @@ const ReviewSection = () => {
                 />
               ))}
             </div>
-            <p className="text-gray-500 text-sm mt-1">{totalReviews} Reviews</p>
+            <p className="text-gray-500 text-sm mt-1">
+              {totalReviews} {totalReviews > 1 ? "reviews" : "review"}
+            </p>
           </div>
 
           {/* Rating Distribution */}
@@ -56,55 +101,69 @@ const ReviewSection = () => {
       <div>
         <h2 className="text-xl font-semibold mb-4">Top reviews from India</h2>
 
-        {topReviews.map((review, i) => (
-          <div key={i} className="mb-6">
+        {loading && <p>Loading reviews...</p>}
+
+        {!loading && reviews.length === 0 && (
+          <p className="text-gray-500">No reviews yet</p>
+        )}
+        {error && <p>{error}</p>}
+        {reviews.map((review) => (
+          <div key={review.id} className="mb-6">
             <div className="flex items-center gap-3">
               <img
-                src={review.avatar}
+                src={review.user?.avatar || "/avatar.png"}
                 alt=""
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>
-                <h4 className="font-semibold">{review.user}</h4>
-                <div className="flex items-center text-sm text-yellow-500">
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <FaStar
-                      key={index}
-                      className={
-                        index < review.rating
-                          ? "text-yellow-500"
-                          : "text-gray-300"
-                      }
-                    />
-                  ))}
+                <h4 className="font-semibold">{review.user?.fullName}</h4>
+
+                <div className="flex gap-2">
+                  <div className="flex text-yellow-500 text-sm">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <FaStar
+                        key={i}
+                        className={
+                          i < review.rating
+                            ? "text-yellow-500"
+                            : "text-gray-300"
+                        }
+                      />
+                    ))}
+                  </div>
+
+                  <p className="text-xs text-gray-500">
+                    | {new Date(review.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500">{review.date}</p>
               </div>
             </div>
 
-            <p className="text-sm text-gray-600 mt-2">{review.text}</p>
+            <p className="text-sm text-gray-600 mt-3 ml-13 ">
+              {review.comment}
+            </p>
 
-            {review.images.length > 0 && (
-              <div className="flex gap-2 mt-3">
-                {review.images.map((img, idx) => (
+            {visibleReviews.images?.length > 0 && (
+              <div className="flex gap-2 mt-3 ml-13">
+                {review.images?.filter(Boolean).map((img, idx) => (
                   <img
                     key={idx}
-                    src={img}
-                    alt="review-img"
-                    className="w-[90px] h-[110px] object-cover rounded"
+                    src={resolveImage(img)}
+                    className="w-24 h-28 object-cover rounded"
                   />
                 ))}
               </div>
             )}
           </div>
         ))}
+
         <hr className="mb-10 text-gray-300" />
         <p
-          className="text-[#03A685] text-xl mb-5 flex items-center gap-6"
-          onClick={() => setOpenDropdown(!openDropdown)}
+          className="text-[#03A685] text-xl mb-5 flex items-center gap-6 cursor-pointer"
+          onClick={() => setShowAllReview(!showAllReview)}
         >
-          See more reviews
-          {openDropdown ? (
+          {showAllReview ? "See less reviews" : "See more reviews"}
+          {showAllReview ? (
             <MdOutlineKeyboardArrowUp />
           ) : (
             <MdOutlineKeyboardArrowDown />

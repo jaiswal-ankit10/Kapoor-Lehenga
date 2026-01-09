@@ -10,11 +10,28 @@ import {
 
 import { breadcrumbRoutes } from "../utils/breadcrumbRoutes";
 import RoutesSection from "../components/RoutesSection";
+import ReviewModal from "../components/ReviewModal";
+
+import razorpay from "../assets/icons/razorpay.png";
+import { BsCashCoin } from "react-icons/bs";
 
 export default function OrderDetail() {
+  const statusStyle = {
+    PENDING: "bg-yellow-100 text-yellow-600",
+    CONFIRMED: "bg-blue-100 text-blue-600",
+    COMPLETED: "bg-green-100 text-green-600",
+    CANCELLED: "bg-red-100 text-red-500",
+    PROCESSING: "bg-blue-100 text-blue-500",
+    RETURNED: "bg-gray-100 text-gray-500",
+    DELIVERED: "bg-green-400 text-white",
+  };
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
+
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const { order, loading, error } = useSelector((state) => state.order);
   useEffect(() => {
@@ -89,7 +106,14 @@ export default function OrderDetail() {
 
           <div>
             <h3 className="font-semibold mb-2">Payment Methods</h3>
-            <p className="text-sm capitalize">{order.paymentMethod}</p>
+            <p className="text-sm capitalize flex items-center">
+              <img
+                src={order.paymentMethod === "COD" ? <BsCashCoin /> : razorpay}
+                alt="payment-method"
+                className="w-8"
+              />
+              {order.paymentMethod}
+            </p>
           </div>
 
           <div>
@@ -123,33 +147,64 @@ export default function OrderDetail() {
         {order.items.map((item) => (
           <div
             key={item.id}
-            className="flex gap-4 border border-gray-100 rounded-lg p-4 mb-5 bg-white shadow-sm"
+            className="flex flex-col gap-2 md:gap-0 md:flex-row justify-between items-center  border border-gray-100 rounded-lg p-4 mb-5 bg-white shadow-sm"
           >
-            <img
-              src={item.product.images?.[0]}
-              alt={item.product.title}
-              className="w-28 h-28 rounded-md object-cover"
-            />
+            <div className="flex gap-3">
+              <img
+                src={item.product.images?.[0]}
+                alt={item.product.title}
+                className="w-28 h-28 rounded-md object-fit"
+              />
 
-            <div className="flex-1">
-              <h4 className="font-semibold text-gray-800 mb-1">
-                {item.product.title}
-              </h4>
+              <div className="">
+                <h4 className="font-semibold text-gray-800 mb-1">
+                  {item.product.title}
+                </h4>
 
-              <p className="text-sm text-gray-700 mb-1">
-                Qty: {item.quantity} | ₹{item.price}
-              </p>
+                <div className="flex gap-4">
+                  <p className="text-sm text-gray-700 mb-1">
+                    Qty: {item.quantity}
+                  </p>
+                  <p className="text-sm text-gray-700 mb-1">
+                    ₹{item.price * item.quantity}
+                  </p>
+                  <p className="text-sm text-gray-700 mb-1">
+                    ({item.quantity} item)
+                  </p>
+                </div>
 
-              <span
-                className={`text-xs px-3 py-1 ${
-                  order.status === "Cancelled"
-                    ? "bg-red-200 text-red-500"
-                    : "bg-gray-200"
-                } rounded-md inline-block`}
-              >
-                {order.status}
-              </span>
+                <span
+                  className={`text-xs px-3 py-1 ${
+                    statusStyle[order.status]
+                  } rounded-md inline-block`}
+                >
+                  {order.status}
+                </span>
+              </div>
             </div>
+            {order.status === "DELIVERED" && (
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => navigate(`/products/${item.productId}`)}
+                  className="bg-[#E9B159] text-white py-2 text-xs cursor-pointer"
+                >
+                  Buy it again
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedProduct({
+                      id: item.productId,
+                      title: item.product.title,
+                      images: item.product.images,
+                    });
+                    setIsReviewOpen(true);
+                  }}
+                  className="bg-[#F4F4F4] text-black py-2 text-xs px-3 cursor-pointer"
+                >
+                  Write Product Review
+                </button>
+              </div>
+            )}
           </div>
         ))}
         {error && (
@@ -179,6 +234,12 @@ export default function OrderDetail() {
           )}
         </div>
       </div>
+      {isReviewOpen && (
+        <ReviewModal
+          product={selectedProduct}
+          onClose={() => setIsReviewOpen(false)}
+        />
+      )}
     </>
   );
 }

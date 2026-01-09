@@ -46,6 +46,7 @@ model User {
   addresses    Address[]
   wishlist     Wishlist?
   couponUsages CouponUsage[]
+  reviews      Review[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -95,6 +96,8 @@ model Product {
 
   ratings      Float @default(0)
   totalReviews Int   @default(0)
+
+  reviews      Review[]
 
   isDeleted Boolean @default(false)
 
@@ -330,4 +333,20 @@ model WishlistItem {
   product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([wishlistId, productId])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int
+  comment   String
+  isVerifiedPurchase Boolean @default(false)
+  images    Json?
+
+  productId String   
+  userId    String  
+  user      User     @relation(fields: [userId],references: [id],onDelete: Cascade)
+  product   Product  @relation(fields: [productId],references: [id],onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([userId, productId])
 }

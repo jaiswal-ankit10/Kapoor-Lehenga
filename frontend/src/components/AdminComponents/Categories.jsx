@@ -101,7 +101,7 @@ const Categories = () => {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-gray-600">
               {products.map((p) => (
                 <tr key={p._id} className="border-t border-gray-300">
                   <td className="px-5 py-4 flex items-center gap-2">

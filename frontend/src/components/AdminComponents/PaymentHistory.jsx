@@ -156,7 +156,7 @@ const PaymentHistory = () => {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-gray-600">
               {orders?.map((order) => (
                 <tr key={order._id} className="border-t border-gray-300">
                   <td className="px-5 py-4">{order.user?.email}</td>

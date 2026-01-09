@@ -79,7 +79,7 @@ export default function Users() {
           <table className="w-full text-left">
             <thead className="bg-gray-50 text-gray-500">
               <tr className="text-sm text-gray-500">
-                <th className="px-3 py-3 text-left">Name</th>
+                <th className="px-3 py-3 text-center">Name</th>
                 <th className="px-4 py-3 text-left">Action</th>
                 <th className="px-3 py-3 text-center">Email</th>
                 <th className="px-3 py-3 text-center">Mobile</th>
@@ -87,10 +87,13 @@ export default function Users() {
                 <th className="px-3 py-3 text-center">Joined</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-gray-600">
               {users.map((u) => (
                 <tr key={u._id} className="border-t border-gray-300">
-                  <td className="py-3 px-3 text-left">{u.fullName}</td>
+                  <td className="py-3 px-4 text-center flex gap-2">
+                    <img src="/avatar.png" alt="avatar" className="w-6" />
+                    {u.fullName}
+                  </td>
                   <td className="py-3 px-5 text-center">
                     <button
                       className="bg-red-100 w-9 h-9 rounded-full flex items-center justify-center"

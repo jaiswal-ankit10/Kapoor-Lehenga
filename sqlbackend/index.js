@@ -56,6 +56,7 @@ import addressRoutes from "./routes/address.routes.js";
 import bannerRoutes from "./routes/banner.routes.js";
 import couponRoutes from "./routes/coupon.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
 
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/auth", authRegister);
@@ -67,6 +68,7 @@ app.use("/api/v1", addressRoutes);
 app.use("/api/v1/banners", bannerRoutes);
 app.use("/api/v1/coupons", couponRoutes);
 app.use("/api/v1/categories", categoryRoutes);
+app.use("/api/v1/review", reviewRoutes);
 
 app.use((req, res, next) => {
   res.status(404).json({

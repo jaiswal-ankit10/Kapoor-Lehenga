@@ -417,7 +417,7 @@ const ProductDetail = () => {
 
       <SimilarProductsSlider products={products} />
       <MoreProducts products={products} />
-      <ReviewSection />
+      <ReviewSection productId={id} />
     </>
   );
 };

@@ -39,6 +39,7 @@ const MyOrder = () => {
     CANCELLED: "bg-red-100 text-red-500",
     PROCESSING: "bg-blue-100 text-blue-500",
     RETURNED: "bg-gray-100 text-gray-500",
+    DELIVERED: "bg-green-400 text-white",
   };
 
   const [showAll, setShowAll] = useState(false);

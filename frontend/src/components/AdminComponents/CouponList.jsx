@@ -106,7 +106,7 @@ const CouponList = () => {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-gray-600">
               {coupons?.map((coupon) => (
                 <tr key={coupon.id}>
                   <td className="px-5 py-4 flex gap-2">

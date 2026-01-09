@@ -240,7 +240,7 @@ const Banner = () => {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-gray-600">
               {banners?.map((banner) => (
                 <tr key={banner.id} className="border-t">
                   <td className="px-5 py-4 text-center flex items-center gap-2">

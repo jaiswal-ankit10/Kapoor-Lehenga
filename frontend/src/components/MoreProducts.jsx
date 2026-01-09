@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import ProductCard from "./ProductCard";
 
@@ -37,7 +37,7 @@ const MoreProducts = ({ products }) => {
         window.removeEventListener("resize", toggleArrows);
       }
     };
-  }, [products]); // Re-run if products list changes
+  }, [products]);
 
   const slide = (offset) => {
     if (sliderRef.current) {
@@ -46,14 +46,14 @@ const MoreProducts = ({ products }) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto mt-10 relative group">
-      <h1 className="text-2xl font-semibold mb-4">More Products For Ethnic</h1>
+    <div className="max-w-7xl mx-auto mt-10 relative">
+      <h1 className="text-2xl font-semibold mb-4">More Products</h1>
 
       {/* Left Arrow */}
       {showLeftArrow && (
         <button
-          onClick={() => slide(-350)}
-          className="hidden lg:flex absolute -left-5 top-1/2 transform -translate-y-1/2 bg-white shadow-lg p-3 rounded-full z-50 cursor-pointer hover:bg-gray-100 transition-all items-center justify-center border border-gray-200"
+          onClick={sliderRef}
+          className="hidden lg:block absolute -left-1 top-1/2 transform -translate-y-1/2 bg-white shadow-md p-2 rounded-full z-50 cursor-pointer"
         >
           <FaChevronLeft />
         </button>
