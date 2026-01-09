@@ -4,6 +4,7 @@ import { breadcrumbAdmin } from "../../utils/breadcrumbRoutes";
 import PageHeader from "./PageHeader";
 import StatCard from "./StatCard";
 import { Users, ShoppingCart, TrendingUp, Box } from "lucide-react";
+import Graph from "./Graph";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ users: 0, orders: 0, revenue: 0 });
@@ -24,7 +25,7 @@ export default function AdminDashboard() {
   return (
     <div>
       <PageHeader title={"Dashboard"} breadcrumbs={breadcrumb} />
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title={"Total Users"}
           value={stats.totalUsers}
@@ -57,6 +58,10 @@ export default function AdminDashboard() {
           iconColor={"text-gray-400"}
           iconBackgroundColor={"bg-gray-100"}
         />
+      </div>
+
+      <div className="mt-15">
+        <Graph />
       </div>
     </div>
   );

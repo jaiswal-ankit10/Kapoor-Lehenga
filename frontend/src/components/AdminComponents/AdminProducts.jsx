@@ -8,11 +8,10 @@ import PageHeader from "./PageHeader";
 import { Edit, Plus, Search, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
+import usePagination from "../../hooks/usePagination";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -26,10 +25,15 @@ export default function AdminProducts() {
   };
 
   //pagination
-  const totalPages = Math.ceil(products.length / rowsPerPage);
-
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
+  const {
+    totalPages,
+    startIndex,
+    endIndex,
+    currentPage,
+    setCurrentPage,
+    rowsPerPage,
+    setRowsPerPage,
+  } = usePagination(products);
 
   const visibleProducts = products.slice(startIndex, endIndex);
 
@@ -71,7 +75,7 @@ export default function AdminProducts() {
               <option>Delete All</option>
             </select>
             <select
-              className="border border-gray-300 rounded-md px-3  py-2 text-sm text-gray-600 outline-none"
+              className="border border-gray-300 rounded-md px-3  py-2 text-sm text-gray-600 outline-none cursor-pointer"
               value={rowsPerPage}
               onChange={(e) => {
                 setRowsPerPage(Number(e.target.value));
@@ -196,7 +200,7 @@ export default function AdminProducts() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`w-8 h-8 rounded-full text-sm font-medium
+                    className={`w-8 h-8 rounded-full text-sm font-medium cursor-pointer
           ${
             currentPage === page
               ? "bg-[#E9B159] text-white"

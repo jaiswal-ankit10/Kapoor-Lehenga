@@ -150,6 +150,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
     todaysRevenueAgg,
     monthlyRevenueAgg,
     yearlyRevenueAgg,
+    monthlyOrders,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.order.count(),
@@ -194,7 +195,59 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
       },
       _sum: { totalAmount: true },
     }),
+
+    prisma.order.count({
+      where: {
+        createdAt: { gte: startOfMonth, lte: endOfMonth },
+        status: { notIn: ["CANCELLED", "RETURNED"] },
+      },
+    }),
   ]);
+  const rawMonthlyData = await prisma.$queryRaw`
+  SELECT
+    YEAR(createdAt) AS year,
+    MONTH(createdAt) AS month,
+    COUNT(*) AS orders,
+    SUM(totalAmount) AS revenue
+  FROM \`order\`
+  WHERE status NOT IN ('CANCELLED', 'RETURNED')
+    AND createdAt >= DATE_SUB(CURDATE(), INTERVAL 11 MONTH)
+  GROUP BY year, month
+  ORDER BY year, month;
+`;
+
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const chartData = [];
+
+  for (let i = 11; i >= 0; i--) {
+    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+
+    const found = rawMonthlyData.find(
+      (d) => Number(d.year) === year && Number(d.month) === month
+    );
+
+    chartData.push({
+      month: `${monthNames[month - 1]} ${year}`,
+      orders: found ? Number(found.orders) : 0,
+      revenue: found ? Number(found.revenue) : 0,
+    });
+  }
 
   res.json({
     success: true,
@@ -209,6 +262,8 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
       todaysRevenue: todaysRevenueAgg._sum.totalAmount || 0,
       monthlyRevenue: monthlyRevenueAgg._sum.totalAmount || 0,
       yearlyRevenue: yearlyRevenueAgg._sum.totalAmount || 0,
+      monthlyOrders,
     },
+    chartData: chartData,
   });
 });

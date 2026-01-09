@@ -39,6 +39,19 @@ const Categories = () => {
     fetchProducts();
   }, []);
 
+  //pagination
+  const {
+    totalPages,
+    startIndex,
+    endIndex,
+    currentPage,
+    setCurrentPage,
+    rowsPerPage,
+    setRowsPerPage,
+  } = usePagination(products);
+
+  const visibleProducts = products.slice(startIndex, endIndex);
+
   const breadcrumb = [breadcrumbAdmin.home, breadcrumbAdmin.categories];
   return (
     <div>
@@ -102,7 +115,7 @@ const Categories = () => {
               </tr>
             </thead>
             <tbody className="text-gray-600">
-              {products.map((p) => (
+              {visibleProducts.map((p) => (
                 <tr key={p._id} className="border-t border-gray-300">
                   <td className="px-5 py-4 flex items-center gap-2">
                     <div

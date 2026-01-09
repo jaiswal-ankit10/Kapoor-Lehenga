@@ -8,6 +8,7 @@ import { fetchCoupons } from "../../redux/couponSlice";
 import dayjs from "dayjs";
 import { ToastContainer } from "react-toastify";
 import axiosInstance from "../../api/axiosInstance";
+import usePagination from "../../hooks/usePagination";
 
 const CouponList = () => {
   const dispatch = useDispatch();
@@ -36,6 +37,18 @@ const CouponList = () => {
     dispatch(fetchCoupons());
   }, [dispatch]);
 
+  //pagination
+  const {
+    totalPages,
+    startIndex,
+    endIndex,
+    currentPage,
+    setCurrentPage,
+    rowsPerPage,
+    setRowsPerPage,
+  } = usePagination(coupons);
+  const visibleCoupons = coupons.slice(startIndex, endIndex);
+
   return (
     <div>
       <ToastContainer />
@@ -51,10 +64,18 @@ const CouponList = () => {
 
       <div className="bg-white p-4 rounded shadow-xl my-6">
         <div className="flex flex-wrap gap-4 items-center justify-between p-5 ">
-          <select className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600">
-            <option>10 rows</option>
-            <option>20 rows</option>
-            <option>50 rows</option>
+          <select
+            className="border border-gray-300 rounded-md px-3  py-2 text-sm text-gray-600 outline-none cursor-pointer"
+            value={rowsPerPage}
+            onChange={(e) => {
+              setRowsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+          >
+            <option value={5}>5 rows</option>
+            <option value={10}>10 rows</option>
+            <option value={20}>20 rows</option>
+            <option value={50}>50 rows</option>
           </select>
 
           <div className="flex items-center gap-3">
@@ -107,7 +128,7 @@ const CouponList = () => {
               </tr>
             </thead>
             <tbody className="text-gray-600">
-              {coupons?.map((coupon) => (
+              {visibleCoupons?.map((coupon) => (
                 <tr key={coupon.id}>
                   <td className="px-5 py-4 flex gap-2">
                     <div
@@ -160,6 +181,50 @@ const CouponList = () => {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-5 flex justify-between items-center">
+          <p className="text-gray-300 text-sm">{`Showing ${
+            startIndex + 1
+          } to ${endIndex} of ${coupons.length} results`}</p>
+          <div className="flex ">
+            <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                className="px-2 text-gray-500 disabled:opacity-40"
+              >
+                ‹
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 rounded-full text-sm font-medium cursor-pointer
+          ${
+            currentPage === page
+              ? "bg-[#E9B159] text-white"
+              : "text-gray-600 hover:bg-gray-200"
+          }
+        `}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(p + 1, totalPages))
+                }
+                className="px-2 text-gray-500 disabled:opacity-40"
+              >
+                ›
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       {showCouponForm && (

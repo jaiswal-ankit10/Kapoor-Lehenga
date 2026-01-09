@@ -5,9 +5,9 @@ import { Plus, Save, Search, SquarePen, Trash } from "lucide-react";
 import axiosInstance from "../../api/axiosInstance";
 import dayjs from "dayjs";
 import { toast, ToastContainer } from "react-toastify";
+import usePagination from "../../hooks/usePagination";
 
 const Banner = () => {
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [banners, setBanners] = useState([]);
   const [showAddBannerForm, setShowAddBannerForm] = useState(false);
   const [editBanner, setEditBanner] = useState(null);
@@ -171,6 +171,18 @@ const Banner = () => {
   useEffect(() => {
     fetchAllBanner();
   }, []);
+  //pagination
+  const {
+    totalPages,
+    startIndex,
+    endIndex,
+    currentPage,
+    setCurrentPage,
+    rowsPerPage,
+    setRowsPerPage,
+  } = usePagination(banners);
+
+  const visibleBanners = banners.slice(startIndex, endIndex);
 
   return (
     <div>
@@ -195,7 +207,7 @@ const Banner = () => {
               <option>Delete All</option>
             </select>
             <select
-              className="border border-gray-300 rounded-md px-3  py-2 text-sm text-gray-600 outline-none"
+              className="border border-gray-300 rounded-md px-3  py-2 text-sm text-gray-600 outline-none cursor-pointer"
               value={rowsPerPage}
               onChange={(e) => {
                 setRowsPerPage(Number(e.target.value));
@@ -241,7 +253,7 @@ const Banner = () => {
               </tr>
             </thead>
             <tbody className="text-gray-600">
-              {banners?.map((banner) => (
+              {visibleBanners?.map((banner) => (
                 <tr key={banner.id} className="border-t">
                   <td className="px-5 py-4 text-center flex items-center gap-2">
                     <div
@@ -275,6 +287,50 @@ const Banner = () => {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-5 flex justify-between items-center">
+          <p className="text-gray-300 text-sm">{`Showing ${
+            startIndex + 1
+          } to ${endIndex} of ${banners.length} results`}</p>
+          <div className="flex ">
+            <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                className="px-2 text-gray-500 disabled:opacity-40"
+              >
+                ‹
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 rounded-full text-sm font-medium cursor-pointer
+          ${
+            currentPage === page
+              ? "bg-[#E9B159] text-white"
+              : "text-gray-600 hover:bg-gray-200"
+          }
+        `}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(p + 1, totalPages))
+                }
+                className="px-2 text-gray-500 disabled:opacity-40"
+              >
+                ›
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       {showAddBannerForm && (
